@@ -1,5 +1,21 @@
 # Getting Started
 
+### Create local properties file
+
+Create a `application-local.properties` file under `src/main/resource` with following structure
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/<db_name>?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+spring.datasource.username=<db_username>
+spring.datasource.password=<db_password>
+```
+
+update:
+- `<db_name>` with database name
+- `<db_username>` with username eg. root
+- `<db_password>` with db password
+- edit the run config in intellij idea, add `--spring.profiles.active=local` as cli argument
+
+
 ### Reference Documentation
 For further reference, please consider the following sections:
 
