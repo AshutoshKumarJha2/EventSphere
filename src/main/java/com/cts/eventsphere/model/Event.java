@@ -20,8 +20,8 @@ import java.time.LocalDateTime;
 @Data
 public class Event {
     @Id
-            @GeneratedValue(strategy = GenerationType.UUID)
-            @Column(columnDefinition = "CHAR(36)")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(columnDefinition = "CHAR(36)")
     private String eventId;
 
     @Column(nullable = false, length = 150)
