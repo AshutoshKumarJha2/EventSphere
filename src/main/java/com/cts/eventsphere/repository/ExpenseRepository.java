@@ -4,7 +4,7 @@ import com.cts.eventsphere.model.Expense;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * [Detailed description of the class's responsibility]
+ * JPA repository for Expense Entity
  *
  * @author 2480081
  * @version 1.0

@@ -1,12 +1,10 @@
 package com.cts.eventsphere.dto.mapper;
 
-import com.cts.eventsphere.dto.BudgetResponseDto;
 import com.cts.eventsphere.dto.PaymentResponseDto;
-import com.cts.eventsphere.model.Budget;
 import com.cts.eventsphere.model.Payment;
 
 /**
- * [Detailed description of the class's responsibility]
+ * Mapper for converting Payment Entity to payment response dto
  *
  * @author 2480081
  * @version 1.0

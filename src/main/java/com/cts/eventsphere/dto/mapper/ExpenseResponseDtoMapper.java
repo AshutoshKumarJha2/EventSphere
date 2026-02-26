@@ -1,13 +1,11 @@
 package com.cts.eventsphere.dto.mapper;
 
-import com.cts.eventsphere.dto.EventResponseDto;
 import com.cts.eventsphere.dto.ExpenseResponseDto;
-import com.cts.eventsphere.model.Event;
 import com.cts.eventsphere.model.Expense;
 import org.springframework.stereotype.Component;
 
 /**
- * [Detailed description of the class's responsibility]
+ * Mapper for converting Expense Entity to ExpenseResponseDto
  *
  * @author 2480081
  * @version 1.0

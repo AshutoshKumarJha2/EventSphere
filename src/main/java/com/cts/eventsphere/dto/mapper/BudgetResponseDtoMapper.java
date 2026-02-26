@@ -1,12 +1,12 @@
 package com.cts.eventsphere.dto.mapper;
 
 import com.cts.eventsphere.dto.BudgetResponseDto;
-import com.cts.eventsphere.dto.ExpenseResponseDto;
+
 import com.cts.eventsphere.model.Budget;
-import com.cts.eventsphere.model.Expense;
+
 
 /**
- * [Detailed description of the class's responsibility]
+ * Mapper for converting Budget entity to BudgetResponseDto
  *
  * @author 2480081
  * @version 1.0

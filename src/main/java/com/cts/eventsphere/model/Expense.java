@@ -16,7 +16,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
+
 
 /**
  * Expense entity representing  financial transactions which is connected to an Event.

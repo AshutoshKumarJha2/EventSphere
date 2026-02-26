@@ -6,7 +6,7 @@ import com.cts.eventsphere.model.data.PaymentStatus;
 import java.math.BigDecimal;
 
 /**
- * [Detailed description of the class's responsibility]
+ * Payment Response Dto representing payment transaction details
  *
  * @author 2480081
  * @version 1.0
