@@ -1,7 +1,5 @@
 package com.cts.eventsphere.dto;
 
-import lombok.Data;
-
 import java.time.LocalDateTime;
 
 /**
@@ -12,7 +10,7 @@ import java.time.LocalDateTime;
  * @since 26-02-2026
  */
 
-public record FeedbackDto(
+public record FeedbackResponseDto(
         String feedbackId,
         String eventId,
         String attendeeId,

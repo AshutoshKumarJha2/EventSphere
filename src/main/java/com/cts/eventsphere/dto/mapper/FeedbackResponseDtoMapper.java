@@ -1,6 +1,6 @@
 package com.cts.eventsphere.dto.mapper;
 
-import com.cts.eventsphere.dto.FeedbackDto;
+import com.cts.eventsphere.dto.FeedbackResponseDto;
 import com.cts.eventsphere.model.FeedBack;
 import org.springframework.stereotype.Component;
 
@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
  * @since 26-02-2026
  */
 @Component
-public class FeedbackDtoMapper {
+public class FeedbackResponseDtoMapper {
 
-    public static FeedbackDto toDTO(FeedBack entity) {
+    public static FeedbackResponseDto toDTO(FeedBack entity) {
         if (entity == null) {
             return null;
         }
-        return new FeedbackDto(
+        return new FeedbackResponseDto(
                 entity.getFeedbackId(),
                 entity.getEventId(),
                 entity.getAttendeeId(),
