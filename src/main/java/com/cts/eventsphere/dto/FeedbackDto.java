@@ -1,0 +1,25 @@
+package com.cts.eventsphere.dto;
+
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+/**
+ * [ Detailed description of the class's responsibility]
+ *
+ * @author 2480027
+ * @version 1.0
+ * @since 26-02-2026
+ */
+
+public record FeedbackDto(
+        String feedbackId,
+        String eventId,
+        String attendeeId,
+        int rating,
+        String comments,
+        LocalDateTime date,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+) {}
+
