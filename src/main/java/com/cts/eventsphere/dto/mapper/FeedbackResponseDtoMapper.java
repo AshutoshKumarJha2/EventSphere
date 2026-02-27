@@ -5,7 +5,7 @@ import com.cts.eventsphere.model.FeedBack;
 import org.springframework.stereotype.Component;
 
 /**
- * [ Detailed description of the class's responsibility]
+ * DTO Mapper for Feedback Response DTO.
  *
  * @author 2480027
  * @version 1.0

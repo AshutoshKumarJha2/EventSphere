@@ -1,9 +1,8 @@
 package com.cts.eventsphere.dto;
-
 import java.time.LocalDateTime;
 
 /**
- * [ Detailed description of the class's responsibility]
+ * DTO for Feedback entity
  *
  * @author 2480027
  * @version 1.0

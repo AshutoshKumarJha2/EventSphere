@@ -9,7 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 /**
- * [ Detailed description of the class's responsibility]
+ * Feedback Model class
  *
  * @author 2480027
  * @version 1.0
