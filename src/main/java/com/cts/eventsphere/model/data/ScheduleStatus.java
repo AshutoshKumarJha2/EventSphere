@@ -1,7 +1,7 @@
 package com.cts.eventsphere.model.data;
 
 /**
- * [Detailed description of the class's responsibility]
+ * data for Schedule Status
  * * @author 2479623
  *
  * @version 1.0

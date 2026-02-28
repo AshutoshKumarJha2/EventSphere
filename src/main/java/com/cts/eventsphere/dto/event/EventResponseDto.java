@@ -1,4 +1,4 @@
-package com.cts.eventsphere.dto;
+package com.cts.eventsphere.dto.event;
 
 import com.cts.eventsphere.model.data.EventStatus;
 
