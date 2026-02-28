@@ -2,6 +2,7 @@ package com.cts.eventsphere.model;
 
 
 import com.cts.eventsphere.model.data.Availability;
+import com.cts.eventsphere.model.data.ResourceType;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -29,7 +30,9 @@ public class Resource {
     @Column(columnDefinition = "CHAR(36)")
     private String venueId;
 
-    private String type;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "ENUM('equipment','staff')")
+    private String type = String.valueOf(ResourceType.equipment);
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('available','in_use','unavailable')")
