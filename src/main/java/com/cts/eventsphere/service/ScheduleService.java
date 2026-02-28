@@ -1,7 +1,8 @@
 package com.cts.eventsphere.service;
 
+import com.cts.eventsphere.dto.schedule.ScheduleRequestDto;
+import com.cts.eventsphere.dto.schedule.ScheduleResponseDto;
 import com.cts.eventsphere.exception.schedule.ScheduleNotFoundException;
-import com.cts.eventsphere.model.Schedule;
 
 /**
  * [Detailed description of the class's responsibility]
@@ -11,7 +12,7 @@ import com.cts.eventsphere.model.Schedule;
  * @since 27-02-2026
  */
 public interface ScheduleService {
-    public boolean updateById(Schedule schedule) throws ScheduleNotFoundException;
+    public ScheduleResponseDto updateById(String id, ScheduleRequestDto schedule) throws ScheduleNotFoundException;
 
-    public boolean deleteById(Schedule schedule) throws ScheduleNotFoundException;
+    public boolean deleteById(String id) throws ScheduleNotFoundException;
 }

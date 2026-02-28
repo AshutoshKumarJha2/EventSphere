@@ -1,14 +1,24 @@
 package com.cts.eventsphere.service.impl;
 
-import com.cts.eventsphere.dto.EventResponseDto;
+import com.cts.eventsphere.dto.event.EventRequestDto;
+import com.cts.eventsphere.dto.event.EventResponseDto;
+import com.cts.eventsphere.dto.mapper.event.EventRequestDtoMapper;
+import com.cts.eventsphere.dto.mapper.event.EventResponseDtoMapper;
+import com.cts.eventsphere.dto.mapper.schedule.ScheduleRequestDtoMapper;
+import com.cts.eventsphere.dto.mapper.schedule.ScheduleResponseDtoMapper;
+import com.cts.eventsphere.dto.schedule.ScheduleRequestDto;
+import com.cts.eventsphere.dto.schedule.ScheduleResponseDto;
 import com.cts.eventsphere.exception.event.EventNotFoundException;
 import com.cts.eventsphere.model.Event;
 import com.cts.eventsphere.model.Schedule;
+import com.cts.eventsphere.repository.EventRepository;
+import com.cts.eventsphere.repository.ScheduleRepository;
 import com.cts.eventsphere.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Implementation for Service Interface for Event Class.
@@ -20,23 +30,33 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
-    private final EventResponseDto eventResponseDto;
+    private final EventRepository eventRepository;
+    private final EventResponseDtoMapper eventResponseDtoMapper;
+    private final EventRequestDtoMapper eventRequestDtoMapper;
+    private final ScheduleRepository scheduleRepository;
+    private final ScheduleResponseDtoMapper scheduleResponseDtoMapper;
+    private final ScheduleRequestDtoMapper scheduleRequestDtoMapper;
 
     /**
-     * @param event
+     * @param eventRequest
      * @return
      */
     @Override
-    public Event create(Event event) {
-        return null;
+    public EventResponseDto create(EventRequestDto eventRequest) {
+        Event event = eventRequestDtoMapper.toEntity(eventRequest);
+        Event savedEvent = eventRepository.save(event);
+
+        return eventResponseDtoMapper.toDTO(savedEvent);
     }
 
     /**
      * @return
      */
     @Override
-    public List<Event> findAllEvents() {
-        return List.of();
+    public List<EventResponseDto> findAllEvents() {
+        return eventRepository.findAll().stream()
+                .map(eventResponseDtoMapper::toDTO)
+                .toList();
     }
 
     /**
@@ -45,8 +65,11 @@ public class EventServiceImpl implements EventService {
      * @throws EventNotFoundException
      */
     @Override
-    public Event findById(String eventId) throws EventNotFoundException {
-        return null;
+    public EventResponseDto findById(String eventId) throws EventNotFoundException {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException(eventId));
+
+        return eventResponseDtoMapper.toDTO(event);
     }
 
     /**
@@ -55,8 +78,16 @@ public class EventServiceImpl implements EventService {
      * @throws EventNotFoundException
      */
     @Override
-    public boolean updateById(String eventId) throws EventNotFoundException {
-        return false;
+    public boolean updateById(String eventId, EventRequestDto eventRequest) throws EventNotFoundException {
+        if(!eventRepository.existsById(eventId)) {
+            throw new EventNotFoundException(eventId);
+        }
+
+        Event event = eventRequestDtoMapper.toEntity(eventRequest);
+        event.setEventId(eventId);
+        eventRepository.save(event);
+
+        return true;
     }
 
     /**
@@ -66,23 +97,33 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public boolean deleteById(String eventId) throws EventNotFoundException {
-        return false;
+        if(!eventRepository.existsById(eventId)) {
+            throw new EventNotFoundException(eventId);
+        }
+        eventRepository.deleteById(eventId);
+
+        return true;
     }
 
     /**
-     * @param schedule
+     * @param scheduleRequest
      * @return
      */
     @Override
-    public boolean addActivity(Schedule schedule) {
-        return false;
+    public ScheduleResponseDto addActivity(ScheduleRequestDto scheduleRequest) {
+        Schedule schedule = scheduleRequestDtoMapper.toEntity(scheduleRequest);
+        Schedule savedSchedule = scheduleRepository.save(schedule);
+
+        return scheduleResponseDtoMapper.toDTO(savedSchedule);
     }
 
     /**
      * @return
      */
     @Override
-    public List<Schedule> findAllSchedules() {
-        return List.of();
+    public List<ScheduleResponseDto> findAllSchedules() {
+        return scheduleRepository.findAll().stream()
+                .map(scheduleResponseDtoMapper::toDTO)
+                .toList();
     }
 }

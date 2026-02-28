@@ -1,7 +1,10 @@
 package com.cts.eventsphere.service;
 
+import com.cts.eventsphere.dto.event.EventRequestDto;
+import com.cts.eventsphere.dto.event.EventResponseDto;
+import com.cts.eventsphere.dto.schedule.ScheduleRequestDto;
+import com.cts.eventsphere.dto.schedule.ScheduleResponseDto;
 import com.cts.eventsphere.exception.event.EventNotFoundException;
-import com.cts.eventsphere.model.Event;
 import com.cts.eventsphere.model.Schedule;
 
 import java.util.List;
@@ -14,17 +17,17 @@ import java.util.List;
  * @since 27-02-2026
  */
 public interface EventService {
-    public Event create(Event event);
+    public EventResponseDto create(EventRequestDto event);
 
-    public List<Event> findAllEvents();
+    public List<EventResponseDto> findAllEvents();
 
-    public Event findById(String eventId) throws EventNotFoundException;
+    public EventResponseDto findById(String eventId) throws EventNotFoundException;
 
-    public boolean updateById(String eventId) throws EventNotFoundException;
+    public boolean updateById(String eventId, EventRequestDto eventRequest) throws EventNotFoundException;
 
     public boolean deleteById(String eventId) throws EventNotFoundException;
 
-    public boolean addActivity(Schedule schedule);
+    public ScheduleResponseDto addActivity(ScheduleRequestDto schedule);
 
-    public List<Schedule> findAllSchedules();
+    public List<ScheduleResponseDto> findAllSchedules();
 }

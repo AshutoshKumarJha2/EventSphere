@@ -1,20 +1,19 @@
-package com.cts.eventsphere.dto;
+package com.cts.eventsphere.dto.schedule;
 
 import com.cts.eventsphere.model.data.ScheduleStatus;
 
-
+import java.time.LocalDateTime;
 
 /**
- * DTO for Schedule Entity.
+ * [Detailed description of the class's responsibility]
  * * @author 2479623
  *
  * @version 1.0
- * @since 26-02-2026
+ * @since 28-02-2026
  */
-public record ScheduleResponseDto(
-        String scheduleId,
+public record ScheduleRequestDto(
         String eventId,
-        String date,
+        LocalDateTime date,
         String timeSlot,
         String activity,
         ScheduleStatus status
