@@ -5,7 +5,7 @@ import com.cts.eventsphere.model.Event;
 import org.springframework.stereotype.Component;
 
 /**
- * [Detailed description of the class's responsibility]
+ * DTO Mapper for Request DTO of Event.
  * * @author 2479623
  *
  * @version 1.0

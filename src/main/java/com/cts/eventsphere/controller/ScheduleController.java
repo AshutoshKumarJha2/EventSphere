@@ -1,15 +1,16 @@
 package com.cts.eventsphere.controller;
 
+import com.cts.eventsphere.dto.schedule.ScheduleRequestDto;
+import com.cts.eventsphere.dto.schedule.ScheduleResponseDto;
 import com.cts.eventsphere.model.Schedule;
 import com.cts.eventsphere.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
- * [Detailed description of the class's responsibility]
+ * Rest Controller for Schedule Entity.
  * * @author 2479623
  *
  * @version 1.0
@@ -18,23 +19,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/api/v1/schedules")
+@RequestMapping("/api/v1/events/{eventId}/schedules")
 public class ScheduleController {
     private final ScheduleService scheduleService;
 
-    /**
-    * [One line summary of method].
-    * [Optional detailed explanation].
-    *
-    * @param name description
-    * @return description of the return value
-    * @throws IOException if a network error occurs
-    */
-    public ResponseEntity<Schedule> update(Schedule schedule){
-
+    @PostMapping("/{id}")
+    public ResponseEntity<ScheduleResponseDto> update(@PathVariable String eventId, @PathVariable String id, ScheduleRequestDto scheduleRequest){
+        return ResponseEntity.ok(scheduleService.updateById(eventId, id, scheduleRequest));
     }
 
-    public ResponseEntity<Schedule> delete(String id) {
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Schedule> delete(@PathVariable String id) {
+        scheduleService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -5,7 +5,7 @@ import com.cts.eventsphere.model.data.ScheduleStatus;
 import java.time.LocalDateTime;
 
 /**
- * [Detailed description of the class's responsibility]
+ * DTO for Request of Schedule.
  * * @author 2479623
  *
  * @version 1.0

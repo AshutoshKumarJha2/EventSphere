@@ -27,7 +27,7 @@ public interface EventService {
 
     public boolean deleteById(String eventId) throws EventNotFoundException;
 
-    public ScheduleResponseDto addActivity(ScheduleRequestDto schedule);
+    public ScheduleResponseDto addActivity(String eventId, ScheduleRequestDto schedule);
 
-    public List<ScheduleResponseDto> findAllSchedules();
+    public List<ScheduleResponseDto> findAllSchedules(String eventId);
 }

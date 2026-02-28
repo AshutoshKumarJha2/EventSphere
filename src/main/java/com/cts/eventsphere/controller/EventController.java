@@ -4,9 +4,7 @@ import com.cts.eventsphere.dto.event.EventRequestDto;
 import com.cts.eventsphere.dto.event.EventResponseDto;
 import com.cts.eventsphere.dto.schedule.ScheduleRequestDto;
 import com.cts.eventsphere.dto.schedule.ScheduleResponseDto;
-import com.cts.eventsphere.model.Event;
 import com.cts.eventsphere.service.EventService;
-import com.cts.eventsphere.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * [Detailed description of the class's responsibility]
+ * Rest Controller for Event Entity.
  * * @author 2479623
  *
  * @version 1.0
@@ -53,11 +51,11 @@ public class EventController {
 
     @PostMapping("/{id}/schedules")
     public ResponseEntity<ScheduleResponseDto> createActivity(@PathVariable String id, @RequestBody ScheduleRequestDto scheduleRequest) {
-        return new ResponseEntity<>(eventService.addActivity(scheduleRequest), HttpStatus.CREATED);
+        return new ResponseEntity<>(eventService.addActivity(id, scheduleRequest), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}/schedules")
     public ResponseEntity<List<ScheduleResponseDto>> getAllActivity(@PathVariable String id) {
-        return ResponseEntity.ok(eventService.findAllSchedules());
+        return ResponseEntity.ok(eventService.findAllSchedules(id));
     }
 }

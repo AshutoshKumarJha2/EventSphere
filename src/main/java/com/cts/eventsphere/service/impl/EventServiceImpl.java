@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Implementation for Service Interface for Event Class.
@@ -110,8 +109,11 @@ public class EventServiceImpl implements EventService {
      * @return
      */
     @Override
-    public ScheduleResponseDto addActivity(ScheduleRequestDto scheduleRequest) {
-        Schedule schedule = scheduleRequestDtoMapper.toEntity(scheduleRequest);
+    public ScheduleResponseDto addActivity(String eventId, ScheduleRequestDto scheduleRequest) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException(eventId));
+
+        Schedule schedule = scheduleRequestDtoMapper.toEntity(scheduleRequest, event);
         Schedule savedSchedule = scheduleRepository.save(schedule);
 
         return scheduleResponseDtoMapper.toDTO(savedSchedule);
@@ -121,8 +123,9 @@ public class EventServiceImpl implements EventService {
      * @return
      */
     @Override
-    public List<ScheduleResponseDto> findAllSchedules() {
+    public List<ScheduleResponseDto> findAllSchedules(String eventId) {
         return scheduleRepository.findAll().stream()
+                .filter(s -> s.getEvent().getEventId().equals(eventId))
                 .map(scheduleResponseDtoMapper::toDTO)
                 .toList();
     }

@@ -16,7 +16,7 @@ public class ScheduleResponseDtoMapper {
     public ScheduleResponseDto toDTO(Schedule schedule) {
         return new ScheduleResponseDto(
                 schedule.getScheduleId(),
-                schedule.getEventId(),
+                schedule.getEvent().getEventId(),
                 schedule.getDate().toString(),
                 schedule.getTimeSlot(),
                 schedule.getActivity(),

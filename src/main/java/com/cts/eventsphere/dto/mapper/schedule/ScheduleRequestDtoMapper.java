@@ -1,11 +1,12 @@
 package com.cts.eventsphere.dto.mapper.schedule;
 
 import com.cts.eventsphere.dto.schedule.ScheduleRequestDto;
+import com.cts.eventsphere.model.Event;
 import com.cts.eventsphere.model.Schedule;
 import org.springframework.stereotype.Component;
 
 /**
- * [Detailed description of the class's responsibility]
+ * Dto Mapper for Schedule Request DTO.
  * * @author 2479623
  *
  * @version 1.0
@@ -13,13 +14,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ScheduleRequestDtoMapper {
-    public Schedule toEntity(ScheduleRequestDto dto) {
+    public Schedule toEntity(ScheduleRequestDto dto, Event event) {
         if(dto == null) {
             return null;
         }
 
         Schedule schedule = new Schedule();
-        schedule.setEventId(dto.eventId());
+        schedule.setEvent(event);
         schedule.setDate(dto.date());
         schedule.setTimeSlot(dto.timeSlot());
         schedule.setActivity(dto.activity());
