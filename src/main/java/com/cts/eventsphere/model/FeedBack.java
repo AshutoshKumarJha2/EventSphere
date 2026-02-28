@@ -1,47 +1,47 @@
 package com.cts.eventsphere.model;
 
-import com.cts.eventsphere.model.data.EventStatus;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
 /**
- * Event model class.
- * * @author 2479623
+ * Feedback Model class
  *
+ * @author 2480027
  * @version 1.0
  * @since 26-02-2026
  */
+
 @Entity
-@Table(name = "event")
+@Table(name = "feedback")
 @Data
-public class Event {
+
+@NoArgsConstructor
+public class FeedBack {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "CHAR(36)")
-    private String eventId;
-
-    @Column(nullable = false, length = 150)
-    private String name;
+    private String feedbackId;
 
     @Column(nullable = false, columnDefinition = "CHAR(36)")
-    private String organizerId;
+    private String eventId;
+
+    @Column(nullable = false,columnDefinition = "CHAR(36)")
+    private String attendeeId;
 
     @Column(nullable = false)
-    private LocalDateTime startDate;
+    private int rating;
 
     @Column(nullable = false)
-    private LocalDateTime endDate;
+    private String comments;
 
-    @Column(columnDefinition = "CHAR(36)")
-    private String venueId;
-
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('draft', 'published', 'completed', 'cancelled')")
-    private EventStatus status = EventStatus.draft;
+    @Column(nullable = false)
+    private LocalDateTime date;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -49,4 +49,6 @@ public class Event {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+
 }
