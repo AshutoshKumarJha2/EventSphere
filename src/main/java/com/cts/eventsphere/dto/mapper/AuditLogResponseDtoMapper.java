@@ -5,7 +5,7 @@ import com.cts.eventsphere.model.AuditLog;
 import org.springframework.stereotype.Component;
 
 /**
- * [Detailed description of the class's responsibility]
+ * Mapper for converting AuditLog entity AuditLogDto
  * * @author 2480010
  *
  * @version 1.0

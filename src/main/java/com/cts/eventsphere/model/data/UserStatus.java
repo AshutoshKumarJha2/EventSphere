@@ -1,7 +1,7 @@
 package com.cts.eventsphere.model.data;
 
 /**
- * [Detailed description of the class's responsibility]
+ * Represents the current status of the user
  * * @author 2480010
  *
  * @version 1.0

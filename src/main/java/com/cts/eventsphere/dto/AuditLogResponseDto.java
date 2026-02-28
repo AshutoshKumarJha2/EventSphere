@@ -1,7 +1,7 @@
 package com.cts.eventsphere.dto;
 
 /**
- * [Detailed description of the class's responsibility]
+ * DTO for Audit Log entity
  * * @author 2480010
  *
  * @version 1.0

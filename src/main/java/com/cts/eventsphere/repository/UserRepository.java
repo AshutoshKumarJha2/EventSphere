@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * [Detailed description of the class's responsibility]
+ * JPA repository for User entity
  * * @author 2480010
  *
  * @version 1.0

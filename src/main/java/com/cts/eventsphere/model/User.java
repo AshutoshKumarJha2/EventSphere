@@ -9,7 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 /**
- * [Detailed description of the class's responsibility]
+ * User model class
  * * @author 2480010
  *
  * @version 1.0

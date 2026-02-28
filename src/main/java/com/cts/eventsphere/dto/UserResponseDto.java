@@ -4,7 +4,7 @@ import com.cts.eventsphere.model.data.UserRoles;
 import com.cts.eventsphere.model.data.UserStatus;
 
 /**
- * [Detailed description of the class's responsibility]
+ * DTO for User entity
  * * @author 2480010
  *
  * @version 1.0

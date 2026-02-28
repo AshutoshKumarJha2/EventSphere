@@ -8,7 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 /**
- * [Detailed description of the class's responsibility]
+ * Audit log model class
  * * @author 2480010
  *
  * @version 1.0
