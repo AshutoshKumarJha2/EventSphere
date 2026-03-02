@@ -1,4 +1,4 @@
-package com.cts.eventsphere.dto;
+package com.cts.eventsphere.dto.payment;
 
 import com.cts.eventsphere.model.data.PaymentMethod;
 import com.cts.eventsphere.model.data.PaymentStatus;

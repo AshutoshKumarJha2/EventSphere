@@ -1,6 +1,6 @@
-package com.cts.eventsphere.dto.mapper;
+package com.cts.eventsphere.dto.mapper.payment;
 
-import com.cts.eventsphere.dto.PaymentResponseDto;
+import com.cts.eventsphere.dto.payment.PaymentResponseDto;
 import com.cts.eventsphere.model.Payment;
 
 /**
