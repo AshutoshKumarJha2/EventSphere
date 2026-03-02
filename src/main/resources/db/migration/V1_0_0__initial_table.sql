@@ -1,4 +1,5 @@
 -- SANGNEEL: Create User Table
+-- Update enum remove space
 CREATE TABLE IF NOT EXISTS `user`(
     userId char(36) PRIMARY KEY DEFAULT (UUID()),
     name varchar(100) NOT NULL,
@@ -54,6 +55,7 @@ CREATE TABLE IF NOT EXISTS `event`(
 );
 
 -- TITHI: Create Report Table
+-- Update metrics to json
 CREATE TABLE IF NOT EXISTS `report` (
     reportId CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     userId CHAR(36) NOT NULL,
@@ -68,6 +70,7 @@ CREATE TABLE IF NOT EXISTS `report` (
 );
 
 -- HARIHARAN: create audit log
+-- Add created at updated at
 CREATE TABLE IF NOT EXISTS `auditlog` (
   auditId   CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   userId    CHAR(36) NOT NULL ,
