@@ -1,5 +1,4 @@
 package com.cts.eventsphere.dto.mapper;
-
 import com.cts.eventsphere.dto.ScheduleResponseDto;
 import com.cts.eventsphere.model.Schedule;
 import org.springframework.stereotype.Component;
