@@ -4,7 +4,7 @@ import com.cts.eventsphere.model.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * [Detailed description of the class's responsibility]
+ * JPA Repository for the Event Entity.
  * * @author 2479623
  *
  * @version 1.0

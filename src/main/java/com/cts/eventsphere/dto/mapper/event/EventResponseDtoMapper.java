@@ -1,6 +1,6 @@
-package com.cts.eventsphere.dto.mapper;
+package com.cts.eventsphere.dto.mapper.event;
 
-import com.cts.eventsphere.dto.EventResponseDto;
+import com.cts.eventsphere.dto.event.EventResponseDto;
 import com.cts.eventsphere.model.Event;
 import org.springframework.stereotype.Component;
 
