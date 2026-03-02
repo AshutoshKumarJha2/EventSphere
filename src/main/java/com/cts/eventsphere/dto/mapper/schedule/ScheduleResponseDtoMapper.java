@@ -1,6 +1,6 @@
-package com.cts.eventsphere.dto.mapper;
+package com.cts.eventsphere.dto.mapper.schedule;
 
-import com.cts.eventsphere.dto.ScheduleResponseDto;
+import com.cts.eventsphere.dto.schedule.ScheduleResponseDto;
 import com.cts.eventsphere.model.Schedule;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +16,7 @@ public class ScheduleResponseDtoMapper {
     public ScheduleResponseDto toDTO(Schedule schedule) {
         return new ScheduleResponseDto(
                 schedule.getScheduleId(),
-                schedule.getEventId(),
+                schedule.getEvent().getEventId(),
                 schedule.getDate().toString(),
                 schedule.getTimeSlot(),
                 schedule.getActivity(),

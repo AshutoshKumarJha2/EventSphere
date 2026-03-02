@@ -24,8 +24,9 @@ public class Schedule {
             @Column(columnDefinition = "CHAR(36)")
     private String scheduleId;
 
-    @Column(nullable = false, columnDefinition = "CHAR(36)")
-    private String eventId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "eventId", nullable = false)
+    private Event event;
 
     @Column(nullable = false)
     private LocalDateTime date;
