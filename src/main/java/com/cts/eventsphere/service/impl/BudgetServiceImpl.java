@@ -32,7 +32,7 @@ public class BudgetServiceImpl  implements BudgetService {
      * Creates a Budget for a given Event
      */
     @Override
-    public BudgetResponseDto createBudget(String eventId, BudgetRequestDto request){
+    public BudgetResponseDto createBudget(String eventId, BudgetRequestDto request) throws EventNotFoundException{
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(eventId));
         Budget budget = budgetRequestDtoMapper.toEntity(request , event);

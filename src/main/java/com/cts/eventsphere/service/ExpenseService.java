@@ -2,6 +2,8 @@ package com.cts.eventsphere.service;
 
 import com.cts.eventsphere.dto.expense.ExpenseRequestDto;
 import com.cts.eventsphere.dto.expense.ExpenseResponseDto;
+import com.cts.eventsphere.exception.event.EventNotFoundException;
+import com.cts.eventsphere.exception.finance.ExpenseNotFoundException;
 import com.cts.eventsphere.model.data.ExpenseStatus;
 
 import java.util.List;
@@ -14,13 +16,13 @@ import java.util.List;
  * @since 01-03-2026
  */
 public interface ExpenseService {
-    ExpenseResponseDto createExpense(String eventId , ExpenseRequestDto request);
+    ExpenseResponseDto createExpense(String eventId , ExpenseRequestDto request) throws EventNotFoundException;
 
     List<ExpenseResponseDto> getExpenseByEvent(String eventId);
 
-    List<ExpenseResponseDto> getAllExpenses();
+    List<ExpenseResponseDto> getAllExpenses() throws EventNotFoundException;
 
-    void deleteExpense(String expenseId);
+    void deleteExpense(String expenseId) throws ExpenseNotFoundException;
 
-    ExpenseResponseDto updateExpenseStatus(String expenseId, ExpenseStatus status);
+    ExpenseResponseDto updateExpenseStatus(String expenseId, ExpenseStatus status) throws ExpenseNotFoundException;
 }

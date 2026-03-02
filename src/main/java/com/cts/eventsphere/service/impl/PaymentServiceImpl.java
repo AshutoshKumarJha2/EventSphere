@@ -34,7 +34,7 @@ public class PaymentServiceImpl implements PaymentService {
      */
 
     @Override
-    public PaymentResponseDto markPayment(String expenseId , PaymentRequestDto request){
+    public PaymentResponseDto markPayment(String expenseId , PaymentRequestDto request) throws ExpenseNotFoundException{
         Expense expense = expenseRepository.findById(expenseId)
                 .orElseThrow(() -> new ExpenseNotFoundException(expenseId));
         Payment payment = paymentRequestDtoMapper.toEntity(request);

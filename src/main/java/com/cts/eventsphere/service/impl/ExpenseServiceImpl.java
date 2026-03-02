@@ -40,7 +40,7 @@ public class ExpenseServiceImpl implements ExpenseService {
      * @return saved expense along with the HTTP status code
      */
     @Override
-    public ExpenseResponseDto createExpense(String eventId , ExpenseRequestDto request){
+    public ExpenseResponseDto createExpense(String eventId , ExpenseRequestDto request) throws EventNotFoundException{
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(eventId));
         Expense expense = expenseRequestDtoMapper.toEntity(request);
@@ -63,7 +63,7 @@ public class ExpenseServiceImpl implements ExpenseService {
      * get Expense of an event
      */
     @Override
-    public List<ExpenseResponseDto> getExpenseByEvent(String eventId){
+    public List<ExpenseResponseDto> getExpenseByEvent(String eventId) throws EventNotFoundException{
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(eventId));
         return expenseRepository.findAll().stream()
@@ -76,7 +76,7 @@ public class ExpenseServiceImpl implements ExpenseService {
      * Delete an Expense
      */
     @Override
-    public void deleteExpense(String expenseId){
+    public void deleteExpense(String expenseId) throws ExpenseNotFoundException{
         if(!expenseRepository.existsById(expenseId)){
             throw new ExpenseNotFoundException(expenseId);
         }
@@ -87,7 +87,7 @@ public class ExpenseServiceImpl implements ExpenseService {
      * Updates the status of an Expense
      */
     @Override
-    public ExpenseResponseDto updateExpenseStatus(String expenseId , ExpenseStatus status){
+    public ExpenseResponseDto updateExpenseStatus(String expenseId , ExpenseStatus status) throws ExpenseNotFoundException{
         Expense expense = expenseRepository.findById(expenseId)
                 .orElseThrow(() -> new ExpenseNotFoundException(expenseId));
         expense.setStatus(status);
