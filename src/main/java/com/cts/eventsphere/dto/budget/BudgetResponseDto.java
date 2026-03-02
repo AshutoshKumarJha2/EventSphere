@@ -1,4 +1,4 @@
-package com.cts.eventsphere.dto;
+package com.cts.eventsphere.dto.budget;
 
 import java.math.BigDecimal;
 

@@ -1,6 +1,6 @@
-package com.cts.eventsphere.dto.mapper;
+package com.cts.eventsphere.dto.mapper.budget;
 
-import com.cts.eventsphere.dto.BudgetResponseDto;
+import com.cts.eventsphere.dto.budget.BudgetResponseDto;
 
 import com.cts.eventsphere.model.Budget;
 
@@ -16,7 +16,7 @@ public class BudgetResponseDtoMapper {
     public BudgetResponseDto toDTO(Budget budget) {
         return new BudgetResponseDto(
                 budget.getBudgetId(),
-                budget.getEventId(),
+                budget.getEvent().getEventId(),
                 budget.getPlannedAmount(),
                 budget.getActualAmount(),
                 budget.getVariance(),

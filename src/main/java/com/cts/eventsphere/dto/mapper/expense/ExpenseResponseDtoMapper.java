@@ -1,6 +1,6 @@
-package com.cts.eventsphere.dto.mapper;
+package com.cts.eventsphere.dto.mapper.expense;
 
-import com.cts.eventsphere.dto.ExpenseResponseDto;
+import com.cts.eventsphere.dto.expense.ExpenseResponseDto;
 import com.cts.eventsphere.model.Expense;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +16,7 @@ public class ExpenseResponseDtoMapper {
     public ExpenseResponseDto toDTO(Expense expense) {
         return new ExpenseResponseDto(
                 expense.getExpenseId(),
-                expense.getEventId(),
+                expense.getEvent().getEventId(),
                 expense.getDescription(),
                 expense.getAmount(),
                 expense.getDate().toString(), // Or use a DateTimeFormatter

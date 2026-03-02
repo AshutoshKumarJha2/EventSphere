@@ -1,6 +1,6 @@
 package com.cts.eventsphere.model;
 
-import com.cts.eventsphere.model.data.EventStatus;
+import com.cts.eventsphere.model.data.DeliveryStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,39 +9,39 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 /**
- * Event model class.
- * * @author 2479623
+ * Represents a delivery entry for orders, equipment, or goods.
  *
+ * @author 2480177
  * @version 1.0
  * @since 26-02-2026
  */
+
 @Entity
-@Table(name = "event")
+@Table(name = "delivery")
 @Data
-public class Event {
+public class Delivery {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "CHAR(36)")
-    private String eventId;
-
-    @Column(nullable = false, length = 150)
-    private String name;
-
-    @Column(nullable = false, columnDefinition = "CHAR(36)")
-    private String organizerId;
+    private String deliveryId;
 
     @Column(nullable = false)
-    private LocalDateTime startDate;
+    private String invoiceId;
+
+    @Column(nullable = false, length = 100)
+    private String item;
 
     @Column(nullable = false)
-    private LocalDateTime endDate;
+    private Integer quantity;
 
-    @Column(columnDefinition = "CHAR(36)")
-    private String venueId;
+    private LocalDateTime deliveryDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('draft', 'published', 'completed', 'cancelled')")
-    private EventStatus status = EventStatus.draft;
+    @Column(columnDefinition = "ENUM('scheduled','in_transit','delivered','failed','cancelled')")
+    private DeliveryStatus status = DeliveryStatus.scheduled;
+
+    @Column(length = 100)
+    private String trackingNumber;
 
     @CreationTimestamp
     @Column(updatable = false)
