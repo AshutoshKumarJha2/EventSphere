@@ -3,6 +3,7 @@ package com.cts.eventsphere.dto.expense;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * Request Dto for Expense Entity
@@ -14,5 +15,5 @@ import java.time.LocalDateTime;
 public record ExpenseRequestDto(
         String description,
         BigDecimal amount,
-        LocalDateTime date
+        LocalDate date
 ) { }

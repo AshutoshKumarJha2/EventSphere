@@ -1,6 +1,5 @@
 package com.cts.eventsphere.model;
 
-import com.cts.eventsphere.model.data.EventStatus;
 import com.cts.eventsphere.model.data.ExpenseStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +17,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 
 /**
@@ -49,7 +50,7 @@ public class Expense {
     private BigDecimal amount;
 
     @Column(nullable = false)
-    private LocalDateTime date;
+    private LocalDate date;
 
     @Column(columnDefinition = "CHAR(36)")
     private String approvedBy;

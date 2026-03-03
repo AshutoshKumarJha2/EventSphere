@@ -16,14 +16,14 @@ import java.time.LocalDateTime;
  */
 
 @Entity
-@Table(name = "audit_log")
+@Table(name = "auditlog")
 @Data
 
 public class AuditLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "CHAR(36)")
+    @Column(name="auditId", columnDefinition = "CHAR(36)")
     private String auditId;
 
     @Column(nullable = false, columnDefinition = "CHAR(36)")
