@@ -7,9 +7,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -36,8 +39,10 @@ public class Payment {
     @Column(columnDefinition = "CHAR(36)")
     private String paymentId;
 
-    @Column(nullable = false , columnDefinition = "CHAR(36)")
-    private String invoiceId;
+//    @Column(nullable = false , columnDefinition = "CHAR(36)")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "invoiceId" , nullable = false)
+    private Invoice invoiceId;
 
     @Column(nullable = false , precision = 10 , scale = 2)
     private BigDecimal amount;

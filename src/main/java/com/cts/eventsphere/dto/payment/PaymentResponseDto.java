@@ -1,5 +1,6 @@
 package com.cts.eventsphere.dto.payment;
 
+import com.cts.eventsphere.model.Invoice;
 import com.cts.eventsphere.model.data.PaymentMethod;
 import com.cts.eventsphere.model.data.PaymentStatus;
 
@@ -14,7 +15,7 @@ import java.math.BigDecimal;
  */
 public record PaymentResponseDto(
     String paymentId,
-    String invoiceId,
+    Invoice invoiceId,
     BigDecimal amount,
     PaymentMethod method,
     PaymentStatus status,

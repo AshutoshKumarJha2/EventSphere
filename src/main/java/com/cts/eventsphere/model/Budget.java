@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -33,9 +34,9 @@ public class Budget {
     @Column(columnDefinition = "CHAR(36)")
     private String budgetId;
 
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "eventId" , nullable = false)
+//    @Column(nullable = false , columnDefinition = "CHAR(36)")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "eventId" , nullable = false , unique = true)
     private Event event;
 
     @Column(nullable = false , precision = 10 , scale = 2)
