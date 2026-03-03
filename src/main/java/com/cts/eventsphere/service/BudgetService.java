@@ -14,5 +14,5 @@ import com.cts.eventsphere.exception.event.EventNotFoundException;
 public interface BudgetService {
     BudgetResponseDto createBudget(String eventId , BudgetRequestDto request) throws EventNotFoundException;
 
-
 }
+
