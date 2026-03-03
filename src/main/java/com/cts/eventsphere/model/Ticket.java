@@ -1,5 +1,6 @@
 package com.cts.eventsphere.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -42,7 +43,7 @@ public class Ticket {
     private String type;
 
     @Column
-    private double price;
+    private BigDecimal price;
 
     @Column(columnDefinition = "ENUM('active','inactive')")
     @Enumerated(EnumType.STRING)

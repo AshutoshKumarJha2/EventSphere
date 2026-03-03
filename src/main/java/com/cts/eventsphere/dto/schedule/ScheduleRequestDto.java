@@ -2,6 +2,7 @@ package com.cts.eventsphere.dto.schedule;
 
 import com.cts.eventsphere.model.data.ScheduleStatus;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
  */
 public record ScheduleRequestDto(
         String eventId,
-        LocalDateTime date,
+        LocalDate date,
         String timeSlot,
         String activity,
         ScheduleStatus status
