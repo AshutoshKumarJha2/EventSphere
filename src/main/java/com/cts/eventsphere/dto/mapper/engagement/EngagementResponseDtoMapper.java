@@ -23,7 +23,7 @@ public class EngagementResponseDtoMapper {
                 entity.getEventId(),
                 entity.getAttendeeId(),
                 entity.getActivity(),
-                entity.getActivityTimestamp(),
+                entity.getTimestamp(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );

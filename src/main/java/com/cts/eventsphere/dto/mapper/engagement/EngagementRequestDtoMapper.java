@@ -25,7 +25,7 @@ public class EngagementRequestDtoMapper {
         entity.setAttendeeId(dto.attendeeId());
         entity.setActivity(dto.activity());
         // Let JPA fill if null via @CreationTimestamp on the entity
-        entity.setActivityTimestamp(dto.activityTimestamp());
+        entity.setTimestamp(dto.activityTimestamp());
         return entity;
     }
 }

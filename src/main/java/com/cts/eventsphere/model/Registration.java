@@ -1,5 +1,6 @@
 package com.cts.eventsphere.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -45,7 +46,7 @@ public class Registration {
     String ticketId;
 
     @Column
-    LocalDateTime date;
+    LocalDate date;
 
     @Column(columnDefinition = "ENUM('pending', 'confirmed', 'cancelled', 'checked_in')")
     @Enumerated(EnumType.STRING)
