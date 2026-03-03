@@ -9,6 +9,14 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+/**
+ * Engagement Model class
+ *
+ * @author 2480027
+ * @version 1.0
+ * @since 26-02-2026
+ */
+
 @Entity
 @Table(name = "engagement")
 @Data
