@@ -1,8 +1,8 @@
-package com.cts.eventsphere.dto;
+package com.cts.eventsphere.dto.feedback;
 import java.time.LocalDateTime;
 
 /**
- * DTO for Feedback entity
+ * FeedbackResponseDto representing Feedback details
  *
  * @author 2480027
  * @version 1.0

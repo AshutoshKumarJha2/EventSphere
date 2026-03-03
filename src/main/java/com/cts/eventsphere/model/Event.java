@@ -40,7 +40,7 @@ public class Event {
     private String venueId;
 
     @Enumerated(EnumType.STRING)
-            @Column(columnDefinition = "ENUM('draft', 'published', 'completed', 'cancelled')")
+    @Column(columnDefinition = "ENUM('draft', 'published', 'completed', 'cancelled')")
     private EventStatus status = EventStatus.draft;
 
     @CreationTimestamp
