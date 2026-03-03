@@ -32,7 +32,7 @@ public class Resource {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('equipment','staff')")
-    private String type = String.valueOf(ResourceType.equipment);
+    private ResourceType type = ResourceType.equipment;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('available','in_use','unavailable')")
