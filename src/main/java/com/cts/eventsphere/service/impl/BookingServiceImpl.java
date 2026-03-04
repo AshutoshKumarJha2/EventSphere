@@ -4,9 +4,14 @@ import com.cts.eventsphere.dto.booking.BookingRequestDto;
 import com.cts.eventsphere.dto.booking.BookingResponseDto;
 import com.cts.eventsphere.dto.mapper.booking.BookingRequestDtoMapper;
 import com.cts.eventsphere.dto.mapper.booking.BookingResponseDtoMapper;
+import com.cts.eventsphere.dto.mapper.venue.VenueRequestDtoMapper;
+import com.cts.eventsphere.dto.mapper.venue.VenueResponseDtoMapper;
 import com.cts.eventsphere.model.Booking;
+import com.cts.eventsphere.model.Venue;
+import com.cts.eventsphere.model.data.AvailabilityStatus;
 import com.cts.eventsphere.model.data.BookingStatus;
 import com.cts.eventsphere.repository.BookingRepository;
+import com.cts.eventsphere.repository.VenueRepository;
 import com.cts.eventsphere.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +28,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
+    private final VenueRepository venueRepository;
+    private final VenueRequestDtoMapper venueRequestDtoMapper;
+    private final VenueResponseDtoMapper venueResponseDtoMapper;
 
     private final BookingRepository bookingRepository;
     private final BookingRequestDtoMapper requestMapper;
@@ -53,17 +61,27 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
     }
 
+
     @Override
     public BookingResponseDto updateBookingStatus(String bookingId, BookingStatus newStatus) {
 
+        // 2. Fetch the existing booking
         Booking existingBooking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Update failed: Booking ID " + bookingId + " does not exist."));
 
+        if (newStatus == BookingStatus.confirmed) {
 
+            Venue venue = venueRepository.findByVenueId(existingBooking.getVenueId());
+
+
+
+            venue.setAvailabilityStatus(AvailabilityStatus.unavailable);
+            venueRepository.save(venue);
+        }
+
+        // 4. Update and save the booking
         existingBooking.setStatus(newStatus);
-
         Booking updatedBooking = bookingRepository.save(existingBooking);
-
 
         return responseMapper.toDto(updatedBooking);
     }

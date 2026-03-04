@@ -13,6 +13,8 @@ import java.util.List;
 @Repository
 public interface VenueRepository extends JpaRepository<Venue, String> {
 
+    Venue findByVenueId(String venueId);
+
     List<Venue> findByLocation(String location);
 
     List<Venue> findByCapacityGreaterThanEqual(int capacity);
