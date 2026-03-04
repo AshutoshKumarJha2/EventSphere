@@ -3,6 +3,7 @@ package com.cts.eventsphere.repository;
 import com.cts.eventsphere.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
 /**
  * JPA repository for User entity
@@ -14,4 +15,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
 
+    Optional<User> findByEmail(String email);
 }
