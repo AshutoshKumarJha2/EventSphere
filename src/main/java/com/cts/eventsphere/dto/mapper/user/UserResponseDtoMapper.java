@@ -1,6 +1,6 @@
-package com.cts.eventsphere.dto.mapper;
+package com.cts.eventsphere.dto.mapper.user;
 
-import com.cts.eventsphere.dto.UserResponseDto;
+import com.cts.eventsphere.dto.user.UserResponseDto;
 
 import com.cts.eventsphere.model.User;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserResponseDtoMapper {
-    public UserResponseDto toDTO(User user){
+    public static UserResponseDto toDTO(User user){
         return new UserResponseDto(
                 user.getUserId(),
                 user.getName(),
