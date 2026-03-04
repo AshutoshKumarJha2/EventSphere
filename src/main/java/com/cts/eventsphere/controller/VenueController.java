@@ -2,6 +2,7 @@ package com.cts.eventsphere.controller;
 
 import com.cts.eventsphere.dto.venue.VenueRequestDto;
 import com.cts.eventsphere.dto.venue.VenueResponseDto;
+import com.cts.eventsphere.model.data.AvailabilityStatus;
 import com.cts.eventsphere.service.impl.VenueServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +51,14 @@ public class VenueController {
         List<VenueResponseDto> venues = venueService.findByCapacity(capacity);
         return ResponseEntity.ok(venues);
     }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<VenueResponseDto>> getVenueByCapacity(@PathVariable AvailabilityStatus status) {
+        List<VenueResponseDto> venues = venueService.findByAvailablityStatus(status);
+        return ResponseEntity.ok(venues);
+    }
+
+
 
     /**
      * Find venues by date (format depends on your domain, currently service returns empty list).

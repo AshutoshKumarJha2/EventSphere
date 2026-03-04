@@ -5,11 +5,15 @@ import com.cts.eventsphere.dto.mapper.venue.VenueResponseDtoMapper;
 import com.cts.eventsphere.dto.venue.VenueRequestDto;
 import com.cts.eventsphere.dto.venue.VenueResponseDto;
 import com.cts.eventsphere.model.Venue;
+import com.cts.eventsphere.model.data.AvailabilityStatus;
 import com.cts.eventsphere.repository.VenueRepository;
 import com.cts.eventsphere.service.VenueService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +49,7 @@ public class VenueServiceImpl implements VenueService {
         return convertHelper(venues);
     }
 
+
     @Override
     public List<VenueResponseDto> findByLocation(String location) {
         List<Venue> locationList = venueRepository.findByLocation(location);
@@ -53,12 +58,36 @@ public class VenueServiceImpl implements VenueService {
 
     @Override
     public List<VenueResponseDto> findByDate(String date) {
-        return List.of();
+        try {
+            // 1. Parse into LocalDate (matches Repository signature)
+            LocalDate localDate = LocalDate.parse(date);
+
+            // 2. Call the repository with consistent Enum naming
+            // Assuming your Enum constant is AVAILABLE (standard Java naming)
+            List<Venue> freeVenues = venueRepository.findAvailableVenues(
+                    localDate,
+                    AvailabilityStatus.available,
+                    null
+            );
+
+            // 3. Convert and return
+            return convertHelper(freeVenues);
+
+        } catch (DateTimeParseException e) {
+            // Log the error or throw a specific exception for the Controller to catch
+            throw new IllegalArgumentException("Invalid date format. Please use yyyy-MM-dd", e);
+        }
     }
 
     @Override
     public List<VenueResponseDto> findByCapacity(int capacity) {
-        List<Venue> byCapacityList = venueRepository.findByCapacity(capacity);
+        List<Venue> byCapacityList = venueRepository.findByCapacityGreaterThanEqual(capacity);
         return convertHelper(byCapacityList);
+    }
+
+    @Override
+    public List<VenueResponseDto> findByAvailablityStatus(AvailabilityStatus status) {
+        List<Venue> byStatus = venueRepository.findByAvailabilityStatus(status);
+        return convertHelper(byStatus);
     }
 }
