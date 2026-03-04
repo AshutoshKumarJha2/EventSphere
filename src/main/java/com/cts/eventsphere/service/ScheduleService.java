@@ -11,6 +11,7 @@ import com.cts.eventsphere.exception.schedule.ScheduleNotFoundException;
  * @version 1.0
  * @since 27-02-2026
  */
+
 public interface ScheduleService {
     public ScheduleResponseDto updateById(String eventId, String id, ScheduleRequestDto schedule) throws ScheduleNotFoundException;
 

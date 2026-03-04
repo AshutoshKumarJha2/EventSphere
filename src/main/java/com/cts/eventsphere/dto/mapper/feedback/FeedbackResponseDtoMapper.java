@@ -1,6 +1,6 @@
-package com.cts.eventsphere.dto.mapper;
+package com.cts.eventsphere.dto.mapper.feedback;
 
-import com.cts.eventsphere.dto.FeedbackResponseDto;
+import com.cts.eventsphere.dto.feedback.FeedbackResponseDto;
 import com.cts.eventsphere.model.FeedBack;
 import org.springframework.stereotype.Component;
 
