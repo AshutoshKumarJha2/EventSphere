@@ -12,7 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
- * [Detailed description of the class's responsibility]
+ * Spring Security configuration class that sets up authentication and authorization for the application.
  * * @author 2480010
  *
  * @version 1.0
