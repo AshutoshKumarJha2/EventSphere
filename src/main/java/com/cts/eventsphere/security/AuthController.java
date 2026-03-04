@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * [Detailed description of the class's responsibility]
+ * AuthController is responsible for handling authentication-related HTTP requests, including user registration, login, and token refresh operations. It interacts with the AuthService to perform these operations and returns appropriate responses to the client.
  * * @author 2480010
  *
  * @version 1.0
  * @since 03-03-2026
  */
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;

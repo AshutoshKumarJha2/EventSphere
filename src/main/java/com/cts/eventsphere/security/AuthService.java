@@ -10,47 +10,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
- * [Detailed description of the class's responsibility]
+ * AuthService is responsible for handling the core authentication logic, including user registration, login, and token refresh operations. It interacts with the UserRepository to manage user data and uses PasswordEncoder for secure password handling. Additionally, it utilizes JwtUtil to generate and manage JWT tokens for authenticated sessions.
  * * @author 2480010
  *
  * @version 1.0
  * @since 04-03-2026
  */
-//@Service
-//@RequiredArgsConstructor
-//public class AuthService {
-//    private final JwtUtil jwtUtil;
-//    private final UserRepository userRepository;
-//    private final PasswordEncoder passwordEncoder;
-//
-//    public LoginResponseDto login(LoginRequestDto request) {
-//        String token = jwtUtil.generateToken(request.getUsername());
-//        return new LoginResponseDto(token);
-//    }
-//}
-
-
-
-//public class AuthService {
-//
-//    private final UserRepository userRepository;
-//    private final JwtUtil jwtUtil;
-//    private final PasswordEncoder passwordEncoder;
-//
-//    public String authenticateAndGenerateToken(LoginRequestDto loginRequest) {
-//        User user = userRepository.findByUsername(loginRequest.getUsername())
-//                .orElseThrow(() -> new RuntimeException("Invalid Username or Password"));
-//
-//        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-//            throw new RuntimeException("Invalid Username or Password");
-//        }
-//
-//        return jwtUtil.generateToken(user.getName());
-//    }
-//}
-
-
-
 
 @Service
 @RequiredArgsConstructor
@@ -71,24 +36,18 @@ public class AuthService {
     }
 
     public LoginResponseDto login(LoginRequestDto loginDto) {
-        // 1. Find the user by email
         User user = userRepository.findByEmail(loginDto.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found with email: " + loginDto.getEmail()));
 
-        // 2. Verify the password
-        // (Matches the raw password from DTO against the hashed password in DB)
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
 
-        // 3. Generate the tokens
-        // Note: Use .name() or .toString() if your role is an Enum
         String roleName = user.getRole().name();
 
         String accessToken = jwtUtil.generateAccessToken(user.getEmail(), roleName);
         String refreshToken = jwtUtil.generateRefreshToken(user.getEmail(), roleName);
 
-        // 4. Return the dual-token response
         return new LoginResponseDto(accessToken, refreshToken, "Bearer");
     }
 

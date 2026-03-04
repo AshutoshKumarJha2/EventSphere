@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * [Detailed description of the class's responsibility]
+ * JwtUtil is a utility class responsible for generating and validating JWT tokens. It provides methods to create access and refresh tokens based on user email and role, as well as methods to extract user information from the token and validate its type. The class uses a secret key for signing the tokens and configurable expiration times for both access and refresh tokens.
  * * @author 2480010
  *
  * @version 1.0

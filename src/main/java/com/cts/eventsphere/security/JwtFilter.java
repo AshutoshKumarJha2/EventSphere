@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 /**
- * [Detailed description of the class's responsibility]
+ * JwtFilter is a custom filter that intercepts incoming HTTP requests to validate JWT tokens. It checks the "Authorization" header for a Bearer token, extracts the user information from the token, and sets the authentication in the SecurityContext if the token is valid. If any exceptions occur during token validation, it logs the error and clears the SecurityContext.
  * * @author 2480010
  *
  * @version 1.0

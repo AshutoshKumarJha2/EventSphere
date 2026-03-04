@@ -1,7 +1,7 @@
 package com.cts.eventsphere.security;
 
 /**
- * [Detailed description of the class's responsibility]
+ * enum representing the types of tokens used in the authentication system, such as access tokens and refresh tokens.
  * * @author 2480010
  *
  * @version 1.0

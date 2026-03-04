@@ -6,7 +6,7 @@ import java.util.Collection;
 
 
 /**
- * [Detailed description of the class's responsibility]
+ * UserPrincipal is a record that represents the authenticated user's principal information, including their email, role, and authorities. It is used in the security context to manage user authentication and authorization.
  * * @author 2480010
  *
  * @version 1.0

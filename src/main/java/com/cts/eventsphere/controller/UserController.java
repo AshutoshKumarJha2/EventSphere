@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * [Detailed description of the class's responsibility]
+ * Rest Controller for User entity
  * * @author 2480010
  *
  * @version 1.0
