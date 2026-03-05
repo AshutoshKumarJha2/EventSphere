@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  * @since 01-03-2026
  */
 public record PaymentRequestDto(
-        Invoice invoiceId,
+        Invoice invoice,
         BigDecimal amount,
         LocalDateTime date
 

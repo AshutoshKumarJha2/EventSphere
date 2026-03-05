@@ -54,7 +54,7 @@ public class Expense {
 
 //    @Column(columnDefinition = "CHAR(36)")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "approvedBy" , nullable = false)
+    @JoinColumn(name = "approvedBy" , nullable = true)
     private User approvedBy;
 
     @Enumerated(EnumType.STRING)

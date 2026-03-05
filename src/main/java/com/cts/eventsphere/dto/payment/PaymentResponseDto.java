@@ -15,7 +15,7 @@ import java.math.BigDecimal;
  */
 public record PaymentResponseDto(
     String paymentId,
-    Invoice invoiceId,
+    Invoice invoice,
     BigDecimal amount,
     PaymentMethod method,
     PaymentStatus status,

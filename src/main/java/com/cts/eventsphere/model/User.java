@@ -7,6 +7,8 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * User model class
@@ -52,4 +54,7 @@ public class User {
 
     @CreationTimestamp
     private  LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "approvedBy")
+    private List<Expense> approvedExpense = new ArrayList<>();
 }

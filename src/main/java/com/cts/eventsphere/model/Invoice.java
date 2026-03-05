@@ -8,6 +8,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents an invoice issued for contractual services.
@@ -25,6 +27,10 @@ public class Invoice {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "CHAR(36)")
     private String invoiceId;
+
+    @OneToMany(mappedBy = "invoice" , cascade = CascadeType.ALL)
+    private List<Payment> payments = new ArrayList<>();
+
 
     @Column(nullable = false)
     private String contractId;

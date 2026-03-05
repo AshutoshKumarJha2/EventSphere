@@ -42,7 +42,7 @@ public class Payment {
 //    @Column(nullable = false , columnDefinition = "CHAR(36)")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "invoiceId" , nullable = false)
-    private Invoice invoiceId;
+    private Invoice invoice;
 
     @Column(nullable = false , precision = 10 , scale = 2)
     private BigDecimal amount;
