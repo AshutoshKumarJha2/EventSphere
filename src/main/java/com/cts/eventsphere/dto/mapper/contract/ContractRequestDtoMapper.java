@@ -4,6 +4,14 @@ import com.cts.eventsphere.dto.contract.ContractRequestDto;
 import com.cts.eventsphere.model.Contract;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper for converting Contract entity to ContractRequestDto
+ *
+ * @author 2480177
+ * @version 1.0
+ * @since 02-03-2026
+ */
+
 @Component
 public class ContractRequestDtoMapper {
     public Contract toEntity(ContractRequestDto dto){
