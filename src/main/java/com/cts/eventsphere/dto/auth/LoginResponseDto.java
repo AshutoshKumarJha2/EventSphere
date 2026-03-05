@@ -11,11 +11,12 @@ import lombok.RequiredArgsConstructor;
  * @version 1.0
  * @since 03-03-2026
  */
-@Data
-@RequiredArgsConstructor
-@AllArgsConstructor
-public class LoginResponseDto {
-    private String accessToken;
-    private String refreshToken;
-    private String type;
-}
+//@Data
+//@RequiredArgsConstructor
+//@AllArgsConstructor
+public record LoginResponseDto(
+        String accessToken,
+    String refreshToken,
+    String type
+    )
+{}

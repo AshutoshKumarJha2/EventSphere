@@ -6,6 +6,7 @@ import com.cts.eventsphere.dto.user.UserRequestDto;
 import com.cts.eventsphere.model.User;
 import com.cts.eventsphere.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -32,14 +34,15 @@ public class AuthService {
         user.setRole(dto.role());
         user.setPassword(passwordEncoder.encode(dto.password())); // Hashing
         userRepository.save(user);
+        log.info("User registered with details: {}", user);
         return "User registered successfully";
     }
 
     public LoginResponseDto login(LoginRequestDto loginDto) {
-        User user = userRepository.findByEmail(loginDto.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + loginDto.getEmail()));
+        User user = userRepository.findByEmail(loginDto.email())
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + loginDto.email()));
 
-        if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(loginDto.password(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
 
