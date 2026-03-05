@@ -24,11 +24,7 @@ public interface FeedbackService {
 
     Page<FeedbackResponseDto> listByEvent(String eventId, Pageable pageable);
 
-    Page<FeedbackResponseDto> listByEventAndAttendee(String eventId, String attendeeId, Pageable pageable);
-
     Page<FeedbackResponseDto> listByEventAndDateRange(String eventId, LocalDateTime start, LocalDateTime end, Pageable pageable);
-
-    FeedbackResponseDto update(String feedbackId, FeedbackRequestDto request);
 
     void delete(String feedbackId);
 }

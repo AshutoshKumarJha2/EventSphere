@@ -39,7 +39,7 @@ public class Engagement {
 
     @CreationTimestamp
     @Column(nullable = false)
-    private LocalDateTime activityTimestamp;
+    private LocalDateTime timestamp;
 
     @CreationTimestamp
     @Column(updatable = false)
