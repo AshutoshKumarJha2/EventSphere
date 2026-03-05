@@ -31,7 +31,7 @@ import java.util.List;
  * @since 01-03-2026
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 @Slf4j
 @RequiredArgsConstructor
 public class ExpenseController {
@@ -45,7 +45,10 @@ public class ExpenseController {
      */
     @GetMapping("/expenses")
     public ResponseEntity<List<ExpenseResponseDto>> getAllExpenses(){
-        return ResponseEntity.ok(expenseService.getAllExpenses());
+        log.info("Request to fetch all expenses");
+        List<ExpenseResponseDto> response = expenseService.getAllExpenses();
+        log.info("Response for all expenses: {}", response);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -53,7 +56,10 @@ public class ExpenseController {
      */
     @GetMapping("/events/{eventId}/expenses")
     public ResponseEntity<List<ExpenseResponseDto>> getEventExpenses(@PathVariable String eventId){
-        return ResponseEntity.ok(expenseService.getExpenseByEvent(eventId));
+        log.info("Request to fetch expenses for eventId: {}", eventId);
+        List<ExpenseResponseDto> response = expenseService.getExpenseByEvent(eventId);
+        log.info("Response for eventId {}: {}", eventId, response);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -61,7 +67,10 @@ public class ExpenseController {
      */
     @PostMapping("/events/{eventId}/expenses")
     public ResponseEntity<ExpenseResponseDto> createExpense(@PathVariable String eventId , @RequestBody ExpenseRequestDto request){
-        return new ResponseEntity<>(expenseService.createExpense(eventId , request),HttpStatus.CREATED);
+        log.info("Request to create expense for eventId: {} with data: {}", eventId, request);
+        ExpenseResponseDto response = expenseService.createExpense(eventId , request);
+        log.info("Response for created expense in eventId {}: {}", eventId, response);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     /**
@@ -69,7 +78,9 @@ public class ExpenseController {
      */
     @DeleteMapping("/expenses/{expenseId}")
     public ResponseEntity<Void> deleteExpense(@PathVariable String expenseId){
+        log.info("Request to delete expense with ID: {}", expenseId);
         expenseService.deleteExpense(expenseId);
+        log.info("Successfully deleted expense with ID: {}", expenseId);
         return ResponseEntity.noContent().build();
     }
 
@@ -78,7 +89,9 @@ public class ExpenseController {
      */
     @PatchMapping("expenses/{expenseId}/status")
     public ResponseEntity<ExpenseResponseDto> updateExpenseStatus(@PathVariable String expenseId , @RequestParam ExpenseStatus status){
+        log.info("Request to update status for expenseId: {} to status: {}", expenseId, status);
         ExpenseResponseDto response = expenseService.updateExpenseStatus(expenseId , status);
+        log.info("Response for updated expense status: {}", response);
         return ResponseEntity.ok(response);
     }
 
@@ -87,7 +100,9 @@ public class ExpenseController {
      */
     @PostMapping("expenses/{expenseId}/payment")
     public ResponseEntity<PaymentResponseDto> makePayment(@PathVariable String expenseId , @RequestBody PaymentRequestDto request){
+        log.info("Request to process payment for expenseId: {} with data: {}", expenseId, request);
         PaymentResponseDto response = paymentService.markPayment(expenseId , request);
+        log.info("Response for processed payment: {}", response);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 

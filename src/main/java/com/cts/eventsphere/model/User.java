@@ -55,6 +55,6 @@ public class User {
     @CreationTimestamp
     private  LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "approvedBy")
+    @OneToMany(mappedBy = "approvedBy", cascade = CascadeType.ALL)
     private List<Expense> approvedExpense = new ArrayList<>();
 }
