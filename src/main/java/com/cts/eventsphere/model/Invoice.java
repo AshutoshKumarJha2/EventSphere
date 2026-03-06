@@ -23,9 +23,10 @@ import java.util.List;
 @Table(name = "invoice")
 @Data
 public class Invoice {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "CHAR(36)")
+    @Column(name = "invoiceId", columnDefinition = "CHAR(36)")
     private String invoiceId;
 
     @OneToMany(mappedBy = "invoice" , cascade = CascadeType.ALL)
@@ -35,19 +36,39 @@ public class Invoice {
     @Column(nullable = false)
     private String contractId;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal totalAmount;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contractId", insertable = false, updatable = false)
+    private Contract contract;
+
+    @Column
+    private LocalDateTime issueDate;
 
     private LocalDateTime dueDate;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('issued','paid','overdue','cancelled')")
     private InvoiceStatus status = InvoiceStatus.issued;
 
+    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Delivery> deliveries = new ArrayList<>();
+
     @CreationTimestamp
-    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    public void addDelivery(Delivery delivery) {
+        deliveries.add(delivery);
+        delivery.setInvoice(this);
+        delivery.setInvoiceId(this.invoiceId);
+    }
+
+    public void removeDelivery(Delivery delivery) {
+        deliveries.remove(delivery);
+        delivery.setInvoice(null);
+    }
 }

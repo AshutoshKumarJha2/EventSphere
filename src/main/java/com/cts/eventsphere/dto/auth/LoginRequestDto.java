@@ -9,9 +9,11 @@ import lombok.Data;
  * @version 1.0
  * @since 03-03-2026
  */
-@Data
-public class LoginRequestDto {
-    private String password;
-    private String email;
-    private String role;
-}
+//@Data
+public record LoginRequestDto(
+    String password,
+    String email,
+    String role
+    )
+{}
+

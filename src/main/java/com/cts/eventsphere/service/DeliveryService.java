@@ -5,6 +5,14 @@ import com.cts.eventsphere.dto.delivery.DeliveryResponseDto;
 
 import java.util.List;
 
+/**
+ * Service interface for Delivery Operations
+ *
+ * @author 2480177
+ * @version 1.0
+ * @since 03-03-2026
+ */
+
 public interface DeliveryService {
     DeliveryResponseDto createDelivery(DeliveryRequestDto request);
 

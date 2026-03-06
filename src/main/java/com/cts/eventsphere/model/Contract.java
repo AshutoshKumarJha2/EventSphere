@@ -8,6 +8,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a contract between EventSphere and a vendor/client.
@@ -21,16 +23,25 @@ import java.time.LocalDateTime;
 @Table(name = "contract")
 @Data
 public class Contract {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "CHAR(36)")
+    @Column(name = "contractId", columnDefinition = "CHAR(36)")
     private String contractId;
 
-    @Column(nullable = false, columnDefinition = "CHAR(36)")
+    @Column(name = "vendorId", columnDefinition = "CHAR(36)")
     private String vendorId;
 
-    @Column(nullable = false, columnDefinition = "CHAR(36)")
+    @Column(name = "eventId", columnDefinition = "CHAR(36)")
     private String eventId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vendorId", insertable = false, updatable = false)
+    private Vendor vendor;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "eventId", insertable = false, updatable = false)
+    private Event event;
 
     @Column(nullable = false)
     private LocalDateTime startDate;
@@ -45,10 +56,24 @@ public class Contract {
     @Column(columnDefinition = "ENUM('draft','active','completed','terminated')")
     private ContractStatus status = ContractStatus.draft;
 
+    @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Invoice> invoices = new ArrayList<>();
+
     @CreationTimestamp
-    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+
+    public void addInvoice(Invoice invoice) {
+        invoices.add(invoice);
+        invoice.setContract(this);
+        invoice.setContractId(this.contractId);
+    }
+
+    public void removeInvoice(Invoice invoice) {
+        invoices.remove(invoice);
+        invoice.setContract(null);
+    }
 }
