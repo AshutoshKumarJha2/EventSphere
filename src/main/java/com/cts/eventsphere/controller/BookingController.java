@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * Controller for Booking API Endpoints
- * * Workflow: Organizer selects venue -> Booking created (Pending)
+ * Workflow: Organizer selects venue -> Booking created (Pending)
  *
  * @author 2479476
  * @version 1.0
@@ -31,36 +31,43 @@ public class BookingController {
 
     /**
      * Creates a new booking.
-     * Initial status is set to 'pending' within the service layer.
      */
     @PostMapping
-    public ResponseEntity<BookingResponseDto> createBooking( @RequestBody BookingRequestDto bookingRequestDto) {
-        log.info("Received request to create booking for Event: {} and Venue: {}",
-                bookingRequestDto.eventId(), bookingRequestDto.venueId());
+    public ResponseEntity<BookingResponseDto> createBooking(@RequestBody BookingRequestDto bookingRequestDto) {
+        log.info("REST request to create Booking. Request Data: {}", bookingRequestDto);
 
         BookingResponseDto response = bookingService.createBooking(bookingRequestDto);
+
+        log.info("Booking created successfully. Response Data: {}", response);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-
 
     /**
      * Retrieves all bookings.
      */
     @GetMapping
     public ResponseEntity<List<BookingResponseDto>> getAllBookings() {
-        log.info("Fetching all bookings");
+        log.info("REST request to fetch all bookings");
+
         List<BookingResponseDto> bookings = bookingService.getAllBookings();
+
+        log.info("Successfully fetched {} bookings", bookings.size());
         return ResponseEntity.ok(bookings);
     }
 
+    /**
+     * Updates the status of a specific booking.
+     */
     @PatchMapping("/{id}/status")
     public ResponseEntity<BookingResponseDto> updateStatus(
             @PathVariable("id") String id,
             @RequestParam("newStatus") BookingStatus newStatus) {
 
-        log.info("Request to update status for Booking ID: {} to {}", id, newStatus);
+        log.info("REST request to update status for Booking ID: {} to {}", id, newStatus);
 
         BookingResponseDto updatedBooking = bookingService.updateBookingStatus(id, newStatus);
+
+        log.info("Booking status updated successfully. Response Data: {}", updatedBooking);
         return ResponseEntity.ok(updatedBooking);
     }
 
@@ -69,8 +76,11 @@ public class BookingController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBooking(@PathVariable("id") String bookingId) {
-        log.info("Deleting booking with ID: {}", bookingId);
+        log.info("REST request to delete booking with ID: {}", bookingId);
+
         bookingService.deleteBooking(bookingId);
+
+        log.info("Booking with ID: {} deleted successfully", bookingId);
         return ResponseEntity.noContent().build();
     }
 }
