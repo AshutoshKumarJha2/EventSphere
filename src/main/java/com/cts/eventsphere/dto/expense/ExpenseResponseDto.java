@@ -1,5 +1,6 @@
 package com.cts.eventsphere.dto.expense;
 
+import com.cts.eventsphere.model.User;
 import com.cts.eventsphere.model.data.ExpenseStatus;
 
 import java.math.BigDecimal;
@@ -18,7 +19,7 @@ public record ExpenseResponseDto(
         String description,
         BigDecimal amount,
         String date,
-        String approvedBy,
+        User approvedBy,
         ExpenseStatus status,
         String createdAt,
         String updatedAt

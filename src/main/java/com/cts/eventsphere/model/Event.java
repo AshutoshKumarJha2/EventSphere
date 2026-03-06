@@ -7,6 +7,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Event model class.
@@ -49,4 +51,7 @@ public class Event {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "event" , cascade = CascadeType.ALL)
+    private List<Expense> expenses = new ArrayList<>();
 }

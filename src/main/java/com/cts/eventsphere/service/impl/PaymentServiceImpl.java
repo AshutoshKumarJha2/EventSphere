@@ -12,6 +12,7 @@ import com.cts.eventsphere.repository.ExpenseRepository;
 import com.cts.eventsphere.repository.PaymentRepository;
 import com.cts.eventsphere.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final ExpenseRepository expenseRepository;
@@ -35,10 +37,13 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentResponseDto markPayment(String expenseId , PaymentRequestDto request) throws ExpenseNotFoundException{
+        log.info("Request to mark payment for expenseId: {} with details: {}", expenseId, request);
         Expense expense = expenseRepository.findById(expenseId)
                 .orElseThrow(() -> new ExpenseNotFoundException(expenseId));
         Payment payment = paymentRequestDtoMapper.toEntity(request);
         payment.setStatus(PaymentStatus.completed);
-        return paymentResponseDtoMapper.toDTO(paymentRepository.save(payment));
+        PaymentResponseDto response = paymentResponseDtoMapper.toDTO(paymentRepository.save(payment));
+        log.info("Payment successfully processed for expenseId: {}. Status: {}", expenseId, response.status());
+        return response;
     }
 }

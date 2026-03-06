@@ -38,7 +38,7 @@ public class Expense {
     @Column(columnDefinition = "CHAR(36)")
     private String expenseId;
 
-
+//    @Column(nullable = false , columnDefinition = "CHAR(36)")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "eventId" , nullable = false)
     private Event event;
@@ -52,8 +52,10 @@ public class Expense {
     @Column(nullable = false)
     private LocalDate date;
 
-    @Column(columnDefinition = "CHAR(36)")
-    private String approvedBy;
+//    @Column(columnDefinition = "CHAR(36)")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "approvedBy" , nullable = true)
+    private User approvedBy;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('submitted', 'rejected', 'approved', 'paid')")
