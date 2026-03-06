@@ -105,12 +105,18 @@
             <version>0.11.5</version>
             <scope>runtime</scope>
         </dependency>
+<<<<<<< HEAD
+
+
+    </dependencies>
+=======
         <dependency>
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
             <version>1.0.2</version>
         </dependency>
 	</dependencies>
+>>>>>>> 27c949ab7c002fc11ba6a66c560c4dfd0934cac2
 
     <build>
         <plugins>
@@ -126,6 +132,7 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

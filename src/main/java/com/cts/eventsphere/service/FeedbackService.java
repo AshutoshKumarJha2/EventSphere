@@ -1,7 +1,7 @@
 package com.cts.eventsphere.service;
 
 /**
- * [ Detailed description of the class's responsibility]
+ *Service class for feedback entity
  *
  * @author 2480027
  * @version 1.0
@@ -24,11 +24,7 @@ public interface FeedbackService {
 
     Page<FeedbackResponseDto> listByEvent(String eventId, Pageable pageable);
 
-    Page<FeedbackResponseDto> listByEventAndAttendee(String eventId, String attendeeId, Pageable pageable);
-
     Page<FeedbackResponseDto> listByEventAndDateRange(String eventId, LocalDateTime start, LocalDateTime end, Pageable pageable);
-
-    FeedbackResponseDto update(String feedbackId, FeedbackRequestDto request);
 
     void delete(String feedbackId);
 }
