@@ -39,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
                 UserPrincipal principal;
-                if (request.getServletPath().equals("/api/auth/refresh")) {
+                if (request.getServletPath().equals("/api/v1/auth/refresh")) {
                     principal = jwtUtil.extractUserPrincipal(token, TokenType.REFRESH);
                 } else {
                     principal = jwtUtil.extractUserPrincipal(token, TokenType.ACCESS);
