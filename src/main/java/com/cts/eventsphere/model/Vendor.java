@@ -7,6 +7,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a vendor entity in the EventSphere system.
@@ -20,12 +22,13 @@ import java.time.LocalDateTime;
 @Table(name = "vendor")
 @Data
 public class Vendor {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "CHAR(36)")
+    @Column(name = "vendorId", columnDefinition = "CHAR(36)")
     private String vendorId;
 
-    @Column(nullable = false , length = 100)
+    @Column(nullable = false, length = 100)
     private String name;
 
     @Column(length = 100)
@@ -41,4 +44,7 @@ public class Vendor {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "vendor")
+    private List<Contract> contracts = new ArrayList<>();
 }
