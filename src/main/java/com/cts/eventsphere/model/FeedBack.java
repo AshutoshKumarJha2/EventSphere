@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "feedback")
 @Data
-
 @NoArgsConstructor
 public class FeedBack {
 
@@ -28,10 +27,18 @@ public class FeedBack {
     @Column(columnDefinition = "CHAR(36)")
     private String feedbackId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "eventId", referencedColumnName = "eventId", insertable = false, updatable = false)
+    private Event event;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "attendeeId", referencedColumnName = "userId", insertable = false, updatable = false)
+    private User attendee;
+
     @Column(nullable = false, columnDefinition = "CHAR(36)")
     private String eventId;
 
-    @Column(nullable = false,columnDefinition = "CHAR(36)")
+    @Column(nullable = false, columnDefinition = "CHAR(36)")
     private String attendeeId;
 
     @Column(nullable = false)
@@ -40,6 +47,7 @@ public class FeedBack {
     @Column(nullable = false)
     private String comments;
 
+    @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime date;
 
@@ -49,6 +57,4 @@ public class FeedBack {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-
 }

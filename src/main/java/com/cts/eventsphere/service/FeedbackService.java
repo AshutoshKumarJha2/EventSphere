@@ -1,7 +1,7 @@
 package com.cts.eventsphere.service;
 
 /**
- * [ Detailed description of the class's responsibility]
+ *Service class for feedback entity
  *
  * @author 2480027
  * @version 1.0

@@ -20,15 +20,20 @@ import java.time.LocalDateTime;
 @Table(name = "delivery")
 @Data
 public class Delivery {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "CHAR(36)")
+    @Column(name = "deliveryId", columnDefinition = "CHAR(36)")
     private String deliveryId;
 
-    @Column(nullable = false)
+    @Column(name = "invoiceId", columnDefinition = "CHAR(36)")
     private String invoiceId;
 
-    @Column(nullable = false, length = 100)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "invoiceId", insertable = false, updatable = false)
+    private Invoice invoice;
+
+    @Column(length = 100, nullable = false)
     private String item;
 
     @Column(nullable = false)
@@ -44,7 +49,6 @@ public class Delivery {
     private String trackingNumber;
 
     @CreationTimestamp
-    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp

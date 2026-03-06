@@ -1,67 +1,33 @@
 package com.cts.eventsphere.repository;
-import com.cts.eventsphere.model.Engagement;
-import org.springframework.data.jpa.repository.JpaRepository;
-import com.cts.eventsphere.model.data.EngagementType;
-import com.cts.eventsphere.model.data.UserStatus;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.*;
 
+import com.cts.eventsphere.model.Engagement;
+import com.cts.eventsphere.model.data.EngagementType;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.List;
 /**
- * Jpa repository for engagement entity
+ * Jpa Repository for Engagement Operations
  *
  * @author 2480027
  * @version 1.0
- * @since 03-03-2026
+ * @since 05-03-2026
  */
 
-import org.springframework.data.repository.query.Param;
+@Repository
+public interface EngagementRepository extends JpaRepository<Engagement, String> {
 
-import java.time.LocalDateTime;
+    // Filter 1: All engagements for a specific event
+    List<Engagement> findByEventId(String eventId);
 
-public interface EngagementRepository extends JpaRepository<Engagement, String>, JpaSpecificationExecutor<Engagement> {
+    // Filter 2: Specific activity across all events (Global trends)
+    List<Engagement> findByActivity(EngagementType activity);
 
-    // --- AC2: Filtering by event/activity/time window (paged) ---
-    Page<Engagement> findByEventId(String eventId, Pageable pageable);
+    // Filter 3: Engagements within a specific time window across all events
+    List<Engagement> findByTimestampBetween(LocalDateTime start, LocalDateTime end);
 
-    Page<Engagement> findByEventIdAndActivity(String eventId, EngagementType activity, Pageable pageable);
-
-    Page<Engagement> findByEventIdAndActivityTimestampBetween(
-            String eventId, LocalDateTime start, LocalDateTime end, Pageable pageable
-    );
-
-    Page<Engagement> findByEventIdAndActivityAndActivityTimestampBetween(
-            String eventId, EngagementType activity, LocalDateTime start, LocalDateTime end, Pageable pageable
-    );
-
-    // --- AC1: KPIs - count only engagements from attendees with CONFIRMED registration ---
-    // Requires a Registration entity/table with fields: eventId, attendeeId, status (UserStatus)
-    @Query("""
-           SELECT COUNT(e)
-           FROM Engagement e, Registration r
-           WHERE r.eventId = e.eventId
-             AND r.attendeeId = e.attendeeId
-             AND r.status = :status
-             AND e.eventId = :eventId
-             AND (:activity IS NULL OR e.activity = :activity)
-             AND (:start IS NULL OR e.activityTimestamp >= :start)
-             AND (:end   IS NULL OR e.activityTimestamp <= :end)
-           """)
-    long countForEventWithRegistrationStatus(
-            @Param("eventId") String eventId,
-            @Param("activity") EngagementType activity,
-            @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end,
-            @Param("status") UserStatus status
-    );
-
-    // Convenience method for AC1 (CONFIRMED only)
-    default long countConfirmedEngagements(
-            String eventId,
-            EngagementType activity,
-            LocalDateTime start,
-            LocalDateTime end
-    ) {
-        return countForEventWithRegistrationStatus(eventId, activity, start, end, UserStatus.CONFIRMED);
-    }
+    // Filter 4: Granular filtering (The one we previously had)
+    List<Engagement> findByEventIdAndActivityAndTimestampBetween(
+            String eventId, EngagementType activity, LocalDateTime start, LocalDateTime end);
 }
