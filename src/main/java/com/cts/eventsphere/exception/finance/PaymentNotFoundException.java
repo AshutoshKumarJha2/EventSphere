@@ -1,5 +1,7 @@
 package com.cts.eventsphere.exception.finance;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Error thrown when a payment is not found.
  *
@@ -7,8 +9,10 @@ package com.cts.eventsphere.exception.finance;
  * @version 1.0
  * @since 28-02-2026
  */
-public class PaymentNotFoundException extends RuntimeException{
-    public PaymentNotFoundException(String message){
+@Slf4j
+public class PaymentNotFoundException extends RuntimeException {
+    public PaymentNotFoundException(String message) {
         super(message);
+        log.error("Payment Exception Triggered: {}", message);
     }
 }

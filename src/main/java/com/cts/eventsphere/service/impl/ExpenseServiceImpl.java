@@ -13,6 +13,7 @@ import com.cts.eventsphere.repository.EventRepository;
 import com.cts.eventsphere.repository.ExpenseRepository;
 import com.cts.eventsphere.service.ExpenseService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ExpenseServiceImpl implements ExpenseService {
 
     private final ExpenseRepository expenseRepository;
@@ -41,11 +43,15 @@ public class ExpenseServiceImpl implements ExpenseService {
      */
     @Override
     public ExpenseResponseDto createExpense(String eventId , ExpenseRequestDto request) throws EventNotFoundException{
+        log.info("Creating expense for eventId: {} with details: {}", eventId, request);
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(eventId));
         Expense expense = expenseRequestDtoMapper.toEntity(request);
         expense.setEvent(event);
-        return expenseResponseDtoMapper.toDTO(expenseRepository.save(expense));
+        Expense savedExpense = expenseRepository.save(expense);
+        ExpenseResponseDto response = expenseResponseDtoMapper.toDTO(savedExpense);
+        log.info("Successfully saved expense for eventId: {}. Response: {}", eventId, response);
+        return response;
 
     }
 
@@ -54,9 +60,12 @@ public class ExpenseServiceImpl implements ExpenseService {
      */
     @Override
     public List<ExpenseResponseDto> getAllExpenses() {
-        return expenseRepository.findAll().stream()
+        log.info("Fetching all expenses from the database");
+        List<ExpenseResponseDto> expenses = expenseRepository.findAll().stream()
                 .map(expenseResponseDtoMapper::toDTO)
                 .toList();
+        log.info("Retrieved {} expenses in total", expenses.size());
+        return expenses;
     }
 
     /**
@@ -64,12 +73,15 @@ public class ExpenseServiceImpl implements ExpenseService {
      */
     @Override
     public List<ExpenseResponseDto> getExpenseByEvent(String eventId) throws EventNotFoundException{
+        log.info("Fetching expenses for eventId: {}", eventId);
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(eventId));
-        return expenseRepository.findAll().stream()
+        List<ExpenseResponseDto> expenses = expenseRepository.findAll().stream()
                 .filter(expense -> expense.getEvent().getEventId().equals(event.getEventId()))
                 .map(expenseResponseDtoMapper::toDTO)
                 .toList();
+        log.info("Retrieved {} expenses for eventId: {}", expenses.size(), eventId);
+        return expenses;
     }
 
     /**
@@ -77,10 +89,12 @@ public class ExpenseServiceImpl implements ExpenseService {
      */
     @Override
     public void deleteExpense(String expenseId) throws ExpenseNotFoundException{
+        log.info("Attempting to delete expense with ID: {}", expenseId);
         if(!expenseRepository.existsById(expenseId)){
             throw new ExpenseNotFoundException(expenseId);
         }
         expenseRepository.deleteById(expenseId);
+        log.info("Successfully deleted expense with ID: {}", expenseId);
     }
 
     /**
@@ -88,11 +102,14 @@ public class ExpenseServiceImpl implements ExpenseService {
      */
     @Override
     public ExpenseResponseDto updateExpenseStatus(String expenseId , ExpenseStatus status) throws ExpenseNotFoundException{
+        log.info("Request to update status for expenseId: {} to {}", expenseId, status);
         Expense expense = expenseRepository.findById(expenseId)
                 .orElseThrow(() -> new ExpenseNotFoundException(expenseId));
         expense.setStatus(status);
         Expense updatedExpense = expenseRepository.save(expense);
-        return expenseResponseDtoMapper.toDTO(updatedExpense);
+        ExpenseResponseDto response = expenseResponseDtoMapper.toDTO(updatedExpense);
+        log.info("Successfully updated expenseId: {} to status: {}", expenseId, response.status());
+        return response;
 
     }
 

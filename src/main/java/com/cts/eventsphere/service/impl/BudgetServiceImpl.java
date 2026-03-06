@@ -11,6 +11,7 @@ import com.cts.eventsphere.repository.BudgetRepository;
 import com.cts.eventsphere.repository.EventRepository;
 import com.cts.eventsphere.service.BudgetService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BudgetServiceImpl  implements BudgetService {
     private final BudgetRepository budgetRepository;
     private final EventRepository eventRepository;
@@ -33,10 +35,13 @@ public class BudgetServiceImpl  implements BudgetService {
      */
     @Override
     public BudgetResponseDto createBudget(String eventId, BudgetRequestDto request) throws EventNotFoundException{
+        log.info("Starting budget creation for eventId: {} with details: {}", eventId, request);
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(eventId));
         Budget budget = budgetRequestDtoMapper.toEntity(request , event);
         Budget savedBudget = budgetRepository.save(budget);
-        return budgetResponseDtoMapper.toDTO(savedBudget);
+        BudgetResponseDto response = budgetResponseDtoMapper.toDTO(savedBudget);
+        log.info("Successfully saved budget. Generated Budget ID: {}", savedBudget.getBudgetId());
+        return response;
     }
 }

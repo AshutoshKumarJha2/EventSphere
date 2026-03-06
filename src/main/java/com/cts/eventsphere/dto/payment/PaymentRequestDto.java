@@ -1,5 +1,6 @@
 package com.cts.eventsphere.dto.payment;
 
+import com.cts.eventsphere.model.Invoice;
 import com.cts.eventsphere.model.data.PaymentStatus;
 
 import java.math.BigDecimal;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
  * @since 01-03-2026
  */
 public record PaymentRequestDto(
-        String invoiceId,
+        Invoice invoice,
         BigDecimal amount,
         LocalDateTime date
 

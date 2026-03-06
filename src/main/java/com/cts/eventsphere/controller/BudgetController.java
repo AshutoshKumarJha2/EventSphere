@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 01-03-2026
  */
 @RestController
-@RequestMapping("/api/events")
+@RequestMapping("/api/events/v1")
 @Slf4j
 @RequiredArgsConstructor
 public class BudgetController {
@@ -35,6 +35,9 @@ public class BudgetController {
      */
     @PostMapping("/{eventId}/budget")
     public ResponseEntity<BudgetResponseDto> setBudget(@PathVariable String eventId , @RequestBody BudgetRequestDto request){
-        return new ResponseEntity<>(budgetService.createBudget(eventId , request), HttpStatus.CREATED);
+        log.info("Request to set budget for eventId: {} with data: {}", eventId, request);
+        BudgetResponseDto response = budgetService.createBudget(eventId , request);
+        log.info("Response for eventId: {}: {}", eventId, response);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

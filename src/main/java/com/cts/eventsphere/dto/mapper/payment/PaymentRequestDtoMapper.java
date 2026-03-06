@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class PaymentRequestDtoMapper {
     public Payment toEntity(PaymentRequestDto dto){
         Payment payment = new Payment();
-        payment.setInvoiceId(dto.invoiceId());
+        payment.setInvoice(dto.invoice());
         payment.setAmount(dto.amount());
         payment.setPaymentDate(dto.date());
         return payment;
