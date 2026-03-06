@@ -1,4 +1,4 @@
-package com.cts.eventsphere.dto;
+package com.cts.eventsphere.dto.user;
 
 import com.cts.eventsphere.model.data.UserRoles;
 import com.cts.eventsphere.model.data.UserStatus;
