@@ -1,4 +1,4 @@
-package com.cts.eventsphere;
+package com.cts.eventsphere.financeModuleTest;
 
 
 import com.cts.eventsphere.dto.expense.ExpenseRequestDto;
