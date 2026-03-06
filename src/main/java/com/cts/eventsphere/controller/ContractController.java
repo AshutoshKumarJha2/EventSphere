@@ -9,6 +9,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controller for Contract Operations
+ *
+ * @author 2480177
+ * @version 1.0
+ * @since 03-03-2026
+ */
+
 @RestController
 @RequestMapping("/api/v1/contracts")
 @RequiredArgsConstructor
@@ -19,13 +27,16 @@ public class ContractController {
 
     @PostMapping
     public ContractResponseDto create(@RequestBody ContractRequestDto request) {
-        log.info("Creating contract");
-        return contractService.createContract(request);
+        log.info("Received request to create contract: vendorId={}, eventId={}",
+                request.vendorId(), request.eventId());
+        ContractResponseDto response = contractService.createContract(request);
+        log.info("Contract created successfully with ID={}", response.contractId());
+        return response;
     }
 
     @GetMapping("/{id}")
     public ContractResponseDto getById(@PathVariable String id) {
-        log.info("Fetching contract with id: {}", id);
+        log.info("Fetching contract with ID={}", id);
         return contractService.getContractById(id);
     }
 
@@ -40,13 +51,16 @@ public class ContractController {
             @PathVariable String id,
             @RequestBody ContractRequestDto request) {
 
-        log.info("Updating contract with id: {}", id);
-        return contractService.updateContract(id, request);
+        log.info("Updating contract with ID={}", id);
+        ContractResponseDto response = contractService.updateContract(id, request);
+        log.info("Contract updated successfully with ID={}", id);
+        return response;
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String id) {
-        log.info("Deleting contract with id: {}", id);
+        log.warn("Request received to delete contract with ID={}", id);
         contractService.deleteContract(id);
+        log.info("Contract deleted successfully with ID={}", id);
     }
 }
