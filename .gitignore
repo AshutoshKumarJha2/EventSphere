@@ -36,3 +36,5 @@ docs/
 
 flyway.conf
 todo.md
+
+logs/
