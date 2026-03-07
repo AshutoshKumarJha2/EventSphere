@@ -15,9 +15,9 @@ import java.util.List;
 /**
  * Controller for Engagement Operations
  *
- * @author 2480027
- * @version 1.0
- * @since 03-03-2026
+ * author 2480027
+ * version 1.0
+ * since 03-03-2026
  */
 @Slf4j
 @RestController
@@ -30,21 +30,34 @@ public class EngagementController {
         this.engagementService = engagementService;
     }
 
-
+    /**
+     * Get all engagements for a given event.
+     * Accessible to ATTENDEE, ORGANIZER, ADMIN.
+     */
     @GetMapping("/event/{eventId}/log")
+    @PreAuthorize("hasAnyRole('ATTENDEE','ORGANIZER','ADMIN')")
     public ResponseEntity<List<Engagement>> getByEvent(@PathVariable String eventId) {
         log.info("API: get engagements for event={}", eventId);
         return ResponseEntity.ok(engagementService.getByEvent(eventId));
     }
 
-
+    /**
+     * Get engagements by activity type.
+     * Accessible to ATTENDEE, ORGANIZER, ADMIN.
+     */
     @GetMapping("/activity/{activity}/log")
+    @PreAuthorize("hasAnyRole('ATTENDEE','ORGANIZER','ADMIN')")
     public ResponseEntity<List<Engagement>> getByActivity(@PathVariable EngagementType activity) {
         log.info("API: get engagements for activity={}", activity);
         return ResponseEntity.ok(engagementService.getByActivityType(activity));
     }
 
+    /**
+     * Filter engagements by event, activity, and time window.
+     * Accessible to ATTENDEE, ORGANIZER, ADMIN.
+     */
     @GetMapping("/filter")
+    @PreAuthorize("hasAnyRole('ATTENDEE','ORGANIZER','ADMIN')")
     public ResponseEntity<List<Engagement>> getDetailedFilter(
             @RequestParam String eventId,
             @RequestParam EngagementType activity,
