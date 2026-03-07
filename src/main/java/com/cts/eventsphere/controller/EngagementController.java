@@ -30,10 +30,6 @@ public class EngagementController {
         this.engagementService = engagementService;
     }
 
-    /**
-     * Get all engagements for a given event.
-     * Accessible to ATTENDEE, ORGANIZER, ADMIN.
-     */
     @GetMapping("/event/{eventId}/log")
     @PreAuthorize("hasAnyRole('ATTENDEE','ORGANIZER','ADMIN')")
     public ResponseEntity<List<Engagement>> getByEvent(@PathVariable String eventId) {
@@ -41,10 +37,6 @@ public class EngagementController {
         return ResponseEntity.ok(engagementService.getByEvent(eventId));
     }
 
-    /**
-     * Get engagements by activity type.
-     * Accessible to ATTENDEE, ORGANIZER, ADMIN.
-     */
     @GetMapping("/activity/{activity}/log")
     @PreAuthorize("hasAnyRole('ATTENDEE','ORGANIZER','ADMIN')")
     public ResponseEntity<List<Engagement>> getByActivity(@PathVariable EngagementType activity) {
@@ -52,10 +44,6 @@ public class EngagementController {
         return ResponseEntity.ok(engagementService.getByActivityType(activity));
     }
 
-    /**
-     * Filter engagements by event, activity, and time window.
-     * Accessible to ATTENDEE, ORGANIZER, ADMIN.
-     */
     @GetMapping("/filter")
     @PreAuthorize("hasAnyRole('ATTENDEE','ORGANIZER','ADMIN')")
     public ResponseEntity<List<Engagement>> getDetailedFilter(
