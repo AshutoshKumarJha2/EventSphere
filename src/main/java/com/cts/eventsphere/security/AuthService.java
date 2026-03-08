@@ -48,18 +48,19 @@ public class AuthService {
 
         String roleName = user.getRole().name();
 
-        String accessToken = jwtUtil.generateAccessToken(user.getEmail(), roleName);
-        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail(), roleName);
+        String accessToken = jwtUtil.generateAccessToken(user.getUserId(),user.getEmail(), roleName);
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUserId(),user.getEmail(), roleName);
 
         return new LoginResponseDto(accessToken, refreshToken, "Bearer");
     }
 
     public LoginResponseDto refreshToken(UserPrincipal principal) {
+        String userId = principal.userId();
         String email = principal.email();
         String roleName = principal.role();
 
-        String newAccessToken = jwtUtil.generateAccessToken(email, roleName);
-        String newRefreshToken = jwtUtil.generateRefreshToken(email, roleName);
+        String newAccessToken = jwtUtil.generateAccessToken(userId, email, roleName);
+        String newRefreshToken = jwtUtil.generateRefreshToken(userId, email, roleName);
 
         return new LoginResponseDto(newAccessToken, newRefreshToken, "Bearer");
     }

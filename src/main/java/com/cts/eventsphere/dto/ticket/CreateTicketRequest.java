@@ -8,7 +8,6 @@ package com.cts.eventsphere.dto.ticket;
  * @since 2026-03-05
  */
 public record CreateTicketRequest(
-        String eventId,
         String type,
         double price,
         String status
