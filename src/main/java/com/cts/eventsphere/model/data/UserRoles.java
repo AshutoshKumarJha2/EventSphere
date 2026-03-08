@@ -8,5 +8,5 @@ package com.cts.eventsphere.model.data;
  * @since 27-02-2026
  */
 public enum UserRoles {
-    admin, organiser,venue_manager, finance_manager, attendee, vendor
+    admin, organizer,venue_manager, finance_manager, attendee, vendor
 }
