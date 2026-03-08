@@ -28,7 +28,7 @@ public class FeedbackController {
     private final FeedbackService feedbackService;
 
     @PostMapping
-//    @PreAuthorize("hasRole('ATTENDEE')")
+    @PreAuthorize("hasRole('ATTENDEE')")
     public FeedbackResponseDto create(@RequestBody FeedbackRequestDto feedbackRequestDto) {
         log.info("REST request to save Feedback : {}", feedbackRequestDto);
         FeedbackResponseDto result = feedbackService.create(feedbackRequestDto);
@@ -37,6 +37,7 @@ public class FeedbackController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ATTENDEE','ORGANIZER','ADMIN')")
     public Optional<FeedbackResponseDto> getById(@PathVariable String id) {
         log.info("REST request to get Feedback by ID : {}", id);
         Optional<FeedbackResponseDto> response = feedbackService.getById(id);
@@ -47,6 +48,7 @@ public class FeedbackController {
     }
 
     @GetMapping("/event/{eventId}")
+    @PreAuthorize("hasAnyRole('ATTENDEE','ORGANIZER','ADMIN')")
     public Page<FeedbackResponseDto> listByEvent(@PathVariable String eventId, Pageable pageable) {
         log.info("REST request to get a page of Feedbacks for Event ID : {} with Pageable: {}", eventId, pageable);
         Page<FeedbackResponseDto> page = feedbackService.listByEvent(eventId, pageable);
@@ -55,6 +57,7 @@ public class FeedbackController {
     }
 
     @DeleteMapping("/{feedbackId}")
+    @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')")
     public void deleteFeedback(@PathVariable String feedbackId) {
         log.info("REST request to delete Feedback ID : {}", feedbackId);
         feedbackService.delete(feedbackId);
