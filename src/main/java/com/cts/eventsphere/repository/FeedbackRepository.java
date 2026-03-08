@@ -5,8 +5,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
+
 /**
- * [ Detailed description of the class's responsibility]
+ * JPA repository for Feedback entity
  *
  * @author 2480027
  * @version 1.0

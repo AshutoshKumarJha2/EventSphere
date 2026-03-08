@@ -9,6 +9,14 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+/**
+ * Engagement Model class
+ *
+ * @author 2480027
+ * @version 1.0
+ * @since 26-02-2026
+ */
+
 @Entity
 @Table(name = "engagement")
 @Data
@@ -19,10 +27,18 @@ public class Engagement {
     @Column(columnDefinition = "CHAR(36)")
     private String engagementId;
 
-    @Column(nullable = false, columnDefinition = "CHAR(36)")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "eventId", referencedColumnName = "eventId", insertable = false, updatable = false)
+    private Event event;
+
+    @Column(name = "eventId", nullable = false, columnDefinition = "CHAR(36)")
     private String eventId;
 
-    @Column(nullable = false, columnDefinition = "CHAR(36)")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "attendeeId", referencedColumnName = "userId", insertable = false, updatable = false)
+    private User attendee;
+
+    @Column(name = "attendeeId", nullable = false, columnDefinition = "CHAR(36)")
     private String attendeeId;
 
     @Enumerated(EnumType.STRING)
@@ -30,7 +46,6 @@ public class Engagement {
     private EngagementType activity;
 
     @CreationTimestamp
-    @Column(nullable = false)
     private LocalDateTime timestamp;
 
     @CreationTimestamp

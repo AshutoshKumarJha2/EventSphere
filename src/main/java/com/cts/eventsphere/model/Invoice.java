@@ -29,7 +29,11 @@ public class Invoice {
     @Column(name = "invoiceId", columnDefinition = "CHAR(36)")
     private String invoiceId;
 
-    @Column(name = "contractId")
+    @OneToMany(mappedBy = "invoice" , cascade = CascadeType.ALL)
+    private List<Payment> payments = new ArrayList<>();
+
+
+    @Column(nullable = false)
     private String contractId;
 
     @ManyToOne(fetch = FetchType.LAZY)

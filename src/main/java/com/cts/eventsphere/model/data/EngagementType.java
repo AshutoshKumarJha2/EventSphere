@@ -1,7 +1,7 @@
 package com.cts.eventsphere.model.data;
 
 /**
- * [ Detailed description of the class's responsibility]
+ * EngagementType enum
  *
  * @author 2480027
  * @version 1.0
