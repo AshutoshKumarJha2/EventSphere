@@ -26,7 +26,7 @@ public class Delivery {
     @Column(name = "deliveryId", columnDefinition = "CHAR(36)")
     private String deliveryId;
 
-    @Column(name = "invoiceId", columnDefinition = "CHAR(36)")
+    @Column(name = "invoiceId", columnDefinition = "CHAR(36)",  nullable = false)
     private String invoiceId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -49,6 +49,7 @@ public class Delivery {
     private String trackingNumber;
 
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp

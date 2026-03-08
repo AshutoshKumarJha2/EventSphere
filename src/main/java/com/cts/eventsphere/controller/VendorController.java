@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Controller for Vendor Operations
+ * Rest Controller for Vendor Entity
  *
  * @author 2480177
  * @version 1.0
