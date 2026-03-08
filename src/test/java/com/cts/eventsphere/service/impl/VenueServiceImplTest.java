@@ -167,7 +167,7 @@ class VenueServiceImplTest {
     void findByCapacity_shouldQueryRepoAndMapResults() {
         // arrange
         int capacity = 200;
-        when(venueRepository.findByCapacity(capacity)).thenReturn(List.of(venue2));
+        when(venueRepository.findByCapacityGreaterThanEqual(capacity)).thenReturn(List.of(venue2));
         when(venueResponseDtoMapper.toDto(venue2)).thenReturn(responseDto2);
 
         // act
@@ -177,7 +177,7 @@ class VenueServiceImplTest {
         assertThat(result).containsExactly(responseDto2);
 
         // verify
-        verify(venueRepository, times(1)).findByCapacity(capacity);
+        verify(venueRepository, times(1)).findByCapacityGreaterThanEqual(capacity);
         verify(venueResponseDtoMapper, times(1)).toDto(venue2);
         verifyNoMoreInteractions(venueRepository, venueResponseDtoMapper);
         verifyNoInteractions(venueRequestDtoMapper);

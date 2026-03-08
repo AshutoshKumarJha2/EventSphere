@@ -9,5 +9,5 @@ package com.cts.eventsphere.model.data;
  */
 
 public enum AvailabilityStatus {
-    available,unavailable,maintenence;
+    available,unavailable,maintenance;
 }
