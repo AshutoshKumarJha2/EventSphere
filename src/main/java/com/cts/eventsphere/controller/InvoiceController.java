@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Controller for Invoice Operations
+ * Rest Controller for Invoice Entity
  *
  * @author 2480177
  * @version 1.0

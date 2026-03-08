@@ -31,6 +31,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final InvoiceRequestDtoMapper requestDtoMapper;
     private final InvoiceResponseDtoMapper responseDtoMapper;
 
+    /**
+     * @param request
+     * @return
+     */
     @Override
     public InvoiceResponseDto createInvoice(InvoiceRequestDto request){
         log.info("Creating invoice...");
@@ -40,6 +44,11 @@ public class InvoiceServiceImpl implements InvoiceService {
         return responseDtoMapper.toDto(saved);
     }
 
+    /**
+     * @param invoiceId
+     * @return
+     * @throws InvoiceNotFoundException
+     */
     @Override
     public InvoiceResponseDto getInvoiceById(String invoiceId){
         log.info("Fetching invoice ID={}", invoiceId);
@@ -50,6 +59,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         return responseDtoMapper.toDto(invoice);
     }
 
+    /**
+     * @return
+     */
     @Override
     public List<InvoiceResponseDto> getAllInvoices(){
         log.info("Fetching all invoices");
@@ -59,6 +71,12 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .toList();
     }
 
+    /**
+     * @param invoiceId
+     * @param request
+     * @return
+     * @throws InvoiceNotFoundException
+     */
     @Override
     public InvoiceResponseDto updateInvoice(String invoiceId, InvoiceRequestDto request){
         log.info("Updating invoice ID={}", invoiceId);
@@ -75,6 +93,10 @@ public class InvoiceServiceImpl implements InvoiceService {
         return responseDtoMapper.toDto(updated);
     }
 
+    /**
+     * @param invoiceId
+     * @throws InvoiceNotFoundException
+     */
     @Override
     public void deleteInvoice(String invoiceId){
         log.warn("Deleting invoice ID={}", invoiceId);

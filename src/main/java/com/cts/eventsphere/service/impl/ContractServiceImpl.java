@@ -31,6 +31,10 @@ public class ContractServiceImpl implements ContractService {
     private final ContractRequestDtoMapper requestDtoMapper;
     private final ContractResponseDtoMapper responseDtoMapper;
 
+    /**
+     * @param request
+     * @return
+     */
     @Override
     public ContractResponseDto createContract(ContractRequestDto request){
         log.info("Creating contract...");
@@ -40,6 +44,11 @@ public class ContractServiceImpl implements ContractService {
         return responseDtoMapper.toDto(saved);
     }
 
+    /**
+     * @param contractId
+     * @return
+     * @throws ContractNotFoundException
+     */
     @Override
     public ContractResponseDto getContractById(String contractId){
         log.info("Fetching contract with ID={}", contractId);
@@ -50,6 +59,9 @@ public class ContractServiceImpl implements ContractService {
         return responseDtoMapper.toDto(contract);
     }
 
+    /**
+     * @return
+     */
     @Override
     public List<ContractResponseDto> getAllContracts(){
         log.info("Fetching all contracts");
@@ -59,6 +71,12 @@ public class ContractServiceImpl implements ContractService {
                 .toList();
     }
 
+    /**
+     * @param contractId
+     * @param request
+     * @return
+     * @throws ContractNotFoundException
+     */
     @Override
     public ContractResponseDto updateContract(String contractId, ContractRequestDto request){
         log.info("Updating contract ID={}", contractId);
@@ -77,6 +95,10 @@ public class ContractServiceImpl implements ContractService {
         return responseDtoMapper.toDto(updated);
     }
 
+    /**
+     * @param contractId
+     * @throws ContractNotFoundException
+     */
     @Override
     public void deleteContract(String contractId){
         log.warn("Deleting contract ID={}", contractId);

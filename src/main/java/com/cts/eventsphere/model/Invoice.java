@@ -33,7 +33,7 @@ public class Invoice {
     private List<Payment> payments = new ArrayList<>();
 
 
-    @Column(nullable = false)
+    @Column(name = "contractId", columnDefinition = "VARCHAR(50)",nullable = false)
     private String contractId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,6 +56,7 @@ public class Invoice {
     private List<Delivery> deliveries = new ArrayList<>();
 
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp

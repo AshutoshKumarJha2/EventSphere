@@ -31,6 +31,10 @@ public class VendorServiceImpl implements VendorService {
     private final VendorRequestDtoMapper requestDtoMapper;
     private final VendorResponseDtoMapper responseDtoMapper;
 
+    /**
+     * @param request
+     * @return
+     */
     @Override
     public VendorResponseDto createVendor(VendorRequestDto request){
         log.info("Creating vendor...");
@@ -40,6 +44,11 @@ public class VendorServiceImpl implements VendorService {
         return responseDtoMapper.toDto(saved);
     }
 
+    /**
+     * @param vendorId
+     * @return
+     * @throws VendorNotFoundException
+     */
     @Override
     public VendorResponseDto getVendorById(String vendorId){
         log.info("Fetching vendor ID={}", vendorId);
@@ -50,6 +59,9 @@ public class VendorServiceImpl implements VendorService {
         return responseDtoMapper.toDto(vendor);
     }
 
+    /**
+     * @return
+     */
     @Override
     public List<VendorResponseDto> getAllVendors(){
         log.info("Fetching all vendors");
@@ -59,6 +71,12 @@ public class VendorServiceImpl implements VendorService {
                 .toList();
     }
 
+    /**
+     * @param vendorId
+     * @param request
+     * @return
+     * @throws VendorNotFoundException
+     */
     @Override
     public VendorResponseDto updateVendor(String vendorId, VendorRequestDto request){
         log.info("Updating vendor ID={}", vendorId);
@@ -74,6 +92,10 @@ public class VendorServiceImpl implements VendorService {
         return responseDtoMapper.toDto(updated);
     }
 
+    /**
+     * @param vendorId
+     * @throws VendorNotFoundException
+     */
     @Override
     public void deleteVendor(String vendorId){
         log.warn("Deleting vendor ID={}", vendorId);

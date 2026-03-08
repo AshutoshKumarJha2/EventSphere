@@ -60,6 +60,7 @@ public class Contract {
     private List<Invoice> invoices = new ArrayList<>();
 
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
