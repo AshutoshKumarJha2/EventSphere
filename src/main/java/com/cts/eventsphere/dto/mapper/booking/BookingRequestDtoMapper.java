@@ -29,8 +29,6 @@ public class BookingRequestDtoMapper {
         Booking booking = new Booking();
         booking.setEventId(dto.eventId());
         booking.setVenueId(dto.venueId());
-        booking.setDate(dto.date());
-        booking.setStatus(dto.status());
 
         return booking;
     }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * JPA Repository for the Booking Entity.
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 
 public interface BookingRepository extends JpaRepository<Booking,String> {
 
+    List<Booking> findByEventId(String eventId);
 //    @Query("""
 //        SELECT COUNT(b) > 0
 //        FROM Booking b

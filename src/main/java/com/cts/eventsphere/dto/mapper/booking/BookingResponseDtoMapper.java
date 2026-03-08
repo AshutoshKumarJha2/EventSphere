@@ -1,8 +1,11 @@
 package com.cts.eventsphere.dto.mapper.booking;
 
 import com.cts.eventsphere.dto.booking.BookingResponseDto;
+import com.cts.eventsphere.dto.resource.ResourceListElementDto;
 import com.cts.eventsphere.model.Booking;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * Mapper to convert Booking Entity to BookingResponseDto
@@ -19,7 +22,7 @@ public class BookingResponseDtoMapper {
      * * @param booking the booking entity from the database
      * @return a BookingResponseDto record
      */
-    public BookingResponseDto toDto(Booking booking) {
+    public BookingResponseDto toDto(Booking booking, List<ResourceListElementDto> resourceReqList) {
         if (booking == null) {
             return null;
         }
@@ -30,6 +33,7 @@ public class BookingResponseDtoMapper {
                 booking.getVenueId(),
                 booking.getDate(),
                 booking.getStatus(),
+                resourceReqList,
                 booking.getCreatedAt(),
                 booking.getUpdatedAt()
         );

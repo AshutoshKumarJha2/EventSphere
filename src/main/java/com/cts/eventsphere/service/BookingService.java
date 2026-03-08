@@ -29,6 +29,10 @@ public interface BookingService {
      */
     List<BookingResponseDto> getAllBookings();
 
+
+
+    List<BookingResponseDto> getBookingsByEvent(String eventId);
+
     /**
      * Updates the status of an existing booking (e.g., from pending to confirmed)
      * * @param bookingId the ID of the booking to update

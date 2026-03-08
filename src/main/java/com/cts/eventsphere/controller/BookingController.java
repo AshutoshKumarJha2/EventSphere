@@ -55,6 +55,16 @@ public class BookingController {
         return ResponseEntity.ok(bookings);
     }
 
+    @GetMapping("/{eventId}")
+    public ResponseEntity<List<BookingResponseDto>> getAllBookings(@PathVariable String eventId) {
+        log.info("REST request to fetch  bookings by event ID");
+
+        List<BookingResponseDto> bookings = bookingService.getBookingsByEvent(eventId);
+
+        log.info("Successfully fetched {} bookings", bookings.size());
+        return ResponseEntity.ok(bookings);
+    }
+
     /**
      * Updates the status of a specific booking.
      */
