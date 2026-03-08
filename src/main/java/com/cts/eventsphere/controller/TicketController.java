@@ -4,6 +4,7 @@ import com.cts.eventsphere.dto.ticket.CreateTicketRequest;
 import com.cts.eventsphere.dto.ticket.TicketListResponseDTO;
 import com.cts.eventsphere.security.UserPrincipal;
 import com.cts.eventsphere.service.TicketService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,8 +20,9 @@ import com.cts.eventsphere.dto.shared.GenericResponse;
  * @version 1.0
  * @since 2026-03-07
  */
-@Controller
+@RestController
 @RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class TicketController {
     private TicketService ticketService;
 
