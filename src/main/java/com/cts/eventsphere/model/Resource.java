@@ -41,6 +41,12 @@ public class Resource {
     @Column(precision = 10, scale = 2)
     private BigDecimal costRate;
 
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    @Column(name = "unit")
+    private Integer unit;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
