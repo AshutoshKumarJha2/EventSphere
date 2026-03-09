@@ -79,7 +79,8 @@ public class JwtUtil {
         String email = claims.getBody().get("email", String.class);
         String role = claims.getBody().get("role", String.class);
         String userId = claims.getBody().get("userId", String.class);
-        return new UserPrincipal(userId, email, role, List.of(new SimpleGrantedAuthority(role)));
+        String roleAuthority = "ROLE_" + role.toUpperCase();
+        return new UserPrincipal(userId, email, role, List.of(new SimpleGrantedAuthority(roleAuthority)));
     }
 
      public String generateAccessToken(String userId, String email, String role) {

@@ -28,7 +28,7 @@ public class RegistrationController {
     private RegistrationService registrationService;
 
     @PostMapping("/events/{eventId}/registrations")
-    @PreAuthorize("hasRole('attendee')")
+    @PreAuthorize("hasRole('ATTENDEE')")
     public ResponseEntity<GenericResponse> createRegistration(@PathVariable String eventId, @AuthenticationPrincipal UserPrincipal userDetails, @RequestBody RegistrationRequestDTO request) {
         var userId = userDetails.userId();
         var ticketId = request.ticketId();
@@ -37,21 +37,21 @@ public class RegistrationController {
     }
 
     @PatchMapping("/registrations/{registrationId}/cancel")
-    @PreAuthorize("hasRole('attendee')")
+    @PreAuthorize("hasRole('ATTENDEE')")
     public ResponseEntity<GenericResponse> cancelRegistration(@PathVariable String registrationId) {
         log.info("Cancelling registration with registrationId: {}", registrationId);
         return ResponseEntity.ok(registrationService.cancelRegistration(registrationId));
     }
 
     @PatchMapping("/registrations/{registrationId}/approve")
-    @PreAuthorize("hasRole('organizer') or hasRole('admin')")
+    @PreAuthorize("hasRole('ORGANISER') or hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> approveRegistration(@PathVariable String registrationId) {
         log.info("Approving registration with registrationId: {}", registrationId);
         return ResponseEntity.ok(registrationService.approveRegistration(registrationId));
     }
 
     @PatchMapping("/registrations/{registrationId}/reject")
-    @PreAuthorize("hasRole('organizer') or hasRole('admin')")
+    @PreAuthorize("hasRole('ORGANISER') or hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> rejectRegistration(@PathVariable String registrationId) {
         log.info("Rejecting registration with registrationId: {}", registrationId);
         return ResponseEntity.ok(registrationService.rejectRegistration(registrationId));

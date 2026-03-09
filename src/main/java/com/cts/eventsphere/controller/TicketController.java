@@ -29,7 +29,7 @@ public class TicketController {
     private TicketService ticketService;
 
     @PostMapping("/events/{eventId}/tickets")
-    @PreAuthorize("hasRole('organizer')")
+    @PreAuthorize("hasRole('ORGANISER') or hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> createTicket(@RequestBody CreateTicketRequest request, @PathVariable String eventId, @AuthenticationPrincipal UserPrincipal userDetails) {
         log.info("Creating ticket for eventId: {}, userId: {}, request: {}", eventId, userDetails.userId(), request);
         return ResponseEntity.ok(ticketService.createTicket(eventId, request.type(), request.price(), request.status()));
@@ -42,14 +42,14 @@ public class TicketController {
     }
 
     @PutMapping("/tickets/{ticketId}")
-    @PreAuthorize("hasRole('organizer') or hasRole('admin')")
+    @PreAuthorize("hasRole('ORGANISER') or hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> updateTicket(@PathVariable String ticketId, @RequestBody CreateTicketRequest request) {
         log.info("Updating ticket with ticketId: {}, request: {}", ticketId, request);
         return ResponseEntity.ok(ticketService.updateTicket(ticketId, request.type(), request.price(), request.status()));
     }
 
     @DeleteMapping("/tickets/{ticketId}")
-    @PreAuthorize("hasRole('organizer') or hasRole('admin')")
+    @PreAuthorize("hasRole('ORGANISER') or hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> deleteTicket(@PathVariable String ticketId) {
         log.info("Deleting ticket with ticketId: {}", ticketId);
         return ResponseEntity.ok(ticketService.deleteTicket(ticketId));
