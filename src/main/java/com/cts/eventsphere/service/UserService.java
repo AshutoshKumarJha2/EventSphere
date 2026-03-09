@@ -20,5 +20,5 @@ public interface UserService {
 
     public UserResponseDto getUser(String userId);
 
-//    public UserResponseDto updateUserDetails(String userId, UserRequestDto userRequestDto);
+    public UserResponseDto updateUserDetails(String userId, UserRequestDto userRequestDto);
 }
