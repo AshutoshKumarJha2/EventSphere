@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Exception raised when Invoice is not found.
- * * @author 2480177
  *
+ * @author 2480177
  * @version 1.0
  * @since 05-03-2026
  */

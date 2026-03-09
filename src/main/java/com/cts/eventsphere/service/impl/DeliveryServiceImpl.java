@@ -31,6 +31,10 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final DeliveryRequestDtoMapper requestDtoMapper;
     private final DeliveryResponseDtoMapper responseDtoMapper;
 
+    /**
+     * @param request
+     * @return
+     */
     @Override
     public DeliveryResponseDto createDelivery(DeliveryRequestDto request){
         log.info("Creating delivery...");
@@ -40,6 +44,11 @@ public class DeliveryServiceImpl implements DeliveryService {
         return responseDtoMapper.toDto(saved);
     }
 
+    /**
+     * @param deliveryId
+     * @return
+     * @throws DeliveryNotFoundException
+     */
     @Override
     public DeliveryResponseDto getDeliveryById(String deliveryId){
         log.info("Fetching delivery ID={}", deliveryId);
@@ -50,6 +59,9 @@ public class DeliveryServiceImpl implements DeliveryService {
         return responseDtoMapper.toDto(delivery);
     }
 
+    /**
+     * @return
+     */
     @Override
     public List<DeliveryResponseDto> getAllDeliveries(){
         log.info("Fetching all deliveries");
@@ -59,6 +71,12 @@ public class DeliveryServiceImpl implements DeliveryService {
                 .toList();
     }
 
+    /**
+     * @param deliveryId
+     * @param request
+     * @return
+     * @throws DeliveryNotFoundException
+     */
     @Override
     public DeliveryResponseDto updateDelivery(String deliveryId, DeliveryRequestDto request){
         log.info("Updating delivery ID={}", deliveryId);
@@ -77,6 +95,10 @@ public class DeliveryServiceImpl implements DeliveryService {
         return responseDtoMapper.toDto(updated);
     }
 
+    /**
+     * @param deliveryId
+     * @throws DeliveryNotFoundException
+     */
     @Override
     public void deleteDelivery(String deliveryId){
         log.warn("Deleting delivery ID={}", deliveryId);
