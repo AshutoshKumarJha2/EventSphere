@@ -11,11 +11,13 @@ import com.cts.eventsphere.model.data.RegistrationStatus;
 import com.cts.eventsphere.repository.RegistrationRepository;
 import com.cts.eventsphere.service.RegistrationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RegistrationServiceImpl implements RegistrationService {
     private final RegistrationRepository registrationRepo;
 
@@ -32,6 +34,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .status(RegistrationStatus.pending)
                 .build();
         registrationRepo.save(newRegistration);
+        log.info("User {} registered for event {} with ticket {}", userId, eventId, ticketId);
         return new GenericResponse("Registration successful");
     }
 
@@ -41,6 +44,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new RegistrationNotFoundException(String.format("Registration with id %s not found", registrationId));
         }
         registrationRepo.deleteById(registrationId);
+        log.info("Registration with id {} deleted", registrationId);
         return new GenericResponse("Registration deleted successfully");
     }
 
@@ -50,6 +54,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .orElseThrow(() -> new RegistrationNotFoundException(String.format("Registration with id %s not found", registrationId)));
         registration.setStatus(RegistrationStatus.cancelled);
         registrationRepo.save(registration);
+        log.info("Registration with id {} cancelled", registrationId);
         return new GenericResponse("Registration cancelled successfully");
     }
 
@@ -59,6 +64,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .orElseThrow(() -> new RegistrationNotFoundException(String.format("Registration with id %s not found", registrationId)));
         registration.setStatus(RegistrationStatus.confirmed);
         registrationRepo.save(registration);
+        log.info("Registration with id {} approved", registrationId);
         return new GenericResponse("Registration approved successfully");
     }
 
@@ -68,6 +74,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .orElseThrow(() -> new RegistrationNotFoundException(String.format("Registration with id %s not found", registrationId)));
         registration.setStatus(RegistrationStatus.cancelled);
         registrationRepo.save(registration);
+        log.info("Registration with id {} rejected", registrationId);
         return new GenericResponse("Registration rejected successfully");
     }
 
@@ -81,6 +88,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         var totalElements = pages.getTotalElements();
         var totalPages = pages.getTotalPages();
 
+        log.info("Fetched {} registrations for userId: {}, page: {}, size: {}", registrations.size(), userId, page, size);
         return new RegistrationListResponseDTO(
                 registrations,
                 pageNo,
@@ -101,6 +109,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         var totalElements = pages.getTotalElements();
         var totalPages = pages.getTotalPages();
 
+        log.info("Fetched {} registrations for eventId: {}, page: {}, size: {}", registrations.size(), eventId, page, size);
         return new RegistrationListResponseDTO(
                 registrations,
                 pageNo,
@@ -120,6 +129,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         var totalElements = pages.getTotalElements();
         var totalPages = pages.getTotalPages();
 
+        log.info("Fetched {} registrations, page: {}, size: {}", registrations.size(), page, size);
         return new RegistrationListResponseDTO(
                 registrations,
                 pageNo,
@@ -134,6 +144,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     public RegistrationDTO getRegistrationById(String registrationId) {
         var registration = registrationRepo.findById(registrationId)
                 .orElseThrow(() -> new RegistrationNotFoundException(String.format("Registration with id %s not found", registrationId)));
+        log.info("Fetched registration with id: {}", registrationId);
         return RegistrationDTOMapper.toDTO(registration);
     }
 
@@ -144,6 +155,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         if (registration == null) {
             throw new RegistrationNotFoundException(String.format("Registration for user %s and event %s not found", userId, eventId));
         }
+        log.info("Fetched registration for userId: {}, eventId: {}", userId, eventId);
         return RegistrationDTOMapper.toDTO(registration);
     }
 }
