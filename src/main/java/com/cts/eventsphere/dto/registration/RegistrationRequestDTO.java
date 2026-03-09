@@ -8,7 +8,6 @@ package com.cts.eventsphere.dto.registration;
  * @since 2026-03-05
  */
 public record RegistrationRequestDTO(
-        String eventId,
         String ticketId
     ) {
 }

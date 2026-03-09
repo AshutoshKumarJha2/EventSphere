@@ -34,7 +34,7 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
-    private String buildToken(String email, String role, TokenType type) {
+    private String buildToken(String userId, String email, String role, TokenType type) {
         var typeString = switch (type){
             case ACCESS -> "ACCESS";
             case REFRESH -> "REFRESH";
@@ -45,6 +45,7 @@ public class JwtUtil {
         };
         return Jwts.builder()
                 .setSubject(email)
+                .claim("userId", userId)
                 .claim("email", email)
                 .claim("role", role)
                 .claim("type", typeString)
@@ -77,15 +78,17 @@ public class JwtUtil {
         }
         String email = claims.getBody().get("email", String.class);
         String role = claims.getBody().get("role", String.class);
-        return new UserPrincipal(email, role, List.of(new SimpleGrantedAuthority(role)));
+        String userId = claims.getBody().get("userId", String.class);
+        String roleAuthority = "ROLE_" + role.toUpperCase();
+        return new UserPrincipal(userId, email, role, List.of(new SimpleGrantedAuthority(roleAuthority)));
     }
 
-     public String generateAccessToken(String email, String role) {
-         return buildToken(email, role, TokenType.ACCESS);
+     public String generateAccessToken(String userId, String email, String role) {
+         return buildToken(userId, email, role, TokenType.ACCESS);
      }
 
-     public String generateRefreshToken(String email, String role) {
-         return buildToken(email, role, TokenType.REFRESH);
+     public String generateRefreshToken(String userId, String email, String role) {
+         return buildToken(userId, email, role, TokenType.REFRESH);
      }
 
 }
