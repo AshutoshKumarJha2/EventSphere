@@ -2,6 +2,7 @@ package com.cts.eventsphere.repository;
 
 import com.cts.eventsphere.model.Expense;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * JPA repository for Expense Entity
