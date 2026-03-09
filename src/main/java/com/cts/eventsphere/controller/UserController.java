@@ -1,10 +1,13 @@
 package com.cts.eventsphere.controller;
 
+import com.cts.eventsphere.dto.user.UserRequestDto;
 import com.cts.eventsphere.dto.user.UserResponseDto;
+import com.cts.eventsphere.security.UserPrincipal;
 import com.cts.eventsphere.service.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +22,7 @@ import java.util.List;
 @RestController
 @Data
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1")
 public class UserController {
     private final UserService userService;
     @GetMapping
@@ -27,13 +30,20 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/users/{userId}")
     public ResponseEntity<UserResponseDto> getUserById(@RequestBody String userId){
         return ResponseEntity.ok(userService.getUser(userId));
     }
 
-//    @PutMapping("/{userId}")
-//    public ResponseEntity<UserResponseDto> updateUserDetails(@RequestBody String userId, @RequestBody UserRequestDto userRequestDto){
-//        return ResponseEntity.ok(userService.updateUserDetails(userId,userRequestDto));
-//    }
+    @PutMapping("/users/{userId}")
+    public ResponseEntity<UserResponseDto> updateUserDetails(@RequestBody String userId, @RequestBody UserRequestDto userRequestDto){
+        return ResponseEntity.ok(userService.updateUserDetails(userId,userRequestDto));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDto> getMyDetails(@AuthenticationPrincipal UserPrincipal userPrincipal){
+
+        String authenticatedUserId = userPrincipal.userId();
+        return ResponseEntity.ok(userService.getUser(authenticatedUserId));
+    }
 }

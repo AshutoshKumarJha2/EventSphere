@@ -15,7 +15,7 @@ public record UserResponseDto(
         String name,
         UserRoles role,
         String email,
-        String password,
+//        String password,
         String phone,
         UserStatus status,
         String createdAt,
