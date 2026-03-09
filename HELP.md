@@ -16,6 +16,13 @@ update:
 - edit the run config in intellij idea, add `--spring.profiles.active=local` as cli argument
 
 
+## API Reference Docs
+You can access api documentation from here - [Api Docs](./docs/api_design.md)
+
+## ER Diagram
+![Er Diagram](./docs/static/event_sphere_er_diagram.png)
+
+
 ### Reference Documentation
 For further reference, please consider the following sections:
 
