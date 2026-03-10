@@ -18,6 +18,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Stri
 
     Page<Notification> findByUserIdAndStatusOrderByCreatedAtDesc(String userId, StatusType status, Pageable pageable);
 
-    List<Notification> findTop20ByUserIdAndNotificationIdGreaterThanOrderByNotificationIdAsc(String userId, String lastId);
-
+    List<Notification> findTop20ByUserIdAndCreatedDateLessThanOrderByCreatedDateDesc(String userId, LocalDateTime lastDate);
 }

@@ -7,6 +7,8 @@ import com.cts.eventsphere.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -20,11 +22,16 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/v1/events/{eventId}/schedules")
+@EnableMethodSecurity(
+        securedEnabled = true,
+        jsr250Enabled = true
+)
 public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @PostMapping("/{id}")
-    public ResponseEntity<ScheduleResponseDto> update(@PathVariable String eventId, @PathVariable String id, ScheduleRequestDto scheduleRequest){
+    @PreAuthorize("hasAnyRole('admin', 'organizer', 'venue_manager')")
+    public ResponseEntity<ScheduleResponseDto> update(@PathVariable String eventId, @PathVariable String id, @RequestBody ScheduleRequestDto scheduleRequest){
         return ResponseEntity.ok(scheduleService.updateById(eventId, id, scheduleRequest));
     }
 

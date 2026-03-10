@@ -1,6 +1,8 @@
 package com.cts.eventsphere.dto.event;
 
 import com.cts.eventsphere.model.data.EventStatus;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * DTO for Event Entity.
@@ -10,12 +12,25 @@ import com.cts.eventsphere.model.data.EventStatus;
  * @since 26-02-2026
  */
 public record EventResponseDto(
+        @NotBlank(message = "Event ID must not be blank")
         String id,
+
+        @NotBlank(message = "Event name must not be blank")
         String eventName,
+
+        @NotBlank(message = "Organizer ID must not be blank")
         String organizerId,
+
+        @NotBlank(message = "Start time must not be blank")
         String startAt,
+
+        @NotBlank(message = "End time must not be blank")
         String endAt,
+
+        @NotNull(message = "Event status must not be null")
         EventStatus status,
+
+        @NotBlank(message = "Venue ID must not be blank")
         String venueId
 ) {
 }
