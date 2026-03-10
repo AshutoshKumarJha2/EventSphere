@@ -40,6 +40,9 @@ public class Notification {
     private String status = "Unread";
 
     @CreationTimestamp
-    @Column(name = "createdDate", updatable = false)
-    private LocalDateTime createdDate;
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @CreationTimestamp
+    private  LocalDateTime updatedAt;
 }
