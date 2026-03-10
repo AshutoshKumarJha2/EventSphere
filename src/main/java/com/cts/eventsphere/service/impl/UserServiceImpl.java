@@ -3,6 +3,8 @@ package com.cts.eventsphere.service.impl;
 import com.cts.eventsphere.dto.mapper.user.UserResponseDtoMapper;
 import com.cts.eventsphere.dto.user.UserRequestDto;
 import com.cts.eventsphere.dto.user.UserResponseDto;
+import com.cts.eventsphere.exception.user.EmailAlreadyExistsException;
+import com.cts.eventsphere.exception.user.UserNotFoundException;
 import com.cts.eventsphere.model.User;
 import com.cts.eventsphere.repository.UserRepository;
 import com.cts.eventsphere.service.UserService;
@@ -31,7 +33,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto getUser(String userId) {
-        User user =userRepository.findById(userId).orElseThrow(()->new IllegalArgumentException("User with id "+userId+" does not exist"));
+        User user =userRepository.findById(userId).orElseThrow(()->new UserNotFoundException(userId));
         UserResponseDto userResponseDto = UserResponseDtoMapper.toDTO(user);
         return userResponseDto;
     }
@@ -41,13 +43,13 @@ public class UserServiceImpl implements UserService {
         if(!userRepository.existsById(userId)){
             throw new IllegalArgumentException("User with user id "+userId+" does not exist");
         }
-        User user = userRepository.findById(userId).orElseThrow(()->new IllegalArgumentException("User with id "+userId+" does not exist"));
+        User user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException(userId));
 
 
         if (userRequestDto.email() != null && !userRequestDto.email().equalsIgnoreCase(user.getEmail())) {
             // Optionally check uniqueness
             if (userRepository.existsByEmail(userRequestDto.email())) {
-                throw new IllegalArgumentException("Email already in use: " + userRequestDto.email());
+                throw new EmailAlreadyExistsException(userRequestDto.email());
             }
             user.setEmail(userRequestDto.email());
         }
