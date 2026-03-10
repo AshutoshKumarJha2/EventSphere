@@ -1,5 +1,11 @@
 package com.cts.eventsphere.model;
 
+import jakarta.persistence.*;
+import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
+
 /**
  * Notification Entity
  *
@@ -7,15 +13,8 @@ package com.cts.eventsphere.model;
  * @version 1.0
  * @since 09-03-2026
  */
-
-import jakarta.persistence.*;
-import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.LocalDateTime;
-
 @Entity
-
+@Table(name = "notification")
 @Data
 public class Notification {
 
@@ -40,6 +39,9 @@ public class Notification {
     private String status = "Unread";
 
     @CreationTimestamp
-    @Column(name = "createdDate", updatable = false)
-    private LocalDateTime createdDate;
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @CreationTimestamp
+    private  LocalDateTime updatedAt;
 }
