@@ -1,5 +1,13 @@
 package com.cts.eventsphere.model;
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
+
 /**
  * Notification Entity
  *
@@ -7,16 +15,11 @@ package com.cts.eventsphere.model;
  * @version 1.0
  * @since 09-03-2026
  */
-
-import jakarta.persistence.*;
-import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "notification")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Notification {
 
     @Id
