@@ -2,8 +2,9 @@ package com.cts.eventsphere.repository;
 import com.cts.eventsphere.model.Notification;
 import com.cts.eventsphere.model.data.StatusType;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import java.awt.print.Pageable;
+import java.time.LocalDateTime;
 import java.util.List;
 /**
  * Repository class for Notification
@@ -18,6 +19,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Stri
 
     Page<Notification> findByUserIdAndStatusOrderByCreatedDateDesc(String userId, StatusType status, Pageable pageable);
 
-    List<Notification> findTop20ByUserIdAndNotificationIdGreaterThanOrderByNotificationIdAsc(String userId, String lastId);
-
+    List<Notification> findTop20ByUserIdAndCreatedDateLessThanOrderByCreatedDateDesc(String userId, LocalDateTime lastDate);
 }
