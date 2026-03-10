@@ -5,9 +5,6 @@ import com.cts.eventsphere.repository.NotificationRepository;
 import com.cts.eventsphere.service.EmailService;
 import com.cts.eventsphere.service.NotificationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,16 +32,11 @@ public class NotificationServiceImpl implements NotificationService {
      */
     @Override
     public List<Notification> getNotificationsScroll(String userId, LocalDateTime lastTimestamp, int limit) {
-        if (lastTimestamp == null) {
-            Pageable firstPage = PageRequest.of(0, limit, Sort.by("createdDate").descending());
-            return notificationRepository.findByUserIdOrderByCreatedDateDesc(userId, firstPage).getContent();
-        }
+        LocalDateTime anchor = (lastTimestamp == null) ? LocalDateTime.now() : lastTimestamp;
 
-        // 2. Subsequent Loads: Fetch notifications older than the last one seen
-        // We use "LessThan" because we are sorting DESC (Newest to Oldest)
-        return notificationRepository.findTop20ByUserIdAndCreatedDateLessThanOrderByCreatedDateDesc(
+        return notificationRepository.findTop20ByUserIdAndCreatedAtLessThanOrderByCreatedAtDesc(
                 userId,
-                lastTimestamp
+                anchor
         );
     }
 
