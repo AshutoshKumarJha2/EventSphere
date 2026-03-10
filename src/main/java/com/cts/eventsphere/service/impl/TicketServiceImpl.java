@@ -10,6 +10,7 @@ import com.cts.eventsphere.model.data.TicketStatus;
 import com.cts.eventsphere.repository.TicketRepository;
 import com.cts.eventsphere.service.TicketService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class TicketServiceImpl implements TicketService {
     private TicketRepository ticketRepository;
     @Override
@@ -29,6 +31,7 @@ public class TicketServiceImpl implements TicketService {
                 .build();
 
         ticketRepository.save(ticket);
+        log.info("Ticket created with id: {}, for eventId: {}", ticket.getTicketId(), eventId);
         return new GenericResponse("Ticket created successfully");
     }
 
@@ -43,6 +46,7 @@ public class TicketServiceImpl implements TicketService {
         var pageNumber = ticketsPage.getNumber();
         var totalElements = ticketsPage.getTotalElements();
         var totalPages = ticketsPage.getTotalPages();
+        log.info("Fetched {} tickets for eventId: {}, page: {}, size: {}", sizeOfPage, eventId, page, size);
         return new TicketListResponseDTO(tickets, pageNumber, sizeOfPage, totalElements, totalPages);
     }
 
@@ -56,12 +60,14 @@ public class TicketServiceImpl implements TicketService {
         var pageNumber = ticketsPage.getNumber();
         var totalElements = ticketsPage.getTotalElements();
         var totalPages = ticketsPage.getTotalPages();
+        log.info("Fetched {} tickets, page: {}, size: {}", sizeOfPage, page, size);
         return new TicketListResponseDTO(tickets, pageNumber, sizeOfPage, totalElements, totalPages);
     }
 
     @Override
     public TicketResponseDTO getTicketById(String ticketId) {
         var ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new TicketNotFoundException("Ticket not found"));
+        log.info("Fetched ticket with id: {}", ticketId);
         return TicketDTOMapper.toDTO(ticket);
     }
 
@@ -73,6 +79,7 @@ public class TicketServiceImpl implements TicketService {
         ticket.setPrice(BigDecimal.valueOf(price));
         ticket.setStatus(status);
         ticketRepository.save(ticket);
+        log.info("Updated ticket with id: {}", ticketId);
         return new GenericResponse("Ticket updated successfully");
     }
 
@@ -82,6 +89,7 @@ public class TicketServiceImpl implements TicketService {
             throw new TicketNotFoundException("Ticket not found");
         }
         ticketRepository.deleteById(ticketId);
+        log.info("Deleted ticket with id: {}", ticketId);
         return new GenericResponse("Ticket deleted successfully");
     }
 }

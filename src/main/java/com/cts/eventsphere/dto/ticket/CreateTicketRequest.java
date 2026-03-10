@@ -1,5 +1,7 @@
 package com.cts.eventsphere.dto.ticket;
 
+import com.cts.eventsphere.model.data.TicketStatus;
+
 /**
  * DTO object for creating ticket request
  *
@@ -8,10 +10,9 @@ package com.cts.eventsphere.dto.ticket;
  * @since 2026-03-05
  */
 public record CreateTicketRequest(
-        String eventId,
         String type,
         double price,
-        String status
+        TicketStatus status
     ) {
     
 }

@@ -3,10 +3,12 @@ package com.cts.eventsphere.controller;
 import com.cts.eventsphere.dto.budget.BudgetRequestDto;
 import com.cts.eventsphere.dto.budget.BudgetResponseDto;
 import com.cts.eventsphere.service.BudgetService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,7 +36,8 @@ public class BudgetController {
      * @return "CREATED" response for successful Budget creation.
      */
     @PostMapping("/{eventId}/budget")
-    public ResponseEntity<BudgetResponseDto> setBudget(@PathVariable String eventId , @RequestBody BudgetRequestDto request){
+    @PreAuthorize("hasAnyRole('admin', 'organizer', 'finance_manager')")
+    public ResponseEntity<BudgetResponseDto> setBudget(@PathVariable String eventId ,@Valid @RequestBody BudgetRequestDto request){
         log.info("Request to set budget for eventId: {} with data: {}", eventId, request);
         BudgetResponseDto response = budgetService.createBudget(eventId , request);
         log.info("Response for eventId: {}: {}", eventId, response);

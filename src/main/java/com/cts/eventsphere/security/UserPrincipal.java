@@ -13,6 +13,7 @@ import java.util.Collection;
  * @since 04-03-2026
  */
 public record UserPrincipal(
+        String userId,
         String email,
         String role,
         Collection<? extends GrantedAuthority> authorities

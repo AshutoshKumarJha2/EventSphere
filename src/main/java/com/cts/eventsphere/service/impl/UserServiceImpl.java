@@ -1,7 +1,10 @@
 package com.cts.eventsphere.service.impl;
 
 import com.cts.eventsphere.dto.mapper.user.UserResponseDtoMapper;
+import com.cts.eventsphere.dto.user.UserRequestDto;
 import com.cts.eventsphere.dto.user.UserResponseDto;
+import com.cts.eventsphere.exception.user.EmailAlreadyExistsException;
+import com.cts.eventsphere.exception.user.UserNotFoundException;
 import com.cts.eventsphere.model.User;
 import com.cts.eventsphere.repository.UserRepository;
 import com.cts.eventsphere.service.UserService;
@@ -30,19 +33,40 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto getUser(String userId) {
-        User user =userRepository.findById(userId).orElseThrow(()->new IllegalArgumentException("User with id "+userId+" does not exist"));
+        User user =userRepository.findById(userId).orElseThrow(()->new UserNotFoundException(userId));
         UserResponseDto userResponseDto = UserResponseDtoMapper.toDTO(user);
         return userResponseDto;
     }
 
-//    @Override
-//    public UserResponseDto updateUserDetails(String userId, UserRequestDto userRequestDto) {
-//        if(!userRepository.existsById(userId)){
-//            throw new IllegalArgumentException("User with user id "+userId+" does not exist");
-//        }
-//        User user = userRepository.findById(userId).orElseThrow(()->new IllegalArgumentException("User with id "+userId+" does not exist"));
-//
-//
-//    }
+    @Override
+    public UserResponseDto updateUserDetails(String userId, UserRequestDto userRequestDto) {
+        if(!userRepository.existsById(userId)){
+            throw new IllegalArgumentException("User with user id "+userId+" does not exist");
+        }
+        User user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException(userId));
+
+
+        if (userRequestDto.email() != null && !userRequestDto.email().equalsIgnoreCase(user.getEmail())) {
+            // Optionally check uniqueness
+            if (userRepository.existsByEmail(userRequestDto.email())) {
+                throw new EmailAlreadyExistsException(userRequestDto.email());
+            }
+            user.setEmail(userRequestDto.email());
+        }
+
+        if (userRequestDto.name() != null) user.setName(userRequestDto.name());
+        if (userRequestDto.role() != null) user.setRole(userRequestDto.role());
+        if (userRequestDto.phone() != null) user.setPhone(userRequestDto.phone());
+
+        // Handle password (hash it)
+        if (userRequestDto.password() != null && !userRequestDto.password().isBlank()) {
+            // String hashed = passwordEncoder.encode(dto.password());
+            String hashed = userRequestDto.password(); // replace with encoder above
+            user.setPassword(hashed);
+        }
+
+        User saved = userRepository.save(user);
+        return UserResponseDtoMapper.toDTO(saved);
+    }
 
 }

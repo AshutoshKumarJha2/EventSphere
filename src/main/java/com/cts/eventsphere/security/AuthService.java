@@ -3,6 +3,9 @@ package com.cts.eventsphere.security;
 import com.cts.eventsphere.dto.auth.LoginRequestDto;
 import com.cts.eventsphere.dto.auth.LoginResponseDto;
 import com.cts.eventsphere.dto.user.UserRequestDto;
+import com.cts.eventsphere.exception.user.InvalidPasswordException;
+import com.cts.eventsphere.exception.user.UserAlreadyExistsException;
+import com.cts.eventsphere.exception.user.UserNotFoundException;
 import com.cts.eventsphere.model.User;
 import com.cts.eventsphere.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,12 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     public String register(UserRequestDto dto) {
+        var existingUser = userRepository.findByEmail(dto.email());
+
+        if (existingUser.isPresent()) {
+            throw new UserAlreadyExistsException(dto.email());
+        }
+
         User user = new User();
         user.setName(dto.name());
         user.setEmail(dto.email());
@@ -40,26 +49,27 @@ public class AuthService {
 
     public LoginResponseDto login(LoginRequestDto loginDto) {
         User user = userRepository.findByEmail(loginDto.email())
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + loginDto.email()));
+                .orElseThrow(() -> new UserNotFoundException(loginDto.email()));
 
         if (!passwordEncoder.matches(loginDto.password(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new InvalidPasswordException("Invalid password provided");
         }
 
         String roleName = user.getRole().name();
 
-        String accessToken = jwtUtil.generateAccessToken(user.getEmail(), roleName);
-        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail(), roleName);
+        String accessToken = jwtUtil.generateAccessToken(user.getUserId(),user.getEmail(), roleName);
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUserId(),user.getEmail(), roleName);
 
         return new LoginResponseDto(accessToken, refreshToken, "Bearer");
     }
 
     public LoginResponseDto refreshToken(UserPrincipal principal) {
+        String userId = principal.userId();
         String email = principal.email();
         String roleName = principal.role();
 
-        String newAccessToken = jwtUtil.generateAccessToken(email, roleName);
-        String newRefreshToken = jwtUtil.generateRefreshToken(email, roleName);
+        String newAccessToken = jwtUtil.generateAccessToken(userId, email, roleName);
+        String newRefreshToken = jwtUtil.generateRefreshToken(userId, email, roleName);
 
         return new LoginResponseDto(newAccessToken, newRefreshToken, "Bearer");
     }

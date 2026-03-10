@@ -21,7 +21,6 @@ public class UserResponseDtoMapper {
                 user.getName(),
                 user.getRole(),
                 user.getEmail(),
-                user.getPassword(),
                 user.getPhone(),
                 user.getStatus(),
                 user.getCreatedAt().toString(),
