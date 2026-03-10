@@ -14,7 +14,7 @@ public class ResourceResponseDtoMapper {
 
         return new ResourceRequestDto(
                 "Resource Name", // Placeholder: You might need to add 'name' to the Entity
-                resource.getVenueId(),
+                resource.getVenue().getVenueId(),
                 resource.getType(),
                 resource.getCostRate(),
                 1 // Placeholder for unit/quantity

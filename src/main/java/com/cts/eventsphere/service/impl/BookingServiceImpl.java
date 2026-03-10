@@ -7,6 +7,7 @@ import com.cts.eventsphere.dto.mapper.booking.BookingResponseDtoMapper;
 import com.cts.eventsphere.dto.mapper.venue.VenueRequestDtoMapper;
 import com.cts.eventsphere.dto.mapper.venue.VenueResponseDtoMapper;
 import com.cts.eventsphere.dto.resource.ResourceListElementDto;
+import com.cts.eventsphere.exception.venue.VenueNotFoundException;
 import com.cts.eventsphere.model.Booking;
 import com.cts.eventsphere.model.ResourceAllocation;
 import com.cts.eventsphere.model.Venue;
@@ -19,6 +20,7 @@ import com.cts.eventsphere.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -47,23 +49,34 @@ public class BookingServiceImpl implements BookingService {
     private final BookingResponseDtoMapper responseMapper;
 
     @Override
+    @Transactional
     public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) {
-        // Convert DTO to Entity
+        // 1. Convert basic fields using Mapper (Mapper should NOT handle Venue)
         Booking booking = requestMapper.toEntity(bookingRequestDto);
 
-        // Ensure initial status is 'pending' as per workflow requirements
+        // 2. Fetch the actual Venue entity
+        Venue venue = venueRepository.findById(bookingRequestDto.venueId())
+                .orElseThrow(() -> new VenueNotFoundException("Venue not found with id: " + bookingRequestDto.venueId()));
+
+        // 3. SET THE RELATION (This fixes the link between the two)
+        booking.setVenue(venue);
+
+        // 4. Set Business Logic Defaults
+        // Use the date from the DTO if provided, otherwise default to now
+        if (booking.getDate() == null) {
+            booking.setDate(LocalDate.now());
+        }
+
         if (booking.getStatus() == null) {
             booking.setStatus(BookingStatus.pending);
         }
 
-//        resourceService.requestAllocation(bookingRequestDto.,bookingRequestDto.eventId(), bookingRequestDto.venueId(),bookingRequestDto.resourceList());
-
-        // Save to Database
-        booking.setDate(LocalDate.now());
+        // 5. Save to Database
         Booking savedBooking = bookingRepository.save(booking);
 
-        // Return mapped Response DTO
-        return responseMapper.toDto(savedBooking,new ArrayList<>());
+        // 6. Return mapped Response DTO
+        // Passing the venue name or empty list as required by your responseMapper
+        return responseMapper.toDto(savedBooking, new ArrayList<>());
     }
 
 
@@ -102,7 +115,7 @@ public class BookingServiceImpl implements BookingService {
 
             // Filter allocations that belong specifically to this booking/venue if needed
             List<ResourceListElementDto> resourceList = allocations.stream()
-                    .filter(a -> a.getEvent().getVenueId().equals(booking.getVenueId())) // Optional: filter by venue logic
+                    .filter(a -> a.getEvent().getVenueId().equals(booking.getVenue().getVenueId())) // Optional: filter by venue logic
                     .map(a -> new ResourceListElementDto(
                             a.getResource().getName(),
                             a.getResource().getUnit()
@@ -113,7 +126,7 @@ public class BookingServiceImpl implements BookingService {
             return new BookingResponseDto(
                     booking.getBookingId(),
                     booking.getEventId(),
-                    booking.getVenueId(),
+                    booking.getVenue().getVenueId(),
                     booking.getDate(),
                     booking.getStatus(),
                     resourceList,
@@ -133,7 +146,7 @@ public class BookingServiceImpl implements BookingService {
 
         if (newStatus == BookingStatus.confirmed) {
 
-            Venue venue = venueRepository.findByVenueId(existingBooking.getVenueId());
+            Venue venue = venueRepository.findByVenueId(existingBooking.getVenue().getVenueId());
 
             venue.setAvailabilityStatus(AvailabilityStatus.unavailable);
             venueRepository.save(venue);

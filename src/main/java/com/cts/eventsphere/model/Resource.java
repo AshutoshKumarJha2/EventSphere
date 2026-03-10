@@ -27,8 +27,10 @@ public class Resource {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String resourceId;
 
-    @Column(columnDefinition = "CHAR(36)")
-    private String venueId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "venue_id", nullable = false)
+    private Venue venue;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('equipment','staff')")
@@ -53,5 +55,4 @@ public class Resource {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
 }

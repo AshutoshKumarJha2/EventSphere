@@ -33,9 +33,18 @@ public class ResourceServiceImpl implements ResourceService {
     private final ResourceAllocationRepository resourceAllocationRepository;
 
     @Override
+    @Transactional
     public ResourceResponseDto createResource(ResourceRequestDto resourceRequestDto) {
+        // 1. Map simple fields from DTO to Entity
         Resource resource = ResourceRequestDtoMapper.toEntity(resourceRequestDto);
+
+        Venue venue = venueRepository.findById(resourceRequestDto.venueId())
+                .orElseThrow(() -> new RuntimeException("Venue not found with id: " + resourceRequestDto.venueId()));
+
+        resource.setVenue(venue);
+
         Resource savedResource = resourceRepository.save(resource);
+
         return mapToResponseDto(savedResource);
     }
 
@@ -56,13 +65,22 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     @Transactional
     public ResourceResponseDto updateResource(String resourceId, ResourceRequestDto dto) {
+        // 1. Find the existing resource
         Resource existingResource = resourceRepository.findById(resourceId)
                 .orElseThrow(() -> new RuntimeException("Resource not found with id: " + resourceId));
 
-        existingResource.setVenueId(dto.venueId());
+        // 2. Fetch the Venue entity using the ID from the DTO
+        Venue venue = venueRepository.findById(dto.venueId())
+                .orElseThrow(() -> new RuntimeException("Venue not found with id: " + dto.venueId()));
+
+        // 3. Update the fields
+        existingResource.setName(dto.name()); // Don't forget the name!
+        existingResource.setVenue(venue);      // Pass the Entity, not the String ID
         existingResource.setType(dto.type());
         existingResource.setCostRate(dto.costRate());
+        existingResource.setUnit(dto.unit());
 
+        // 4. Save and return
         Resource updatedResource = resourceRepository.save(existingResource);
         return mapToResponseDto(updatedResource);
     }
@@ -124,7 +142,7 @@ public class ResourceServiceImpl implements ResourceService {
     private ResourceResponseDto mapToResponseDto(Resource resource) {
         return new ResourceResponseDto(
                 resource.getResourceId(),
-                resource.getVenueId(),
+                resource.getVenue().getVenueId(),
                 resource.getType(),
                 resource.getAvailability(),
                 resource.getCostRate(),
