@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Global Exception Handler for Validation errors
+ * Global Exception Handler for Validation errors and Custom made Exceptions
  *
  * @author 2480081
  * @version 1.0
