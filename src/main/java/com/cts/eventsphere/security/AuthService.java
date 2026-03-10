@@ -3,6 +3,9 @@ package com.cts.eventsphere.security;
 import com.cts.eventsphere.dto.auth.LoginRequestDto;
 import com.cts.eventsphere.dto.auth.LoginResponseDto;
 import com.cts.eventsphere.dto.user.UserRequestDto;
+import com.cts.eventsphere.exception.user.InvalidPasswordException;
+import com.cts.eventsphere.exception.user.UserAlreadyExistsException;
+import com.cts.eventsphere.exception.user.UserNotFoundException;
 import com.cts.eventsphere.model.User;
 import com.cts.eventsphere.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,12 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     public String register(UserRequestDto dto) {
+        var existingUser = userRepository.findByEmail(dto.email());
+
+        if (existingUser.isPresent()) {
+            throw new UserAlreadyExistsException(dto.email());
+        }
+
         User user = new User();
         user.setName(dto.name());
         user.setEmail(dto.email());
@@ -40,10 +49,10 @@ public class AuthService {
 
     public LoginResponseDto login(LoginRequestDto loginDto) {
         User user = userRepository.findByEmail(loginDto.email())
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + loginDto.email()));
+                .orElseThrow(() -> new UserNotFoundException(loginDto.email()));
 
         if (!passwordEncoder.matches(loginDto.password(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new InvalidPasswordException("Invalid password provided");
         }
 
         String roleName = user.getRole().name();
