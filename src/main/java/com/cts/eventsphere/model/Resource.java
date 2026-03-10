@@ -29,7 +29,7 @@ public class Resource {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "venue_id", nullable = false)
+    @JoinColumn(name = "venueId", nullable = false)
     private Venue venue;
 
     @Enumerated(EnumType.STRING)

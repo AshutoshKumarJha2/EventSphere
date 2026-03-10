@@ -33,7 +33,7 @@ public class Booking {
     private String eventId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "venue_id", nullable = false)
+    @JoinColumn(name = "venueId", nullable = false)
     private Venue venue;
 
     @Column(name = "date", nullable = false)
