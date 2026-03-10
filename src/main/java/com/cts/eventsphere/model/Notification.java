@@ -15,7 +15,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-
+@Table(name = "notification")
 @Data
 public class Notification {
 
@@ -40,6 +40,9 @@ public class Notification {
     private String status = "Unread";
 
     @CreationTimestamp
-    @Column(name = "createdDate", updatable = false)
-    private LocalDateTime createdDate;
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @CreationTimestamp
+    private  LocalDateTime updatedAt;
 }
