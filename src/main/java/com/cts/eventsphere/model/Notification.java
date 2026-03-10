@@ -1,0 +1,45 @@
+package com.cts.eventsphere.model;
+
+/**
+ * Notification Entity
+ *
+ * @author 2480027
+ * @version 1.0
+ * @since 09-03-2026
+ */
+
+import jakarta.persistence.*;
+import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
+
+@Entity
+
+@Data
+public class Notification {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "notificationId", columnDefinition = "CHAR(36)")
+    private String notificationId;
+
+    @Column(name = "userId", nullable = false, columnDefinition = "CHAR(36)")
+    private String userId;
+
+    @Column(name = "eventId", columnDefinition = "CHAR(36)")
+    private String eventId;
+
+    @Column(name = "message", nullable = false, length = 255)
+    private String message;
+
+    @Column(name = "category", nullable = false, length = 20)
+    private String category;
+
+    @Column(name = "status", nullable = false, length = 20)
+    private String status = "Unread";
+
+    @CreationTimestamp
+    @Column(name = "createdDate", updatable = false)
+    private LocalDateTime createdDate;
+}
