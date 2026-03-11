@@ -23,11 +23,15 @@ public interface BookingService {
     BookingResponseDto createBooking(BookingRequestDto bookingRequestDto);
 
 
+
+    List<BookingResponseDto> getBookingsByVenue(String venueId);
+
+
     /**
      * Retrieves all bookings in the system
      * * @return list of booking responses
      */
-    List<BookingResponseDto> getAllBookings();
+    List<BookingResponseDto> getAllBookingsServ();
 
 
 

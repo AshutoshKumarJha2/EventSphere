@@ -4,6 +4,8 @@ import com.cts.eventsphere.dto.mapper.venue.VenueRequestDtoMapper;
 import com.cts.eventsphere.dto.mapper.venue.VenueResponseDtoMapper;
 import com.cts.eventsphere.dto.venue.VenueRequestDto;
 import com.cts.eventsphere.dto.venue.VenueResponseDto;
+import com.cts.eventsphere.exception.resource.ResourceNotFoundException;
+import com.cts.eventsphere.exception.venue.VenueNotFoundException;
 import com.cts.eventsphere.model.Venue;
 import com.cts.eventsphere.model.data.AvailabilityStatus;
 import com.cts.eventsphere.repository.VenueRepository;
@@ -52,6 +54,37 @@ public class VenueServiceImpl implements VenueService {
     public List<VenueResponseDto> findByLocation(String location) {
         List<Venue> locationList = venueRepository.findByLocation(location);
         return convertHelper(locationList);
+    }
+
+    // ... existing imports
+
+    @Override
+    public VenueResponseDto updateVenue(String venueId, VenueRequestDto dto) {
+        Venue existingVenue = venueRepository.findById(venueId)
+                .orElseThrow(() -> new RuntimeException("Venue not found with id: " + venueId));
+
+
+        Venue updatedVenue = venueRequestDtoMapper.toEntity(dto);
+        updatedVenue.setVenueId(existingVenue.getVenueId());
+
+        return venueResponseDtoMapper.toDto(venueRepository.save(updatedVenue));
+    }
+
+    @Override
+    public VenueResponseDto updateVenueStatus(String venueId, AvailabilityStatus status) {
+        Venue venue = venueRepository.findById(venueId)
+                .orElseThrow(() -> new RuntimeException("Venue not found with id: " + venueId));
+
+        venue.setAvailabilityStatus(status);
+        return venueResponseDtoMapper.toDto(venueRepository.save(venue));
+    }
+
+    @Override
+    public void deleteVenue(String venueId) {
+        if (!venueRepository.existsById(venueId)) {
+            throw new VenueNotFoundException("Venue not found with id: " + venueId);
+        }
+        venueRepository.deleteById(venueId);
     }
 
     @Override
