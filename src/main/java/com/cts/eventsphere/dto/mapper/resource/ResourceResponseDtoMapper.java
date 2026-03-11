@@ -1,6 +1,7 @@
 package com.cts.eventsphere.dto.mapper.resource;
 
 import com.cts.eventsphere.dto.resource.ResourceRequestDto;
+import com.cts.eventsphere.dto.resource.ResourceResponseDto;
 import com.cts.eventsphere.model.Resource;
 
 public class ResourceResponseDtoMapper {
@@ -13,11 +14,22 @@ public class ResourceResponseDtoMapper {
         }
 
         return new ResourceRequestDto(
-                "Resource Name", // Placeholder: You might need to add 'name' to the Entity
-                resource.getVenue().getVenueId(),
+                "Resource Name",
                 resource.getType(),
                 resource.getCostRate(),
                 1 // Placeholder for unit/quantity
+        );
+    }
+
+
+    public static ResourceResponseDto mapToResponseDto(Resource resource) {
+        return new ResourceResponseDto(
+                resource.getResourceId(),
+                resource.getVenue().getVenueId(),
+                resource.getType(),
+                resource.getName(),
+                resource.getAvailability(),
+                resource.getCostRate()
         );
     }
 }

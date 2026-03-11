@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 
 public record ResourceRequestDto(
                                 String name,
-                                 String venueId,
                                  ResourceType type,
                                  BigDecimal costRate,
                                  Integer unit

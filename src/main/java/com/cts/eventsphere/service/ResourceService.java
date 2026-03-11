@@ -16,7 +16,7 @@ public interface ResourceService {
     /**
      * Adds a new resource to the inventory.
      */
-    ResourceResponseDto createResource(ResourceRequestDto resourceRequestDto);
+    ResourceResponseDto createResource(String venueId,ResourceRequestDto resourceRequestDto);
 
     /**
      * Retrieves all available resources.

@@ -8,8 +8,8 @@ import java.math.BigDecimal;
 public record ResourceResponseDto(String resourceId,
                                   String venueId,
                                   ResourceType type,
+                                  String name,
                                   Availability availability,
-                                  BigDecimal costRate,
-                                  Integer requestedQuantity,
-                                  String approvalStatus) {
+                                  BigDecimal costRate
+                                  ) {
 }
