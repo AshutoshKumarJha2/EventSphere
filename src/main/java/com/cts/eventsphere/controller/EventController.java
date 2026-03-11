@@ -34,7 +34,7 @@ public class EventController {
     private final EventService eventService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('admin', 'organizer', 'venue_manager')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER', 'VENUE_MANAGER')")
     public ResponseEntity<EventResponseDto> create(@RequestBody EventRequestDto event) {
         log.info("Received request to create a new event: {}", event.name());
         EventResponseDto createdEvent = eventService.create(event);
@@ -51,7 +51,7 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('admin', 'organizer', 'venue_manager')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER', 'VENUE_MANAGER')")
     public ResponseEntity<Void> update(@PathVariable String id, @RequestBody EventRequestDto eventRequest) {
         log.info("Received request to update event with ID: {}", id);
         eventService.updateById(id, eventRequest);
@@ -68,7 +68,7 @@ public class EventController {
     }
 
     @PostMapping("/{id}/schedules")
-    @PreAuthorize("hasAnyRole('admin', 'organizer', 'venue_manager')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER', 'VENUE_MANAGER')")
     public ResponseEntity<ScheduleResponseDto> createActivity(@PathVariable String id, @RequestBody ScheduleRequestDto scheduleRequest) {
         log.info("Received request to add activity to event ID: {}", id);
         ScheduleResponseDto response = eventService.addActivity(id, scheduleRequest);
