@@ -19,7 +19,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * @version 1.0
  * @since 04-03-2026
  */
-
 @Configuration
 @RequiredArgsConstructor
 @EnableMethodSecurity(
@@ -49,7 +48,6 @@ public class SecurityConfig {
                                 "/webjars/**",
                                 "/api/v1/swagger-ui/**"
                         ).permitAll()
-
                         .requestMatchers("/api/v1/auth/refresh").authenticated()
                         .anyRequest().authenticated()
                 )
