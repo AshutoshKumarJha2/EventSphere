@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * JPA Repository for the Resource Entity.
@@ -14,7 +15,11 @@ import java.util.List;
  */
 @Repository
 public interface ResourceRepository extends JpaRepository<Resource, String> {
-    Resource findByName(String name);
+    Optional<Resource> findByName(String name);
+
+    boolean existsByName(String name);
+
+    Resource findByResourceId(String resourceId);
 
     List<Resource> findByVenue_VenueId(String venueId);
 }

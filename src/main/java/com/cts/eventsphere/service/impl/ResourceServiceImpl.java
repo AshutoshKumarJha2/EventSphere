@@ -5,7 +5,10 @@ import com.cts.eventsphere.dto.mapper.resource.ResourceResponseDtoMapper;
 import com.cts.eventsphere.dto.resource.ResourceListElementDto;
 import com.cts.eventsphere.dto.resource.ResourceRequestDto;
 import com.cts.eventsphere.dto.resource.ResourceResponseDto;
+import com.cts.eventsphere.exception.event.EventNotFoundException;
 import com.cts.eventsphere.exception.resource.InsufficientResourceException;
+import com.cts.eventsphere.exception.resource.ResourceAlreadyExistsException;
+import com.cts.eventsphere.exception.resource.ResourceDuplicateAllocationException;
 import com.cts.eventsphere.exception.resource.ResourceNotFoundException;
 import com.cts.eventsphere.model.Event;
 import com.cts.eventsphere.model.Resource;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,16 +40,21 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     @Transactional
-    public ResourceResponseDto createResource(String venueId,ResourceRequestDto resourceRequestDto) {
+    public ResourceResponseDto createResource(String venueId, ResourceRequestDto resourceRequestDto) {
         log.info("Initiating resource creation: {}", resourceRequestDto.name());
 
-        Resource resource = ResourceRequestDtoMapper.toEntity(resourceRequestDto);
+        if (resourceRepository.existsByName(resourceRequestDto.name())) {
+            log.warn("Resource creation failed: Name '{}' already exists", resourceRequestDto.name());
+            throw new ResourceAlreadyExistsException("Resource already exists with name: " + resourceRequestDto.name());
+        }
 
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> {
                     log.error("Venue ID {} not found during resource creation", venueId);
                     return new RuntimeException("Venue not found with id: " + venueId);
                 });
+
+        Resource resource = ResourceRequestDtoMapper.toEntity(resourceRequestDto);
 
         resource.setVenue(venue);
         Resource savedResource = resourceRepository.save(resource);
@@ -60,6 +69,32 @@ public class ResourceServiceImpl implements ResourceService {
         return resourceRepository.findAll().stream()
                 .map(ResourceResponseDtoMapper::mapToResponseDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void approveAllocation(String allocationId) {
+        log.info("Venue Manager approving allocation ID: {}", allocationId);
+
+        ResourceAllocation allocation = resourceAllocationRepository.findById(allocationId)
+                .orElseThrow(() -> new RuntimeException("Allocation request not found"));
+
+
+        Resource resource = allocation.getResource();
+
+        // Logic: Double check inventory at the moment of approval
+        if (resource.getUnit() < allocation.getQuantity()) {
+            throw new InsufficientResourceException("Cannot approve: Units no longer available");
+        }
+
+        // SUBTRACTION HAPPENS HERE
+        resource.setUnit(resource.getUnit() - allocation.getQuantity());
+//        allocation.setStatus("APPROVED");
+
+        resourceRepository.save(resource);
+        resourceAllocationRepository.save(allocation);
+
+        log.info("Allocation approved and inventory updated for: {}", resource.getName());
     }
 
     @Override
@@ -115,25 +150,29 @@ public class ResourceServiceImpl implements ResourceService {
     public void requestAllocation(String bookingId, String eventId, String venueId, List<ResourceListElementDto> resources) {
         log.info("Processing resource allocation for Event: {} at Venue: {}", eventId, venueId);
 
-        Event event = eventRepository.getReferenceById(eventId);
-        Venue venue = venueRepository.getReferenceById(venueId);
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Event not found: " + eventId));
+        Venue venue = venueRepository.findById(venueId)
+                .orElseThrow(() -> new ResourceNotFoundException("Venue not found: " + venueId));
 
         for (ResourceListElementDto resourceReq : resources) {
-            Resource resource = resourceRepository.findByName(resourceReq.resourceName());
+            Resource resource = resourceRepository.findById(resourceReq.resourceId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Resource not found: " + resourceReq.resourceId()));
 
-            if (resource == null) {
-                log.error("Allocation failed: Resource '{}' not found", resourceReq.resourceName());
-                throw new ResourceNotFoundException("Resource not found: " + resourceReq.resourceName());
+            // --- NEW CHECK: Prevent same resource name at same venue ---
+            if (resourceAllocationRepository.existsByResourceNameAndVenueVenueId(resource.getName(), venueId)) {
+                log.warn("Allocation failed: Resource '{}' is already allocated to Venue '{}'", resource.getName(), venueId);
+                throw new ResourceDuplicateAllocationException("Resource '" + resource.getName() + "' is already allocated to this venue.");
             }
+            // -----------------------------------------------------------
 
             if (resource.getUnit() < resourceReq.quantity()) {
                 log.error("Allocation failed: Insufficient units for {}. Available: {}, Requested: {}",
                         resource.getName(), resource.getUnit(), resourceReq.quantity());
-                throw new InsufficientResourceException("Not enough units for: " + resourceReq.resourceName());
+                throw new InsufficientResourceException("Insufficient units for: " + resource.getName());
             }
 
             resource.setUnit(resource.getUnit() - resourceReq.quantity());
-            resourceRepository.save(resource);
 
             ResourceAllocation resourceAllocation = ResourceAllocation.builder()
                     .resource(resource)
@@ -143,7 +182,6 @@ public class ResourceServiceImpl implements ResourceService {
                     .build();
 
             resourceAllocationRepository.save(resourceAllocation);
-            log.debug("Allocated {} units of '{}' to Event: {}", resourceReq.quantity(), resource.getName(), eventId);
         }
         log.info("Resource allocation completed for Event: {}", eventId);
     }
