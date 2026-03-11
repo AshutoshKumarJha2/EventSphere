@@ -10,9 +10,13 @@ import com.cts.eventsphere.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -36,6 +40,7 @@ import java.util.List;
 @RequestMapping("/api/v1")
 @Slf4j
 @RequiredArgsConstructor
+
 public class ExpenseController {
 
     private final ExpenseService expenseService;
@@ -59,10 +64,10 @@ public class ExpenseController {
      */
     @GetMapping("/events/{eventId}/expenses")
     @PreAuthorize("hasAnyRole('admin', 'organizer', 'finance_manager')")
-    public ResponseEntity<List<ExpenseResponseDto>> getEventExpenses(@PathVariable String eventId){
-        log.info("Request to fetch expenses for eventId: {}", eventId);
-        List<ExpenseResponseDto> response = expenseService.getExpenseByEvent(eventId);
-        log.info("Response for eventId {}: {}", eventId, response);
+    public ResponseEntity<List<ExpenseResponseDto>> getEventExpenses(@PathVariable String eventId ){
+        log.info("Request to fetch expenses for eventId: {} ", eventId);
+        List<ExpenseResponseDto> response = expenseService.getExpenseByEvent(eventId );
+        log.info("Response for eventId {}: {} ", eventId, response);
         return ResponseEntity.ok(response);
     }
 

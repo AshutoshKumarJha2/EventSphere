@@ -4,6 +4,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ import java.util.Date;
  * @version 1.0
  * @since 01-03-2026
  */
+@Builder
 public record ExpenseRequestDto(
         @NotBlank(message = "Description cannot be empty")
         @Size(max = 255 , message = "Description provided is too long")

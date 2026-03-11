@@ -15,11 +15,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class BudgetRequestDtoMapper {
     public Budget toEntity(BudgetRequestDto dto, Event event){
-        Budget budget = new Budget();
-        budget.setEvent(event);
-        budget.setPlannedAmount(dto.plannedAmount());
-//        budget.setActualAmount(dto.actualAmount);
-//        budget.setVariance(dto.Variance);
-        return budget;
+//        Budget budget = new Budget();
+//        budget.setEvent(event);
+//        budget.setPlannedAmount(dto.plannedAmount());
+////        budget.setActualAmount(dto.actualAmount);
+////        budget.setVariance(dto.Variance);
+//        return budget;
+
+        return Budget.builder()
+                .event(event)
+                .plannedAmount(dto.plannedAmount())
+                .build();
     }
 }
