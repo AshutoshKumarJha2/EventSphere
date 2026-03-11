@@ -1,0 +1,123 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > VenueRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: VenueRepository (com.cts.eventsphere.repository)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">VenueRepository$MockitoMock$StRDJSkL</td>
+  </tr>
+  <tr>
+    <td class="name">VenueRepository$MockitoMock$StRDJSkL$auxiliary$3BilHCYi</td>
+  </tr>
+  <tr>
+    <td class="name">VenueRepository$MockitoMock$StRDJSkL$auxiliary$BE5AXVxr</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.repository;
+&nbsp;
+&nbsp;import com.cts.eventsphere.model.Venue;
+&nbsp;import com.cts.eventsphere.model.data.AvailabilityStatus;
+&nbsp;import org.springframework.data.jpa.repository.JpaRepository;
+&nbsp;import org.springframework.data.jpa.repository.Query;
+&nbsp;import org.springframework.data.repository.query.Param;
+&nbsp;import org.springframework.stereotype.Repository;
+&nbsp;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Repository
+&nbsp;public interface VenueRepository extends JpaRepository&lt;Venue, String&gt; {
+&nbsp;
+&nbsp;    Venue findByVenueId(String venueId);
+&nbsp;
+&nbsp;    List&lt;Venue&gt; findByLocation(String location);
+&nbsp;
+&nbsp;    List&lt;Venue&gt; findByCapacityGreaterThanEqual(int capacity);
+&nbsp;
+&nbsp;    List&lt;Venue&gt; findByAvailabilityStatus(AvailabilityStatus status);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds venues that are available on a specific date, match the status,
+&nbsp;     * and meet the minimum capacity requirement.
+&nbsp;     */
+&nbsp;    @Query(&quot;&quot;&quot;
+&nbsp;       SELECT v 
+&nbsp;       FROM Venue v 
+&nbsp;       WHERE v.availabilityStatus = :status
+&nbsp;         AND (:minCapacity IS NULL OR v.capacity &gt;= :minCapacity)
+&nbsp;         AND NOT EXISTS (
+&nbsp;             SELECT e 
+&nbsp;             FROM Event e 
+&nbsp;             WHERE e.venueId = v.venueId
+&nbsp;               AND e.startDate &lt;= :date 
+&nbsp;               AND e.endDate &gt;= :date 
+&nbsp;         )
+&nbsp;    &quot;&quot;&quot;)
+&nbsp;    List&lt;Venue&gt; findAvailableVenues(
+&nbsp;            @Param(&quot;date&quot;) LocalDate date,
+&nbsp;            @Param(&quot;status&quot;) AvailabilityStatus status,
+&nbsp;            @Param(&quot;minCapacity&quot;) Integer minCapacity
+&nbsp;    );
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

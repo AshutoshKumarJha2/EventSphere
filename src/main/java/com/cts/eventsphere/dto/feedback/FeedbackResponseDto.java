@@ -1,4 +1,6 @@
 package com.cts.eventsphere.dto.feedback;
+
+import lombok.Builder;
 import java.time.LocalDateTime;
 
 /**
@@ -8,7 +10,7 @@ import java.time.LocalDateTime;
  * @version 1.0
  * @since 26-02-2026
  */
-
+@Builder
 public record FeedbackResponseDto(
         String feedbackId,
         String eventId,
@@ -19,4 +21,3 @@ public record FeedbackResponseDto(
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {}
-

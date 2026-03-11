@@ -15,11 +15,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class PaymentRequestDtoMapper {
     public Payment toEntity(PaymentRequestDto dto){
-        Payment payment = new Payment();
-        payment.setInvoice(dto.invoice());
-        payment.setAmount(dto.amount());
-        payment.setPaymentDate(dto.date());
-        return payment;
+//        Payment payment = new Payment();
+//        payment.setInvoice(dto.invoice());
+//        payment.setAmount(dto.amount());
+//        payment.setPaymentDate(dto.date());
+//        return payment;
+
+        return Payment.builder()
+                .invoice(dto.invoice())
+                .amount(dto.amount())
+                .paymentDate(dto.date())
+                .build();
     }
 
 }

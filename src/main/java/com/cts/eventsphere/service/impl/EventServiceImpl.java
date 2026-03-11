@@ -15,6 +15,7 @@ import com.cts.eventsphere.repository.EventRepository;
 import com.cts.eventsphere.repository.ScheduleRepository;
 import com.cts.eventsphere.service.EventService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final EventResponseDtoMapper eventResponseDtoMapper;
@@ -42,8 +44,10 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public EventResponseDto create(EventRequestDto eventRequest) {
+        log.info("Creating a new event: {}", eventRequest.name());
         Event event = eventRequestDtoMapper.toEntity(eventRequest);
         Event savedEvent = eventRepository.save(event);
+        log.info("Successfully saved event with ID: {}", savedEvent.getEventId());
 
         return eventResponseDtoMapper.toDTO(savedEvent);
     }
@@ -53,9 +57,12 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public List<EventResponseDto> findAllEvents() {
-        return eventRepository.findAll().stream()
+        log.info("Fetching all events from repository");
+        List<EventResponseDto> events = eventRepository.findAll().stream()
                 .map(eventResponseDtoMapper::toDTO)
                 .toList();
+        log.debug("Found {} events in total", events.size());
+        return events;
     }
 
     /**
@@ -65,8 +72,12 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public EventResponseDto findById(String eventId) throws EventNotFoundException {
+        log.info("Searching for event with ID: {}", eventId);
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EventNotFoundException(eventId));
+                .orElseThrow(() -> {
+                    log.error("Event lookup failed: ID {} not found", eventId);
+                    return new EventNotFoundException(eventId);
+                });
 
         return eventResponseDtoMapper.toDTO(event);
     }
@@ -78,13 +89,16 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public boolean updateById(String eventId, EventRequestDto eventRequest) throws EventNotFoundException {
+        log.info("Updating event with ID: {}", eventId);
         if(!eventRepository.existsById(eventId)) {
+            log.error("Update failed: Event ID {} does not exist", eventId);
             throw new EventNotFoundException(eventId);
         }
 
         Event event = eventRequestDtoMapper.toEntity(eventRequest);
         event.setEventId(eventId);
         eventRepository.save(event);
+        log.info("Successfully updated event ID: {}", eventId);
 
         return true;
     }
@@ -96,10 +110,13 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public boolean deleteById(String eventId) throws EventNotFoundException {
+        log.info("Request to delete event with ID: {}", eventId);
         if(!eventRepository.existsById(eventId)) {
+            log.warn("Delete aborted: Event ID {} not found", eventId);
             throw new EventNotFoundException(eventId);
         }
         eventRepository.deleteById(eventId);
+        log.info("Successfully deleted event ID: {}", eventId);
 
         return true;
     }
@@ -110,11 +127,16 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public ScheduleResponseDto addActivity(String eventId, ScheduleRequestDto scheduleRequest) {
+        log.info("Adding new activity to event ID: {}", eventId);
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EventNotFoundException(eventId));
+                .orElseThrow(() -> {
+                    log.error("Activity creation failed: Parent Event ID {} not found", eventId);
+                    return new EventNotFoundException(eventId);
+                });
 
         Schedule schedule = scheduleRequestDtoMapper.toEntity(scheduleRequest, event);
         Schedule savedSchedule = scheduleRepository.save(schedule);
+        log.info("Successfully added activity ID: {} to event ID: {}", savedSchedule.getScheduleId(), eventId);
 
         return scheduleResponseDtoMapper.toDTO(savedSchedule);
     }
@@ -124,9 +146,12 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public List<ScheduleResponseDto> findAllSchedules(String eventId) {
-        return scheduleRepository.findAll().stream()
+        log.info("Fetching all activities for event ID: {}", eventId);
+        List<ScheduleResponseDto> schedules = scheduleRepository.findAll().stream()
                 .filter(s -> s.getEvent().getEventId().equals(eventId))
                 .map(scheduleResponseDtoMapper::toDTO)
                 .toList();
+        log.debug("Found {} activities matching event ID: {}", schedules.size(), eventId);
+        return schedules;
     }
 }

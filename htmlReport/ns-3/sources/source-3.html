@@ -1,0 +1,170 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ContractController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: ContractController (com.cts.eventsphere.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ContractController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (1/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.9%
+  </span>
+  <span class="absValue">
+    (1/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.controller;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.contract.ContractRequestDto;
+&nbsp;import com.cts.eventsphere.dto.contract.ContractResponseDto;
+&nbsp;import com.cts.eventsphere.service.ContractService;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Rest Controller for Contract Entity
+&nbsp; *
+&nbsp; * @author 2480177
+&nbsp; * @version 1.0
+&nbsp; * @since 03-03-2026
+&nbsp; */
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/api/v1/contracts&quot;)
+&nbsp;@RequiredArgsConstructor
+<b class="fc">&nbsp;@Slf4j</b>
+&nbsp;public class ContractController {
+&nbsp;
+&nbsp;    private final ContractService contractService;
+&nbsp;
+&nbsp;    @PostMapping
+&nbsp;    public ContractResponseDto create(@RequestBody ContractRequestDto request) {
+<b class="nc">&nbsp;        log.info(&quot;Received request to create contract: vendorId={}, eventId={}&quot;,</b>
+<b class="nc">&nbsp;                request.vendorId(), request.eventId());</b>
+<b class="nc">&nbsp;        ContractResponseDto response = contractService.createContract(request);</b>
+<b class="nc">&nbsp;        log.info(&quot;Contract created successfully with ID={}&quot;, response.contractId());</b>
+<b class="nc">&nbsp;        return response;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{id}&quot;)
+&nbsp;    public ContractResponseDto getById(@PathVariable String id) {
+<b class="nc">&nbsp;        log.info(&quot;Fetching contract with ID={}&quot;, id);</b>
+<b class="nc">&nbsp;        return contractService.getContractById(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping
+&nbsp;    public List&lt;ContractResponseDto&gt; getAll() {
+<b class="nc">&nbsp;        log.info(&quot;Fetching all contracts&quot;);</b>
+<b class="nc">&nbsp;        return contractService.getAllContracts();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/{id}&quot;)
+&nbsp;    public ContractResponseDto update(
+&nbsp;            @PathVariable String id,
+&nbsp;            @RequestBody ContractRequestDto request) {
+&nbsp;
+<b class="nc">&nbsp;        log.info(&quot;Updating contract with ID={}&quot;, id);</b>
+<b class="nc">&nbsp;        ContractResponseDto response = contractService.updateContract(id, request);</b>
+<b class="nc">&nbsp;        log.info(&quot;Contract updated successfully with ID={}&quot;, id);</b>
+<b class="nc">&nbsp;        return response;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/{id}&quot;)
+&nbsp;    public void delete(@PathVariable String id) {
+<b class="nc">&nbsp;        log.warn(&quot;Request received to delete contract with ID={}&quot;, id);</b>
+<b class="nc">&nbsp;        contractService.deleteContract(id);</b>
+<b class="nc">&nbsp;        log.info(&quot;Contract deleted successfully with ID={}&quot;, id);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

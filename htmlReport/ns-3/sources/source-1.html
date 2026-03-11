@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BookingController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: BookingController (com.cts.eventsphere.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BookingController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (1/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    4.8%
+  </span>
+  <span class="absValue">
+    (1/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.controller;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.booking.BookingRequestDto;
+&nbsp;import com.cts.eventsphere.dto.booking.BookingResponseDto;
+&nbsp;import com.cts.eventsphere.model.data.BookingStatus;
+&nbsp;import com.cts.eventsphere.service.BookingService;
+&nbsp;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Controller for Booking API Endpoints
+&nbsp; * Workflow: Organizer selects venue -&gt; Booking created (Pending)
+&nbsp; *
+&nbsp; * @author 2479476
+&nbsp; * @version 1.0
+&nbsp; * @since 04-03-2026
+&nbsp; */
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/api/v1/bookings&quot;)
+<b class="fc">&nbsp;@Slf4j</b>
+&nbsp;@RequiredArgsConstructor
+&nbsp;public class BookingController {
+&nbsp;
+&nbsp;    private final BookingService bookingService;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new booking.
+&nbsp;     */
+&nbsp;    @PostMapping
+&nbsp;    public ResponseEntity&lt;BookingResponseDto&gt; createBooking(@RequestBody BookingRequestDto bookingRequestDto) {
+<b class="nc">&nbsp;        log.info(&quot;REST request to create Booking. Request Data: {}&quot;, bookingRequestDto);</b>
+&nbsp;
+<b class="nc">&nbsp;        BookingResponseDto response = bookingService.createBooking(bookingRequestDto);</b>
+&nbsp;
+<b class="nc">&nbsp;        log.info(&quot;Booking created successfully. Response Data: {}&quot;, response);</b>
+<b class="nc">&nbsp;        return new ResponseEntity&lt;&gt;(response, HttpStatus.CREATED);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieves all bookings.
+&nbsp;     */
+&nbsp;    @GetMapping
+&nbsp;    public ResponseEntity&lt;List&lt;BookingResponseDto&gt;&gt; getAllBookings() {
+<b class="nc">&nbsp;        log.info(&quot;REST request to fetch all bookings&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BookingResponseDto&gt; bookings = bookingService.getAllBookings();</b>
+&nbsp;
+<b class="nc">&nbsp;        log.info(&quot;Successfully fetched {} bookings&quot;, bookings.size());</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(bookings);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{eventId}&quot;)
+&nbsp;    public ResponseEntity&lt;List&lt;BookingResponseDto&gt;&gt; getAllBookings(@PathVariable String eventId) {
+<b class="nc">&nbsp;        log.info(&quot;REST request to fetch  bookings by event ID&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BookingResponseDto&gt; bookings = bookingService.getBookingsByEvent(eventId);</b>
+&nbsp;
+<b class="nc">&nbsp;        log.info(&quot;Successfully fetched {} bookings&quot;, bookings.size());</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(bookings);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Updates the status of a specific booking.
+&nbsp;     */
+&nbsp;    @PatchMapping(&quot;/{id}/status&quot;)
+&nbsp;    public ResponseEntity&lt;BookingResponseDto&gt; updateStatus(
+&nbsp;            @PathVariable(&quot;id&quot;) String id,
+&nbsp;            @RequestParam(&quot;newStatus&quot;) BookingStatus newStatus) {
+&nbsp;
+<b class="nc">&nbsp;        log.info(&quot;REST request to update status for Booking ID: {} to {}&quot;, id, newStatus);</b>
+&nbsp;
+<b class="nc">&nbsp;        BookingResponseDto updatedBooking = bookingService.updateBookingStatus(id, newStatus);</b>
+&nbsp;
+<b class="nc">&nbsp;        log.info(&quot;Booking status updated successfully. Response Data: {}&quot;, updatedBooking);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(updatedBooking);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes a booking record.
+&nbsp;     */
+&nbsp;    @DeleteMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;Void&gt; deleteBooking(@PathVariable(&quot;id&quot;) String bookingId) {
+<b class="nc">&nbsp;        log.info(&quot;REST request to delete booking with ID: {}&quot;, bookingId);</b>
+&nbsp;
+<b class="nc">&nbsp;        bookingService.deleteBooking(bookingId);</b>
+&nbsp;
+<b class="nc">&nbsp;        log.info(&quot;Booking with ID: {} deleted successfully&quot;, bookingId);</b>
+<b class="nc">&nbsp;        return ResponseEntity.noContent().build();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

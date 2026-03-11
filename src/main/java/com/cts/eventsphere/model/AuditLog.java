@@ -1,6 +1,7 @@
 package com.cts.eventsphere.model;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "auditlog")
 @Data
-
+@Builder
 public class AuditLog {
 
     @Id
@@ -35,7 +36,14 @@ public class AuditLog {
     @Column(nullable = false, length = 100)
     private String resource;
 
+    @Column(nullable = false, length = 100)
+    private String entityId;
+
+    @Column(nullable = false, length = 100)
+    private String entityName;
+
     @Column(nullable = false)
+    @CreationTimestamp
     private LocalDateTime timeStamp;
 
     @CreationTimestamp

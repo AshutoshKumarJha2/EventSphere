@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -22,22 +21,23 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/v1/events/{eventId}/schedules")
-@EnableMethodSecurity(
-        securedEnabled = true,
-        jsr250Enabled = true
-)
 public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @PostMapping("/{id}")
     @PreAuthorize("hasAnyRole('admin', 'organizer', 'venue_manager')")
     public ResponseEntity<ScheduleResponseDto> update(@PathVariable String eventId, @PathVariable String id, @RequestBody ScheduleRequestDto scheduleRequest){
-        return ResponseEntity.ok(scheduleService.updateById(eventId, id, scheduleRequest));
+        log.info("Received request to update schedule with ID: {} for event ID: {}", id, eventId);
+        ScheduleResponseDto response = scheduleService.updateById(eventId, id, scheduleRequest);
+        log.info("Successfully updated schedule with ID: {}", id);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Schedule> delete(@PathVariable String id) {
+        log.info("Received request to delete schedule with ID: {}", id);
         scheduleService.deleteById(id);
+        log.info("Successfully deleted schedule with ID: {}", id);
         return ResponseEntity.noContent().build();
     }
 }
