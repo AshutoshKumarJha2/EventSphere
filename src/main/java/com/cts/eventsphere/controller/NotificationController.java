@@ -3,6 +3,7 @@ package com.cts.eventsphere.controller;
 import com.cts.eventsphere.model.Notification;
 import com.cts.eventsphere.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/notifications")
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationController {
 
     private final NotificationService notificationService;
@@ -36,7 +38,9 @@ public class NotificationController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastTimestamp,
             @RequestParam(defaultValue = "20") int limit) {
 
+        log.info("Fetching notifications for user: {} with limit: {} and lastTimestamp: {}", userId, limit, lastTimestamp);
         List<Notification> notifications = notificationService.getNotificationsScroll(userId, lastTimestamp, limit);
+        log.info("Retrieved {} notifications for user: {}", notifications.size(), userId);
         return ResponseEntity.ok(notifications);
     }
 
@@ -50,7 +54,9 @@ public class NotificationController {
             @RequestParam String message,
             @RequestParam String category) {
 
+        log.info("Request to send notification to user: {} (Category: {})", userId, category);
         notificationService.sendNotification(userId, email, message, category);
+        log.info("Notification sent successfully to user: {}", userId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -59,7 +65,9 @@ public class NotificationController {
      */
     @PatchMapping("/{notificationId}/read")
     public ResponseEntity<Void> markAsRead(@PathVariable String notificationId) {
+        log.info("Request to mark notification {} as read", notificationId);
         notificationService.markAsRead(notificationId);
+        log.info("Notification {} marked as read", notificationId);
         return ResponseEntity.noContent().build();
     }
 }

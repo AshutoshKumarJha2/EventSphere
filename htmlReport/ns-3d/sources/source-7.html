@@ -1,0 +1,273 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EventServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: EventServiceImpl (com.cts.eventsphere.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EventServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    10%
+  </span>
+  <span class="absValue">
+    (1/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    2%
+  </span>
+  <span class="absValue">
+    (1/50)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.service.impl;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.event.EventRequestDto;
+&nbsp;import com.cts.eventsphere.dto.event.EventResponseDto;
+&nbsp;import com.cts.eventsphere.dto.mapper.event.EventRequestDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.mapper.event.EventResponseDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.mapper.schedule.ScheduleRequestDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.mapper.schedule.ScheduleResponseDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.schedule.ScheduleRequestDto;
+&nbsp;import com.cts.eventsphere.dto.schedule.ScheduleResponseDto;
+&nbsp;import com.cts.eventsphere.exception.event.EventNotFoundException;
+&nbsp;import com.cts.eventsphere.model.Event;
+&nbsp;import com.cts.eventsphere.model.Schedule;
+&nbsp;import com.cts.eventsphere.repository.EventRepository;
+&nbsp;import com.cts.eventsphere.repository.ScheduleRepository;
+&nbsp;import com.cts.eventsphere.service.EventService;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Implementation for Service Interface for Event Class.
+&nbsp; * * @author 2479623
+&nbsp; *
+&nbsp; * @version 1.0
+&nbsp; * @since 27-02-2026
+&nbsp; */
+&nbsp;@Service
+&nbsp;@RequiredArgsConstructor
+<b class="fc">&nbsp;@Slf4j</b>
+&nbsp;public class EventServiceImpl implements EventService {
+&nbsp;    private final EventRepository eventRepository;
+&nbsp;    private final EventResponseDtoMapper eventResponseDtoMapper;
+&nbsp;    private final EventRequestDtoMapper eventRequestDtoMapper;
+&nbsp;    private final ScheduleRepository scheduleRepository;
+&nbsp;    private final ScheduleResponseDtoMapper scheduleResponseDtoMapper;
+&nbsp;    private final ScheduleRequestDtoMapper scheduleRequestDtoMapper;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param eventRequest
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public EventResponseDto create(EventRequestDto eventRequest) {
+<b class="nc">&nbsp;        log.info(&quot;Creating a new event: {}&quot;, eventRequest.name());</b>
+<b class="nc">&nbsp;        Event event = eventRequestDtoMapper.toEntity(eventRequest);</b>
+<b class="nc">&nbsp;        Event savedEvent = eventRepository.save(event);</b>
+<b class="nc">&nbsp;        log.info(&quot;Successfully saved event with ID: {}&quot;, savedEvent.getEventId());</b>
+&nbsp;
+<b class="nc">&nbsp;        return eventResponseDtoMapper.toDTO(savedEvent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public List&lt;EventResponseDto&gt; findAllEvents() {
+<b class="nc">&nbsp;        log.info(&quot;Fetching all events from repository&quot;);</b>
+<b class="nc">&nbsp;        List&lt;EventResponseDto&gt; events = eventRepository.findAll().stream()</b>
+<b class="nc">&nbsp;                .map(eventResponseDtoMapper::toDTO)</b>
+<b class="nc">&nbsp;                .toList();</b>
+<b class="nc">&nbsp;        log.debug(&quot;Found {} events in total&quot;, events.size());</b>
+<b class="nc">&nbsp;        return events;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param eventId
+&nbsp;     * @return
+&nbsp;     * @throws EventNotFoundException
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public EventResponseDto findById(String eventId) throws EventNotFoundException {
+<b class="nc">&nbsp;        log.info(&quot;Searching for event with ID: {}&quot;, eventId);</b>
+<b class="nc">&nbsp;        Event event = eventRepository.findById(eventId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; {</b>
+<b class="nc">&nbsp;                    log.error(&quot;Event lookup failed: ID {} not found&quot;, eventId);</b>
+<b class="nc">&nbsp;                    return new EventNotFoundException(eventId);</b>
+&nbsp;                });
+&nbsp;
+<b class="nc">&nbsp;        return eventResponseDtoMapper.toDTO(event);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param eventId
+&nbsp;     * @return
+&nbsp;     * @throws EventNotFoundException
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean updateById(String eventId, EventRequestDto eventRequest) throws EventNotFoundException {
+<b class="nc">&nbsp;        log.info(&quot;Updating event with ID: {}&quot;, eventId);</b>
+<b class="nc">&nbsp;        if(!eventRepository.existsById(eventId)) {</b>
+<b class="nc">&nbsp;            log.error(&quot;Update failed: Event ID {} does not exist&quot;, eventId);</b>
+<b class="nc">&nbsp;            throw new EventNotFoundException(eventId);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Event event = eventRequestDtoMapper.toEntity(eventRequest);</b>
+<b class="nc">&nbsp;        event.setEventId(eventId);</b>
+<b class="nc">&nbsp;        eventRepository.save(event);</b>
+<b class="nc">&nbsp;        log.info(&quot;Successfully updated event ID: {}&quot;, eventId);</b>
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param eventId
+&nbsp;     * @return
+&nbsp;     * @throws EventNotFoundException
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean deleteById(String eventId) throws EventNotFoundException {
+<b class="nc">&nbsp;        log.info(&quot;Request to delete event with ID: {}&quot;, eventId);</b>
+<b class="nc">&nbsp;        if(!eventRepository.existsById(eventId)) {</b>
+<b class="nc">&nbsp;            log.warn(&quot;Delete aborted: Event ID {} not found&quot;, eventId);</b>
+<b class="nc">&nbsp;            throw new EventNotFoundException(eventId);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        eventRepository.deleteById(eventId);</b>
+<b class="nc">&nbsp;        log.info(&quot;Successfully deleted event ID: {}&quot;, eventId);</b>
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param scheduleRequest
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public ScheduleResponseDto addActivity(String eventId, ScheduleRequestDto scheduleRequest) {
+<b class="nc">&nbsp;        log.info(&quot;Adding new activity to event ID: {}&quot;, eventId);</b>
+<b class="nc">&nbsp;        Event event = eventRepository.findById(eventId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; {</b>
+<b class="nc">&nbsp;                    log.error(&quot;Activity creation failed: Parent Event ID {} not found&quot;, eventId);</b>
+<b class="nc">&nbsp;                    return new EventNotFoundException(eventId);</b>
+&nbsp;                });
+&nbsp;
+<b class="nc">&nbsp;        Schedule schedule = scheduleRequestDtoMapper.toEntity(scheduleRequest, event);</b>
+<b class="nc">&nbsp;        Schedule savedSchedule = scheduleRepository.save(schedule);</b>
+<b class="nc">&nbsp;        log.info(&quot;Successfully added activity ID: {} to event ID: {}&quot;, savedSchedule.getScheduleId(), eventId);</b>
+&nbsp;
+<b class="nc">&nbsp;        return scheduleResponseDtoMapper.toDTO(savedSchedule);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public List&lt;ScheduleResponseDto&gt; findAllSchedules(String eventId) {
+<b class="nc">&nbsp;        log.info(&quot;Fetching all activities for event ID: {}&quot;, eventId);</b>
+<b class="nc">&nbsp;        List&lt;ScheduleResponseDto&gt; schedules = scheduleRepository.findAll().stream()</b>
+<b class="nc">&nbsp;                .filter(s -&gt; s.getEvent().getEventId().equals(eventId))</b>
+<b class="nc">&nbsp;                .map(scheduleResponseDtoMapper::toDTO)</b>
+<b class="nc">&nbsp;                .toList();</b>
+<b class="nc">&nbsp;        log.debug(&quot;Found {} activities matching event ID: {}&quot;, schedules.size(), eventId);</b>
+<b class="nc">&nbsp;        return schedules;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

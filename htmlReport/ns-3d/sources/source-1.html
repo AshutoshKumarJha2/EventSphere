@@ -1,0 +1,272 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BookingServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: BookingServiceImpl (com.cts.eventsphere.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BookingServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.service.impl;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.booking.BookingRequestDto;
+&nbsp;import com.cts.eventsphere.dto.booking.BookingResponseDto;
+&nbsp;import com.cts.eventsphere.dto.mapper.booking.BookingRequestDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.mapper.booking.BookingResponseDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.mapper.venue.VenueRequestDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.mapper.venue.VenueResponseDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.resource.ResourceListElementDto;
+&nbsp;import com.cts.eventsphere.model.Booking;
+&nbsp;import com.cts.eventsphere.model.ResourceAllocation;
+&nbsp;import com.cts.eventsphere.model.Venue;
+&nbsp;import com.cts.eventsphere.model.data.AvailabilityStatus;
+&nbsp;import com.cts.eventsphere.model.data.BookingStatus;
+&nbsp;import com.cts.eventsphere.repository.BookingRepository;
+&nbsp;import com.cts.eventsphere.repository.ResourceAllocationRepository;
+&nbsp;import com.cts.eventsphere.repository.VenueRepository;
+&nbsp;import com.cts.eventsphere.service.BookingService;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import org.springframework.cglib.core.Local;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;/**
+&nbsp; * Service Implementation for Booking operations
+&nbsp; * * @author 2479476
+&nbsp; * @version 1.0
+&nbsp; * @since 04-03-2026
+&nbsp; */
+&nbsp;@Service
+&nbsp;@RequiredArgsConstructor
+&nbsp;public class BookingServiceImpl implements BookingService {
+&nbsp;    private final VenueRepository venueRepository;
+&nbsp;    private final VenueRequestDtoMapper venueRequestDtoMapper;
+&nbsp;    private final VenueResponseDtoMapper venueResponseDtoMapper;
+&nbsp;    private final ResourceAllocationRepository resourceAllocationRepository;
+&nbsp;
+&nbsp;
+&nbsp;    private final ResourceServiceImpl resourceService;
+&nbsp;
+&nbsp;    private final BookingRepository bookingRepository;
+&nbsp;    private final BookingRequestDtoMapper requestMapper;
+&nbsp;    private final BookingResponseDtoMapper responseMapper;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) {
+&nbsp;        // Convert DTO to Entity
+<b class="nc">&nbsp;        Booking booking = requestMapper.toEntity(bookingRequestDto);</b>
+&nbsp;
+&nbsp;        // Ensure initial status is &#39;pending&#39; as per workflow requirements
+<b class="nc">&nbsp;        if (booking.getStatus() == null) {</b>
+<b class="nc">&nbsp;            booking.setStatus(BookingStatus.pending);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;//        resourceService.requestAllocation(bookingRequestDto.,bookingRequestDto.eventId(), bookingRequestDto.venueId(),bookingRequestDto.resourceList());
+&nbsp;
+&nbsp;        // Save to Database
+<b class="nc">&nbsp;        booking.setDate(LocalDate.now());</b>
+<b class="nc">&nbsp;        Booking savedBooking = bookingRepository.save(booking);</b>
+&nbsp;
+&nbsp;        // Return mapped Response DTO
+<b class="nc">&nbsp;        return responseMapper.toDto(savedBooking,new ArrayList&lt;&gt;());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;BookingResponseDto&gt; getAllBookings() {
+<b class="nc">&nbsp;        return bookingRepository.findAll()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(booking -&gt; {</b>
+&nbsp;                    // 1. Fetch resources for this specific event/booking
+<b class="nc">&nbsp;                    List&lt;ResourceListElementDto&gt; resources = resourceAllocationRepository</b>
+<b class="nc">&nbsp;                            .findByEvent_EventId(booking.getEventId())</b>
+<b class="nc">&nbsp;                            .stream()</b>
+<b class="nc">&nbsp;                            .map(allocation -&gt; new ResourceListElementDto(</b>
+<b class="nc">&nbsp;                                    allocation.getResource().getName(),</b>
+<b class="nc">&nbsp;                                    allocation.getQuantity()</b>
+&nbsp;                            ))
+<b class="nc">&nbsp;                            .toList();</b>
+&nbsp;
+&nbsp;                    // 2. Use the mapper with both required arguments
+<b class="nc">&nbsp;                    return responseMapper.toDto(booking, resources);</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;BookingResponseDto&gt; getBookingsByEvent(String eventId) {
+&nbsp;        // 1. Fetch all bookings associated with the event
+<b class="nc">&nbsp;        List&lt;Booking&gt; bookings = bookingRepository.findByEventId(eventId);</b>
+&nbsp;
+&nbsp;        // 2. Fetch all resource allocations for this event to map them later
+<b class="nc">&nbsp;        List&lt;ResourceAllocation&gt; allocations = resourceAllocationRepository.findByEvent_EventId(eventId);</b>
+&nbsp;
+&nbsp;        // 3. Map the Entities to Response DTOs
+<b class="nc">&nbsp;        return bookings.stream().map(booking -&gt; {</b>
+&nbsp;
+&nbsp;            // Filter allocations that belong specifically to this booking/venue if needed
+<b class="nc">&nbsp;            List&lt;ResourceListElementDto&gt; resourceList = allocations.stream()</b>
+<b class="nc">&nbsp;                    .filter(a -&gt; a.getEvent().getVenueId().equals(booking.getVenueId())) // Optional: filter by venue logic</b>
+<b class="nc">&nbsp;                    .map(a -&gt; new ResourceListElementDto(</b>
+<b class="nc">&nbsp;                            a.getResource().getName(),</b>
+<b class="nc">&nbsp;                            a.getResource().getUnit()</b>
+&nbsp;                    ))
+<b class="nc">&nbsp;                    .toList();</b>
+&nbsp;
+&nbsp;            // Return the final record
+<b class="nc">&nbsp;            return new BookingResponseDto(</b>
+<b class="nc">&nbsp;                    booking.getBookingId(),</b>
+<b class="nc">&nbsp;                    booking.getEventId(),</b>
+<b class="nc">&nbsp;                    booking.getVenueId(),</b>
+<b class="nc">&nbsp;                    booking.getDate(),</b>
+<b class="nc">&nbsp;                    booking.getStatus(),</b>
+&nbsp;                    resourceList,
+<b class="nc">&nbsp;                    booking.getCreatedAt(),</b>
+<b class="nc">&nbsp;                    booking.getUpdatedAt()</b>
+&nbsp;            );
+<b class="nc">&nbsp;        }).toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BookingResponseDto updateBookingStatus(String bookingId, BookingStatus newStatus) {
+&nbsp;
+&nbsp;        // 2. Fetch the existing booking
+<b class="nc">&nbsp;        Booking existingBooking = bookingRepository.findById(bookingId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Update failed: Booking ID &quot; + bookingId + &quot; does not exist.&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (newStatus == BookingStatus.confirmed) {</b>
+&nbsp;
+<b class="nc">&nbsp;            Venue venue = venueRepository.findByVenueId(existingBooking.getVenueId());</b>
+&nbsp;
+<b class="nc">&nbsp;            venue.setAvailabilityStatus(AvailabilityStatus.unavailable);</b>
+<b class="nc">&nbsp;            venueRepository.save(venue);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // 4. Update and save the booking
+<b class="nc">&nbsp;        existingBooking.setStatus(newStatus);</b>
+<b class="nc">&nbsp;        Booking updatedBooking = bookingRepository.save(existingBooking);</b>
+&nbsp;
+<b class="nc">&nbsp;        return responseMapper.toDto(updatedBooking,new ArrayList&lt;&gt;());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void deleteBooking(String bookingId) {
+<b class="nc">&nbsp;        if (!bookingRepository.existsById(bookingId)) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Cannot delete: Booking not found with ID: &quot; + bookingId);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        bookingRepository.deleteById(bookingId);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

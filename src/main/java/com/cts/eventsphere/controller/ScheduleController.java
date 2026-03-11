@@ -27,12 +27,17 @@ public class ScheduleController {
     @PostMapping("/{id}")
     @PreAuthorize("hasAnyRole('admin', 'organizer', 'venue_manager')")
     public ResponseEntity<ScheduleResponseDto> update(@PathVariable String eventId, @PathVariable String id, @RequestBody ScheduleRequestDto scheduleRequest){
-        return ResponseEntity.ok(scheduleService.updateById(eventId, id, scheduleRequest));
+        log.info("Received request to update schedule with ID: {} for event ID: {}", id, eventId);
+        ScheduleResponseDto response = scheduleService.updateById(eventId, id, scheduleRequest);
+        log.info("Successfully updated schedule with ID: {}", id);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Schedule> delete(@PathVariable String id) {
+        log.info("Received request to delete schedule with ID: {}", id);
         scheduleService.deleteById(id);
+        log.info("Successfully deleted schedule with ID: {}", id);
         return ResponseEntity.noContent().build();
     }
 }
