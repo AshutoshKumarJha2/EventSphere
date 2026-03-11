@@ -27,10 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/events/v1")
 @Slf4j
 @RequiredArgsConstructor
-@EnableMethodSecurity(
-        securedEnabled = true,
-        jsr250Enabled = true
-)
+
 public class BudgetController {
 
     private final BudgetService budgetService;
