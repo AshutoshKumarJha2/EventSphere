@@ -2,9 +2,11 @@ package com.cts.eventsphere.controller;
 
 import com.cts.eventsphere.dto.delivery.DeliveryRequestDto;
 import com.cts.eventsphere.dto.delivery.DeliveryResponseDto;
+import com.cts.eventsphere.model.data.DeliveryStatus;
 import com.cts.eventsphere.service.DeliveryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,7 +45,18 @@ public class DeliveryController {
         return deliveryService.getAllDeliveries();
     }
 
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('VENDOR')")
+    public DeliveryResponseDto updateStatus(
+            @PathVariable String id,
+            @RequestParam DeliveryStatus status) {
+
+        log.info("Request to update delivery status for ID={} to {}", id, status);
+        return deliveryService.updateDeliveryStatus(id, status);
+    }
+
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('VENDOR')")
     public DeliveryResponseDto update(
             @PathVariable String id,
             @RequestBody DeliveryRequestDto request) {
@@ -53,6 +66,7 @@ public class DeliveryController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('VENDOR','ADMIN')")
     public void delete(@PathVariable String id) {
         log.info("Deleting delivery with id: {}", id);
         deliveryService.deleteDelivery(id);

@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class DeliveryResponseDtoMapper {
     public DeliveryResponseDto toDto(Delivery delivery){
+        if (delivery == null) {
+            return null;
+        }
         return new DeliveryResponseDto(
                 delivery.getDeliveryId(),
                 delivery.getInvoiceId(),

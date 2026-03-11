@@ -2,9 +2,11 @@ package com.cts.eventsphere.controller;
 
 import com.cts.eventsphere.dto.contract.ContractRequestDto;
 import com.cts.eventsphere.dto.contract.ContractResponseDto;
+import com.cts.eventsphere.model.data.ContractStatus;
 import com.cts.eventsphere.service.ContractService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,12 +28,31 @@ public class ContractController {
     private final ContractService contractService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ORGANIZER')")
     public ContractResponseDto create(@RequestBody ContractRequestDto request) {
         log.info("Received request to create contract: vendorId={}, eventId={}",
                 request.vendorId(), request.eventId());
         ContractResponseDto response = contractService.createContract(request);
         log.info("Contract created successfully with ID={}", response.contractId());
         return response;
+    }
+
+    @PostMapping("/{contractId}/invoice")
+    @PreAuthorize("hasAnyRole('FINANCE', 'VENDOR')")
+    public String generateInvoice(@PathVariable String contractId) {
+        log.info("Received request to process billing for contract: {}", contractId);
+        contractService.processContractInvoice(contractId);
+        return "Invoice generated and Payment processed successfully for Contract ID: " + contractId;
+    }
+
+    @PostMapping("/{contractId}/deliveries")
+    @PreAuthorize("hasRole('VENDOR')")
+    public String addDelivery(
+            @PathVariable String contractId,
+            @RequestParam String item,
+            @RequestParam Integer quantity) {
+        contractService.addDeliverable(contractId, item, quantity);
+        return "Deliverable added to contract.";
     }
 
     @GetMapping("/{id}")
@@ -44,6 +65,16 @@ public class ContractController {
     public List<ContractResponseDto> getAll() {
         log.info("Fetching all contracts");
         return contractService.getAllContracts();
+    }
+
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('ORGANIZER', 'VENDOR')")
+    public ContractResponseDto updateStatus(
+            @PathVariable String id,
+            @RequestParam ContractStatus status) {
+
+        log.info("Request to update status for contract ID={} to {}", id, status);
+        return contractService.updateContractStatus(id, status);
     }
 
     @PutMapping("/{id}")
