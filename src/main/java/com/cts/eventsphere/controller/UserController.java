@@ -7,6 +7,8 @@ import com.cts.eventsphere.service.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,11 @@ import java.util.List;
 @Data
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
+@EnableMethodSecurity(
+        prePostEnabled = true,
+        securedEnabled = true,
+        jsr250Enabled = true
+)
 public class UserController {
     private final UserService userService;
     @GetMapping
@@ -41,8 +48,8 @@ public class UserController {
     }
 
     @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserResponseDto> getMyDetails(@AuthenticationPrincipal UserPrincipal userPrincipal){
-
         String authenticatedUserId = userPrincipal.userId();
         return ResponseEntity.ok(userService.getUser(authenticatedUserId));
     }

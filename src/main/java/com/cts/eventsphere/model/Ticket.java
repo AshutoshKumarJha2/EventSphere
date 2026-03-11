@@ -3,9 +3,7 @@ package com.cts.eventsphere.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.*;
 
 import com.cts.eventsphere.model.data.TicketStatus;
 
@@ -31,6 +29,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@DynamicInsert
 public class Ticket {
     @Id
     @UuidGenerator

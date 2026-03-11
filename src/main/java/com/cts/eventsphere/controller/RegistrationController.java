@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 public class RegistrationController {
-    private RegistrationService registrationService;
+    private final RegistrationService registrationService;
 
     @PostMapping("/events/{eventId}/registrations")
     @PreAuthorize("hasRole('ATTENDEE')")
@@ -44,14 +44,14 @@ public class RegistrationController {
     }
 
     @PatchMapping("/registrations/{registrationId}/approve")
-    @PreAuthorize("hasRole('ORGANISER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ORGANIZER') or hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> approveRegistration(@PathVariable String registrationId) {
         log.info("Approving registration with registrationId: {}", registrationId);
         return ResponseEntity.ok(registrationService.approveRegistration(registrationId));
     }
 
     @PatchMapping("/registrations/{registrationId}/reject")
-    @PreAuthorize("hasRole('ORGANISER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ORGANIZER') or hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> rejectRegistration(@PathVariable String registrationId) {
         log.info("Rejecting registration with registrationId: {}", registrationId);
         return ResponseEntity.ok(registrationService.rejectRegistration(registrationId));
