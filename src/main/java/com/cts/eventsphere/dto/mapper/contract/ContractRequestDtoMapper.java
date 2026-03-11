@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ContractRequestDtoMapper {
     public Contract toEntity(ContractRequestDto dto){
+        if (dto == null) {
+            return null;
+        }
         Contract contract = new Contract();
         contract.setVendorId(dto.vendorId());
         contract.setEventId(dto.eventId());
