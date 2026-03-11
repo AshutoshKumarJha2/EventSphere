@@ -26,10 +26,10 @@ import java.util.List;
 @RequestMapping("/api/v1/events")
 @Slf4j
 @RequiredArgsConstructor
-@EnableMethodSecurity(
-        securedEnabled = true,
-        jsr250Enabled = true
-)
+//@EnableMethodSecurity(
+//        securedEnabled = true,
+//        jsr250Enabled = true
+//)
 public class EventController {
     private final EventService eventService;
 

@@ -19,7 +19,7 @@ public class VenueRequestDtoMapper {
     public Venue toEntity(VenueRequestDto dto){
         Venue venue = new Venue();
 
-        venue.setVenueId(dto.venueId());
+
         venue.setName(dto.name());
         venue.setLocation(dto.location());
         venue.setCapacity(dto.capacity());
