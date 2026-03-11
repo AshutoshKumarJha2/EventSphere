@@ -38,7 +38,7 @@ public class BudgetController {
      * @return "CREATED" response for successful Budget creation.
      */
     @PostMapping("/{eventId}/budget")
-    @PreAuthorize("hasAnyRole('admin', 'organizer', 'finance_manager')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER', 'FINANCE_MANAGER')")
     public ResponseEntity<BudgetResponseDto> setBudget(@PathVariable String eventId ,@Valid @RequestBody BudgetRequestDto request){
         log.info("Request to set budget for eventId: {} with data: {}", eventId, request);
         BudgetResponseDto response = budgetService.createBudget(eventId , request);

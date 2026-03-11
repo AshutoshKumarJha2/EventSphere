@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.DynamicInsert;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +27,6 @@ import com.cts.eventsphere.dto.shared.GenericResponse;
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Slf4j
-@EnableMethodSecurity(
-        securedEnabled = true,
-        jsr250Enabled = true
-)
 public class TicketController {
     private final TicketService ticketService;
 
