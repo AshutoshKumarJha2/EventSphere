@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class InvoiceRequestDtoMapper {
     public Invoice toEntity(InvoiceRequestDto dto){
+        if (dto == null) {
+            return null;
+        }
         Invoice invoice = new Invoice();
         invoice.setContractId(dto.contractId());
         invoice.setTotalAmount(dto.totalAmount());

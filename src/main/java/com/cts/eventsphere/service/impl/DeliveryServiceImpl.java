@@ -6,6 +6,7 @@ import com.cts.eventsphere.dto.mapper.delivery.DeliveryRequestDtoMapper;
 import com.cts.eventsphere.dto.mapper.delivery.DeliveryResponseDtoMapper;
 import com.cts.eventsphere.exception.delivery.DeliveryNotFoundException;
 import com.cts.eventsphere.model.Delivery;
+import com.cts.eventsphere.model.data.DeliveryStatus;
 import com.cts.eventsphere.repository.DeliveryRepository;
 import com.cts.eventsphere.service.DeliveryService;
 import lombok.RequiredArgsConstructor;
@@ -69,6 +70,27 @@ public class DeliveryServiceImpl implements DeliveryService {
                 .stream()
                 .map(responseDtoMapper::toDto)
                 .toList();
+    }
+
+    /**
+     * @param deliveryId
+     * @param status
+     * @return
+     * @throws DeliveryNotFoundException
+     */
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public DeliveryResponseDto updateDeliveryStatus(String deliveryId, DeliveryStatus status) {
+        log.info("Updating status for delivery ID={} to {}", deliveryId, status);
+
+        Delivery delivery = deliveryRepository.findById(deliveryId)
+                .orElseThrow(() -> new DeliveryNotFoundException(deliveryId));
+
+        delivery.setStatus(status);
+        Delivery updated = deliveryRepository.save(delivery);
+
+        log.info("Delivery status updated successfully for ID={}", deliveryId);
+        return responseDtoMapper.toDto(updated);
     }
 
     /**

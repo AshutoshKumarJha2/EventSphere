@@ -16,6 +16,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class VendorRequestDtoMapper{
     public Vendor toEntity(VendorRequestDto dto){
+        if (dto == null) {
+            return null;
+        }
         Vendor vendor = new Vendor();
         vendor.setName(dto.name());
         vendor.setContactInfo(dto.contactInfo());
