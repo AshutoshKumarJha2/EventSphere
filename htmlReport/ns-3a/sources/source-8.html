@@ -1,0 +1,141 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Payment</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Payment (com.cts.eventsphere.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">Payment$HibernateInstantiator</td>
+  </tr>
+  <tr>
+    <td class="name">Payment$HibernateProxy</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.model;
+&nbsp;
+&nbsp;import com.cts.eventsphere.model.data.ExpenseStatus;
+&nbsp;import com.cts.eventsphere.model.data.PaymentMethod;
+&nbsp;import com.cts.eventsphere.model.data.PaymentStatus;
+&nbsp;import jakarta.persistence.Column;
+&nbsp;import jakarta.persistence.Entity;
+&nbsp;import jakarta.persistence.EnumType;
+&nbsp;import jakarta.persistence.Enumerated;
+&nbsp;import jakarta.persistence.FetchType;
+&nbsp;import jakarta.persistence.GeneratedValue;
+&nbsp;import jakarta.persistence.GenerationType;
+&nbsp;import jakarta.persistence.Id;
+&nbsp;import jakarta.persistence.JoinColumn;
+&nbsp;import jakarta.persistence.ManyToOne;
+&nbsp;import jakarta.persistence.Table;
+&nbsp;import lombok.Data;
+&nbsp;import org.hibernate.annotations.CreationTimestamp;
+&nbsp;import org.hibernate.annotations.UpdateTimestamp;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.time.LocalDateTime;
+&nbsp;
+&nbsp;
+&nbsp;/**
+&nbsp; * Payment Entity representing financial transactions on the invoice generated.
+&nbsp; * Tracks Payment method and Status.
+&nbsp; *
+&nbsp; * @author 2480081
+&nbsp; * @version 1.0
+&nbsp; * @since 26-02-2026
+&nbsp; */
+&nbsp;@Entity
+&nbsp;@Table(name = &quot;payment&quot;)
+&nbsp;@Data
+&nbsp;public class Payment {
+&nbsp;    @Id
+&nbsp;    @GeneratedValue(strategy = GenerationType.UUID)
+&nbsp;    @Column(columnDefinition = &quot;CHAR(36)&quot;)
+&nbsp;    private String paymentId;
+&nbsp;
+&nbsp;//    @Column(nullable = false , columnDefinition = &quot;CHAR(36)&quot;)
+&nbsp;    @ManyToOne(fetch = FetchType.LAZY)
+&nbsp;    @JoinColumn(name = &quot;invoiceId&quot; , nullable = false)
+&nbsp;    private Invoice invoice;
+&nbsp;
+&nbsp;    @Column(nullable = false , precision = 10 , scale = 2)
+&nbsp;    private BigDecimal amount;
+&nbsp;
+&nbsp;    @Enumerated(EnumType.STRING)
+&nbsp;    @Column(nullable = false , columnDefinition = &quot;ENUM(&#39;credit_card&#39;, &#39;debit_card&#39;, &#39;bank_transfer&#39;, &#39;cash&#39; , &#39;upi&#39; , &#39;paypal&#39;)&quot;)
+&nbsp;    private PaymentMethod method;
+&nbsp;
+&nbsp;    @Enumerated(EnumType.STRING)
+&nbsp;    @Column(columnDefinition = &quot;ENUM(&#39;pending&#39;, &#39;completed&#39;, &#39;failed&#39;, &#39;refunded&#39;)&quot;)
+&nbsp;    private PaymentStatus status = PaymentStatus.pending;
+&nbsp;
+&nbsp;    @Column(nullable = false)
+&nbsp;    private LocalDateTime paymentDate;
+&nbsp;
+&nbsp;    @CreationTimestamp
+&nbsp;    @Column(updatable = false)
+&nbsp;    private LocalDateTime createdAt;
+&nbsp;
+&nbsp;    @UpdateTimestamp
+&nbsp;    private LocalDateTime updatedAt;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

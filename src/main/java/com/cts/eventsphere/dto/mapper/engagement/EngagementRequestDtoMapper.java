@@ -8,10 +8,9 @@ import org.springframework.stereotype.Component;
  * DTO Mapper for Engagement Request DTO.
  * Converts incoming request data into the Engagement entity.
  *
- *
- * author 2480027
- * version 1.0
- * since 02-03-2026
+ * @author 2480027
+ * @version 1.0
+ * @since 02-03-2026
  */
 @Component
 public class EngagementRequestDtoMapper {
@@ -20,12 +19,12 @@ public class EngagementRequestDtoMapper {
         if (dto == null) {
             return null;
         }
-        Engagement entity = new Engagement();
-        entity.setEventId(dto.eventId());
-        entity.setAttendeeId(dto.attendeeId());
-        entity.setActivity(dto.activity());
-        // Let JPA fill if null via @CreationTimestamp on the entity
-        entity.setTimestamp(dto.activityTimestamp());
-        return entity;
+
+        return Engagement.builder()
+                .eventId(dto.eventId())
+                .attendeeId(dto.attendeeId())
+                .activity(dto.activity())
+                .timestamp(dto.activityTimestamp())
+                .build();
     }
 }

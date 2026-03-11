@@ -2,6 +2,7 @@ package com.cts.eventsphere.dto.expense;
 
 import com.cts.eventsphere.model.User;
 import com.cts.eventsphere.model.data.ExpenseStatus;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
  * @version 1.0
  * @since 26-02-2026
  */
+@Builder
 public record ExpenseResponseDto(
         String expenseId,
         String eventId,

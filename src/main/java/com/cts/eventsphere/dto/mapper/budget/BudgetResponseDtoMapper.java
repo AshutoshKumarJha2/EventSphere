@@ -17,14 +17,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class BudgetResponseDtoMapper {
     public BudgetResponseDto toDTO(Budget budget) {
-        return new BudgetResponseDto(
-                budget.getBudgetId(),
-                budget.getEvent().getEventId(),
-                budget.getPlannedAmount(),
-                budget.getActualAmount(),
-                budget.getVariance(),
-                budget.getCreatedAt().toString(),
-                budget.getUpdatedAt().toString()
-        );
+        return BudgetResponseDto.builder()
+                .budgetId(budget.getBudgetId())
+                .eventId(budget.getEvent().getEventId())
+                .plannedAmount(budget.getPlannedAmount())
+                .actualAmount(budget.getActualAmount())
+                .variance(budget.getVariance())
+                .createdAt(budget.getCreatedAt() != null ? budget.getCreatedAt().toString() : null)
+                .updatedAt(budget.getUpdatedAt() != null ? budget.getUpdatedAt().toString() : null)
+                .build();
     }
 }

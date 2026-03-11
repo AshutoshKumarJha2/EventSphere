@@ -19,10 +19,15 @@ public class ExpenseRequestDtoMapper {
      * @return Expense Entity
      */
     public Expense toEntity(ExpenseRequestDto dto){
-        Expense expense = new Expense();
-        expense.setDescription(dto.description());
-        expense.setAmount(dto.amount());
-        expense.setDate(dto.date());
-        return expense;
+//        Expense expense = new Expense();
+//        expense.setDescription(dto.description());
+//        expense.setAmount(dto.amount());
+//        expense.setDate(dto.date());
+//        return expense;
+        return  Expense.builder()
+                .description(dto.description())
+                .amount(dto.amount())
+                .date(dto.date())
+                .build();
     }
 }

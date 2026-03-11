@@ -1,0 +1,228 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ContractServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: ContractServiceImpl (com.cts.eventsphere.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ContractServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (1/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.3%
+  </span>
+  <span class="absValue">
+    (1/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.service.impl;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.contract.ContractRequestDto;
+&nbsp;import com.cts.eventsphere.dto.contract.ContractResponseDto;
+&nbsp;import com.cts.eventsphere.dto.mapper.contract.ContractRequestDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.mapper.contract.ContractResponseDtoMapper;
+&nbsp;import com.cts.eventsphere.exception.contract.ContractNotFoundException;
+&nbsp;import com.cts.eventsphere.model.Contract;
+&nbsp;import com.cts.eventsphere.repository.ContractRepository;
+&nbsp;import com.cts.eventsphere.service.ContractService;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Implementation for Contract Service
+&nbsp; *
+&nbsp; * @author 2480177
+&nbsp; * @version 1.0
+&nbsp; * @since 03-03-2026
+&nbsp; */
+&nbsp;
+&nbsp;@Service
+&nbsp;@RequiredArgsConstructor
+<b class="fc">&nbsp;@Slf4j</b>
+&nbsp;public class ContractServiceImpl implements ContractService {
+&nbsp;
+&nbsp;    private final ContractRepository contractRepository;
+&nbsp;    private final ContractRequestDtoMapper requestDtoMapper;
+&nbsp;    private final ContractResponseDtoMapper responseDtoMapper;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param request
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public ContractResponseDto createContract(ContractRequestDto request){
+<b class="nc">&nbsp;        log.info(&quot;Creating contract...&quot;);</b>
+<b class="nc">&nbsp;        Contract contract = requestDtoMapper.toEntity(request);</b>
+<b class="nc">&nbsp;        Contract saved = contractRepository.save(contract);</b>
+<b class="nc">&nbsp;        log.info(&quot;Contract created with ID={}&quot;, saved.getContractId());</b>
+<b class="nc">&nbsp;        return responseDtoMapper.toDto(saved);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param contractId
+&nbsp;     * @return
+&nbsp;     * @throws ContractNotFoundException
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public ContractResponseDto getContractById(String contractId){
+<b class="nc">&nbsp;        log.info(&quot;Fetching contract with ID={}&quot;, contractId);</b>
+&nbsp;
+<b class="nc">&nbsp;        Contract contract = contractRepository.findById(contractId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new ContractNotFoundException(contractId));</b>
+&nbsp;
+<b class="nc">&nbsp;        return responseDtoMapper.toDto(contract);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public List&lt;ContractResponseDto&gt; getAllContracts(){
+<b class="nc">&nbsp;        log.info(&quot;Fetching all contracts&quot;);</b>
+<b class="nc">&nbsp;        return contractRepository.findAll()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(responseDtoMapper::toDto)</b>
+<b class="nc">&nbsp;                .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param contractId
+&nbsp;     * @param request
+&nbsp;     * @return
+&nbsp;     * @throws ContractNotFoundException
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public ContractResponseDto updateContract(String contractId, ContractRequestDto request){
+<b class="nc">&nbsp;        log.info(&quot;Updating contract ID={}&quot;, contractId);</b>
+&nbsp;
+<b class="nc">&nbsp;        Contract contract = contractRepository.findById(contractId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new ContractNotFoundException(contractId));</b>
+&nbsp;
+<b class="nc">&nbsp;        contract.setVendorId(request.vendorId());</b>
+<b class="nc">&nbsp;        contract.setEventId(request.eventId());</b>
+<b class="nc">&nbsp;        contract.setStartDate(request.startDate());</b>
+<b class="nc">&nbsp;        contract.setEndDate(request.endDate());</b>
+<b class="nc">&nbsp;        contract.setValue(request.value());</b>
+<b class="nc">&nbsp;        contract.setStatus(request.status());</b>
+&nbsp;
+<b class="nc">&nbsp;        Contract updated = contractRepository.save(contract);</b>
+<b class="nc">&nbsp;        return responseDtoMapper.toDto(updated);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param contractId
+&nbsp;     * @throws ContractNotFoundException
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void deleteContract(String contractId){
+<b class="nc">&nbsp;        log.warn(&quot;Deleting contract ID={}&quot;, contractId);</b>
+&nbsp;
+<b class="nc">&nbsp;        if(!contractRepository.existsById(contractId)){</b>
+<b class="nc">&nbsp;            throw new ContractNotFoundException(contractId);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        contractRepository.deleteById(contractId);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

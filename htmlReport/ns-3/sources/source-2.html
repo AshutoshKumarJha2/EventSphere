@@ -1,0 +1,160 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BudgetController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: BudgetController (com.cts.eventsphere.controller)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BudgetController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BudgetController$$SpringCGLIB$$0</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.controller;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.budget.BudgetRequestDto;
+&nbsp;import com.cts.eventsphere.dto.budget.BudgetResponseDto;
+&nbsp;import com.cts.eventsphere.service.BudgetService;
+&nbsp;import jakarta.validation.Valid;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.security.access.prepost.PreAuthorize;
+&nbsp;import org.springframework.web.bind.annotation.PathVariable;
+&nbsp;import org.springframework.web.bind.annotation.PostMapping;
+&nbsp;import org.springframework.web.bind.annotation.RequestBody;
+&nbsp;import org.springframework.web.bind.annotation.RequestMapping;
+&nbsp;import org.springframework.web.bind.annotation.RestController;
+&nbsp;
+&nbsp;/**
+&nbsp; * Controller for Budget Operations
+&nbsp; *
+&nbsp; * @author 2480081
+&nbsp; * @version 1.0
+&nbsp; * @since 01-03-2026
+&nbsp; */
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/api/events/v1&quot;)
+<b class="fc">&nbsp;@Slf4j</b>
+&nbsp;@RequiredArgsConstructor
+&nbsp;public class BudgetController {
+&nbsp;
+&nbsp;    private final BudgetService budgetService;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Setting Budget for an Event
+&nbsp;     * @param eventId
+&nbsp;     * @return &quot;CREATED&quot; response for successful Budget creation.
+&nbsp;     */
+&nbsp;    @PostMapping(&quot;/{eventId}/budget&quot;)
+&nbsp;    @PreAuthorize(&quot;hasAnyRole(&#39;admin&#39;, &#39;organizer&#39;, &#39;finance_manager&#39;)&quot;)
+&nbsp;    public ResponseEntity&lt;BudgetResponseDto&gt; setBudget(@PathVariable String eventId ,@Valid @RequestBody BudgetRequestDto request){
+<b class="fc">&nbsp;        log.info(&quot;Request to set budget for eventId: {} with data: {}&quot;, eventId, request);</b>
+<b class="fc">&nbsp;        BudgetResponseDto response = budgetService.createBudget(eventId , request);</b>
+<b class="fc">&nbsp;        log.info(&quot;Response for eventId: {}: {}&quot;, eventId, response);</b>
+<b class="fc">&nbsp;        return new ResponseEntity&lt;&gt;(response, HttpStatus.CREATED);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,225 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > VendorServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: VendorServiceImpl (com.cts.eventsphere.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">VendorServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (1/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.7%
+  </span>
+  <span class="absValue">
+    (1/27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.service.impl;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.mapper.vendor.VendorRequestDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.mapper.vendor.VendorResponseDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.vendor.VendorRequestDto;
+&nbsp;import com.cts.eventsphere.dto.vendor.VendorResponseDto;
+&nbsp;import com.cts.eventsphere.exception.vendor.VendorNotFoundException;
+&nbsp;import com.cts.eventsphere.model.Vendor;
+&nbsp;import com.cts.eventsphere.repository.VendorRepository;
+&nbsp;import com.cts.eventsphere.service.VendorService;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Implementation for Vendor Service
+&nbsp; *
+&nbsp; * @author 2480177
+&nbsp; * @version 1.0
+&nbsp; * @since 03-03-2026
+&nbsp; */
+&nbsp;
+&nbsp;@Service
+&nbsp;@RequiredArgsConstructor
+<b class="fc">&nbsp;@Slf4j</b>
+&nbsp;public class VendorServiceImpl implements VendorService {
+&nbsp;
+&nbsp;    private final VendorRepository vendorRepository;
+&nbsp;    private final VendorRequestDtoMapper requestDtoMapper;
+&nbsp;    private final VendorResponseDtoMapper responseDtoMapper;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param request
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public VendorResponseDto createVendor(VendorRequestDto request){
+<b class="nc">&nbsp;        log.info(&quot;Creating vendor...&quot;);</b>
+<b class="nc">&nbsp;        Vendor vendor = requestDtoMapper.toEntity(request);</b>
+<b class="nc">&nbsp;        Vendor saved = vendorRepository.save(vendor);</b>
+<b class="nc">&nbsp;        log.info(&quot;Vendor created with ID={}&quot;, saved.getVendorId());</b>
+<b class="nc">&nbsp;        return responseDtoMapper.toDto(saved);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param vendorId
+&nbsp;     * @return
+&nbsp;     * @throws VendorNotFoundException
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public VendorResponseDto getVendorById(String vendorId){
+<b class="nc">&nbsp;        log.info(&quot;Fetching vendor ID={}&quot;, vendorId);</b>
+&nbsp;
+<b class="nc">&nbsp;        Vendor vendor = vendorRepository.findById(vendorId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new VendorNotFoundException(vendorId));</b>
+&nbsp;
+<b class="nc">&nbsp;        return responseDtoMapper.toDto(vendor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public List&lt;VendorResponseDto&gt; getAllVendors(){
+<b class="nc">&nbsp;        log.info(&quot;Fetching all vendors&quot;);</b>
+<b class="nc">&nbsp;        return vendorRepository.findAll()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(responseDtoMapper::toDto)</b>
+<b class="nc">&nbsp;                .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param vendorId
+&nbsp;     * @param request
+&nbsp;     * @return
+&nbsp;     * @throws VendorNotFoundException
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public VendorResponseDto updateVendor(String vendorId, VendorRequestDto request){
+<b class="nc">&nbsp;        log.info(&quot;Updating vendor ID={}&quot;, vendorId);</b>
+&nbsp;
+<b class="nc">&nbsp;        Vendor vendor = vendorRepository.findById(vendorId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new VendorNotFoundException(vendorId));</b>
+&nbsp;
+<b class="nc">&nbsp;        vendor.setName(request.name());</b>
+<b class="nc">&nbsp;        vendor.setContactInfo(request.contactInfo());</b>
+<b class="nc">&nbsp;        vendor.setStatus(request.status());</b>
+&nbsp;
+<b class="nc">&nbsp;        Vendor updated = vendorRepository.save(vendor);</b>
+<b class="nc">&nbsp;        return responseDtoMapper.toDto(updated);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param vendorId
+&nbsp;     * @throws VendorNotFoundException
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void deleteVendor(String vendorId){
+<b class="nc">&nbsp;        log.warn(&quot;Deleting vendor ID={}&quot;, vendorId);</b>
+&nbsp;
+<b class="nc">&nbsp;        if(!vendorRepository.existsById(vendorId)){</b>
+<b class="nc">&nbsp;            throw new VendorNotFoundException(vendorId);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        vendorRepository.deleteById(vendorId);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

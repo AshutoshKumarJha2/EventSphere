@@ -1,10 +1,13 @@
 package com.cts.eventsphere.model;
 
 import com.cts.eventsphere.model.data.EngagementType;
-import com.cts.eventsphere.model.data.UserStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -16,10 +19,13 @@ import java.time.LocalDateTime;
  * @version 1.0
  * @since 26-02-2026
  */
-
 @Entity
 @Table(name = "engagement")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@DynamicInsert
 public class Engagement {
 
     @Id
