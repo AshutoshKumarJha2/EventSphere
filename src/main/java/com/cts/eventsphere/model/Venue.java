@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *  Venue model class
@@ -23,21 +24,28 @@ public class Venue {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "venueId")
-    private String venueId ;
+    private String venueId;
+
+    @OneToMany(mappedBy = "venue", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Resource> resources;
+
+    @OneToMany(mappedBy = "venue", cascade = CascadeType.ALL)
+    private List<Booking> bookings;
 
 
-    @Column(nullable = false,columnDefinition = "VARCHAR(255)")
+
+    @Column(nullable = false, columnDefinition = "VARCHAR(255)")
     private String location;
 
     @Column(nullable = false)
     private int capacity;
 
-    @Column(nullable = false,columnDefinition = "VARCHAR(100)")
+    @Column(nullable = false, columnDefinition = "VARCHAR(100)")
     private String name;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('available','unavailable','maintenance')")
-    private AvailabilityStatus availabilityStatus  =  AvailabilityStatus.available;
+    private AvailabilityStatus availabilityStatus = AvailabilityStatus.available;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -45,5 +53,4 @@ public class Venue {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
 }

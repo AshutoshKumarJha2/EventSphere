@@ -15,6 +15,12 @@ public interface VenueService {
 
   public List<VenueResponseDto> findByLocation(String location);
 
+    public VenueResponseDto updateVenue(String venueId, VenueRequestDto dto);
+
+    public VenueResponseDto updateVenueStatus(String venueId, AvailabilityStatus status);
+
+    public void deleteVenue(String venueId);
+
   public List<VenueResponseDto> findByDate(String date);
 
   public List<VenueResponseDto> findByCapacity(int capacity);
