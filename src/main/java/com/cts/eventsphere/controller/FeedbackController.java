@@ -3,6 +3,7 @@ package com.cts.eventsphere.controller;
 import com.cts.eventsphere.dto.feedback.FeedbackRequestDto;
 import com.cts.eventsphere.dto.feedback.FeedbackResponseDto;
 import com.cts.eventsphere.service.FeedbackService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,7 +30,7 @@ public class FeedbackController {
 
     @PostMapping
     @PreAuthorize("hasRole('ATTENDEE')")
-    public FeedbackResponseDto create(@RequestBody FeedbackRequestDto feedbackRequestDto) {
+    public FeedbackResponseDto create(@Valid @RequestBody FeedbackRequestDto feedbackRequestDto) {
         log.info("REST request to save Feedback : {}", feedbackRequestDto);
         FeedbackResponseDto result = feedbackService.create(feedbackRequestDto);
         log.info("Feedback created successfully with data: {}", result);

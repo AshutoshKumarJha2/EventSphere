@@ -19,13 +19,12 @@ public class FeedbackRequestDtoMapper {
             return null;
         }
 
-        FeedBack entity = new FeedBack();
-        entity.setEventId(dto.eventId());
-        entity.setAttendeeId(dto.attendeeId());
-        entity.setRating(dto.rating());
-        entity.setComments(dto.comments());
-        entity.setDate(dto.date());
-
-        return entity;
+        return FeedBack.builder()
+                .eventId(dto.eventId())
+                .attendeeId(dto.attendeeId())
+                .rating(dto.rating())
+                .comments(dto.comments())
+                .date(dto.date())
+                .build();
     }
 }
