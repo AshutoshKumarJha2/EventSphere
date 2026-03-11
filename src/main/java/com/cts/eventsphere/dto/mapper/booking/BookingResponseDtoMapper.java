@@ -30,7 +30,7 @@ public class BookingResponseDtoMapper {
         return new BookingResponseDto(
                 booking.getBookingId(),
                 booking.getEventId(),
-                booking.getVenueId(),
+                booking.getVenue().getVenueId(),
                 booking.getDate(),
                 booking.getStatus(),
                 resourceReqList,

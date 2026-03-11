@@ -22,14 +22,9 @@ public class BookingRequestDtoMapper {
      * @return a Booking entity populated with DTO data
      */
     public Booking toEntity(BookingRequestDto dto) {
-        if (dto == null) {
-            return null;
-        }
-
         Booking booking = new Booking();
         booking.setEventId(dto.eventId());
-        booking.setVenueId(dto.venueId());
-
+        // Leave venue out of the mapper entirely
         return booking;
     }
 }

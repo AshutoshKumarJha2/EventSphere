@@ -12,7 +12,6 @@ import com.cts.eventsphere.model.data.AvailabilityStatus;
 
 
 public record VenueRequestDto(
-        String venueId,
         String name,
         String location,
         int capacity,
