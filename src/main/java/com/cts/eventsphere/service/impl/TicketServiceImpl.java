@@ -11,16 +11,17 @@ import com.cts.eventsphere.repository.TicketRepository;
 import com.cts.eventsphere.service.TicketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class TicketServiceImpl implements TicketService {
-    private TicketRepository ticketRepository;
+    private final TicketRepository ticketRepository;
     @Override
     public GenericResponse createTicket(String eventId, String type, double price, TicketStatus status) {
         var ticket = Ticket.builder()
@@ -38,6 +39,7 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public TicketListResponseDTO getTicketsByEventId(String eventId, int page, int size) {
+        log.info("Fetching tickets for eventId: {}, page: {}, size: {}", eventId, page, size);
         var ticketsPage = ticketRepository.findByEventId(eventId, PageRequest.of(page, size));
         var tickets = ticketsPage.getContent().stream()
                 .map(TicketDTOMapper::toDTO)

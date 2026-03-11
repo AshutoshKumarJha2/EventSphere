@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.Collate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,7 +29,7 @@ import java.util.Collections;
  */
 @Component
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
 
@@ -44,6 +45,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 } else {
                     principal = jwtUtil.extractUserPrincipal(token, TokenType.ACCESS);
                 }
+                log.info("Extracted jwt for user {} with role {}", principal.userId(), principal.authorities());
                 var authToken = new UsernamePasswordAuthenticationToken(
                         principal, null,principal.authorities());
                 SecurityContextHolder.getContext().setAuthentication(authToken);
