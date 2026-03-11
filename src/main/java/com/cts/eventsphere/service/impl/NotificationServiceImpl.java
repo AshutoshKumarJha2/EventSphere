@@ -5,6 +5,7 @@ import com.cts.eventsphere.repository.NotificationRepository;
 import com.cts.eventsphere.service.EmailService;
 import com.cts.eventsphere.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final EmailService emailService;
@@ -33,11 +35,15 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public List<Notification> getNotificationsScroll(String userId, LocalDateTime lastTimestamp, int limit) {
         LocalDateTime anchor = (lastTimestamp == null) ? LocalDateTime.now() : lastTimestamp;
+        log.debug("Fetching scroll notifications for user: {} using anchor timestamp: {}", userId, anchor);
 
-        return notificationRepository.findTop20ByUserIdAndCreatedAtLessThanOrderByCreatedAtDesc(
+        List<Notification> results = notificationRepository.findTop20ByUserIdAndCreatedAtLessThanOrderByCreatedAtDesc(
                 userId,
                 anchor
         );
+
+        log.info("Found {} notifications for user: {} starting from {}", results.size(), userId, anchor);
+        return results;
     }
 
     /**
@@ -49,14 +55,18 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     @Transactional
     public void sendNotification(String userId, String email, String message, String category) {
+        log.info("Processing notification for user: {} and category: {}", userId, category);
+
         Notification notification = new Notification();
         notification.setUserId(userId);
         notification.setMessage(message);
         notification.setCategory(category);
         notification.setStatus("Unread");
 
-        notificationRepository.save(notification);
+        Notification savedNotification = notificationRepository.save(notification);
+        log.debug("Notification saved to DB with ID: {}", savedNotification.getNotificationId());
 
+        log.info("Dispatching email notification to: {}", email);
         emailService.sendNotificationEmail(email, "New Notification: " + category, message);
     }
 
@@ -66,6 +76,13 @@ public class NotificationServiceImpl implements NotificationService {
     @Transactional
     @Override
     public void markAsRead(String notificationId) {
-        notificationRepository.findById(notificationId).ifPresent(n -> n.setStatus("Read"));
+        log.info("Attempting to mark notification {} as read", notificationId);
+        notificationRepository.findById(notificationId).ifPresentOrElse(
+                n -> {
+                    n.setStatus("Read");
+                    log.info("Notification {} status updated to Read", notificationId);
+                },
+                () -> log.warn("Notification {} not found, unable to mark as read", notificationId)
+        );
     }
 }

@@ -1,0 +1,146 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AuthController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.security</a>
+</div>
+
+<h1>Coverage Summary for Class: AuthController (com.cts.eventsphere.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AuthController</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.security;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.auth.LoginRequestDto;
+&nbsp;import com.cts.eventsphere.dto.auth.LoginResponseDto;
+&nbsp;import com.cts.eventsphere.dto.user.UserRequestDto;
+&nbsp;import com.cts.eventsphere.dto.user.UserResponseDto;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.security.access.prepost.PreAuthorize;
+&nbsp;import org.springframework.security.core.annotation.AuthenticationPrincipal;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;/**
+&nbsp; * AuthController is responsible for handling authentication-related HTTP requests, including user registration, login, and token refresh operations. It interacts with the AuthService to perform these operations and returns appropriate responses to the client.
+&nbsp; * * @author 2480010
+&nbsp; *
+&nbsp; * @version 1.0
+&nbsp; * @since 03-03-2026
+&nbsp; */
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/api/v1/auth&quot;)
+&nbsp;@RequiredArgsConstructor
+&nbsp;public class AuthController {
+&nbsp;    private final AuthService authService;
+&nbsp;
+&nbsp;    @PostMapping(&quot;/register&quot;)
+&nbsp;    public ResponseEntity&lt;String&gt; register(@RequestBody UserRequestDto dto) {
+<b class="nc">&nbsp;        return ResponseEntity.ok(authService.register(dto));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping(&quot;/login&quot;)
+&nbsp;    public ResponseEntity&lt;LoginResponseDto&gt; login(@RequestBody LoginRequestDto dto) {
+<b class="nc">&nbsp;        var response = authService.login(dto);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(response);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping(&quot;/refresh&quot;)
+&nbsp;    public ResponseEntity&lt;LoginResponseDto&gt; refreshToken(@AuthenticationPrincipal UserPrincipal principal) {
+<b class="nc">&nbsp;        var response = authService.refreshToken(principal);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(response);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

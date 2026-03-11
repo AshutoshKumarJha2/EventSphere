@@ -12,6 +12,7 @@ import com.cts.eventsphere.repository.EventRepository;
 import com.cts.eventsphere.repository.ScheduleRepository;
 import com.cts.eventsphere.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final EventRepository eventRepository;
@@ -36,16 +38,26 @@ public class ScheduleServiceImpl implements ScheduleService {
      */
     @Override
     public ScheduleResponseDto updateById(String eventId, String id, ScheduleRequestDto scheduleRequest) throws ScheduleNotFoundException {
+        log.info("Attempting to update schedule ID: {} for event ID: {}", id, eventId);
+
         if(!scheduleRepository.existsById(id)) {
+            log.error("Update failed: Schedule with ID {} does not exist", id);
             throw new ScheduleNotFoundException(id);
         }
 
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EventNotFoundException(eventId));
+                .orElseThrow(() -> {
+                    log.error("Update failed: Event with ID {} not found", eventId);
+                    return new EventNotFoundException(eventId);
+                });
 
+        log.debug("Mapping ScheduleRequestDto to Schedule entity for ID: {}", id);
         Schedule schedule = scheduleRequestDtoMapper.toEntity(scheduleRequest, event);
         schedule.setScheduleId(id);
+
         Schedule updatedSchedule = scheduleRepository.save(schedule);
+        log.info("Successfully saved updated schedule ID: {}", updatedSchedule.getScheduleId());
+
         return scheduleResponseDtoMapper.toDTO(updatedSchedule);
     }
 
@@ -56,11 +68,15 @@ public class ScheduleServiceImpl implements ScheduleService {
      */
     @Override
     public boolean deleteById(String id) throws ScheduleNotFoundException {
+        log.info("Attempting to delete schedule with ID: {}", id);
+
         if(!scheduleRepository.existsById(id)) {
+            log.warn("Delete aborted: Schedule ID {} not found in repository", id);
             throw new ScheduleNotFoundException(id);
         }
 
         scheduleRepository.deleteById(id);
+        log.info("Successfully deleted schedule with ID: {}", id);
         return true;
     }
 }

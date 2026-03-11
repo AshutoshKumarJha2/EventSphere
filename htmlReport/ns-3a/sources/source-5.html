@@ -1,0 +1,131 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Resource</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Resource (com.cts.eventsphere.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">Resource$HibernateInstantiator</td>
+  </tr>
+  <tr>
+    <td class="name">Resource$HibernateProxy</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.model;
+&nbsp;
+&nbsp;
+&nbsp;import com.cts.eventsphere.model.data.Availability;
+&nbsp;import com.cts.eventsphere.model.data.ResourceType;
+&nbsp;import jakarta.persistence.*;
+&nbsp;import lombok.Data;
+&nbsp;import org.hibernate.annotations.CreationTimestamp;
+&nbsp;import org.hibernate.annotations.UpdateTimestamp;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.time.LocalDateTime;
+&nbsp;
+&nbsp;/**
+&nbsp; * * Resource model class
+&nbsp; * @author 2479476
+&nbsp; * @version 1.0
+&nbsp; * @since 26-02-2026
+&nbsp; */
+&nbsp;
+&nbsp;
+&nbsp;@Data
+&nbsp;@Table(name = &quot;resource&quot;)
+&nbsp;@Entity
+&nbsp;public class Resource {
+&nbsp;    @Id
+&nbsp;    @GeneratedValue(strategy = GenerationType.UUID)
+&nbsp;    private String resourceId;
+&nbsp;
+&nbsp;    @Column(columnDefinition = &quot;CHAR(36)&quot;)
+&nbsp;    private String venueId;
+&nbsp;
+&nbsp;    @Enumerated(EnumType.STRING)
+&nbsp;    @Column(columnDefinition = &quot;ENUM(&#39;equipment&#39;,&#39;staff&#39;)&quot;)
+&nbsp;    private ResourceType type = ResourceType.equipment;
+&nbsp;
+&nbsp;    @Enumerated(EnumType.STRING)
+&nbsp;    @Column(columnDefinition = &quot;ENUM(&#39;available&#39;,&#39;in_use&#39;,&#39;unavailable&#39;)&quot;)
+&nbsp;    private Availability availability = Availability.available;
+&nbsp;
+&nbsp;    @Column(precision = 10, scale = 2)
+&nbsp;    private BigDecimal costRate;
+&nbsp;
+&nbsp;    @Column(name = &quot;name&quot;, nullable = false)
+&nbsp;    private String name;
+&nbsp;
+&nbsp;    @Column(name = &quot;unit&quot;)
+&nbsp;    private Integer unit;
+&nbsp;
+&nbsp;    @CreationTimestamp
+&nbsp;    @Column(updatable = false)
+&nbsp;    private LocalDateTime createdAt;
+&nbsp;
+&nbsp;    @UpdateTimestamp
+&nbsp;    private LocalDateTime updatedAt;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

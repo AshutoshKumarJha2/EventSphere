@@ -1,0 +1,100 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FeedbackRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: FeedbackRepository (com.cts.eventsphere.repository)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">FeedbackRepository$MockitoMock$j4ObwA3U</td>
+  </tr>
+  <tr>
+    <td class="name">FeedbackRepository$MockitoMock$j4ObwA3U$auxiliary$0Rx9i6G5</td>
+  </tr>
+  <tr>
+    <td class="name">FeedbackRepository$MockitoMock$j4ObwA3U$auxiliary$UBC2yg0s</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.repository;
+&nbsp;import com.cts.eventsphere.model.FeedBack;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;import org.springframework.data.jpa.repository.JpaRepository;
+&nbsp;
+&nbsp;import java.time.LocalDateTime;
+&nbsp;
+&nbsp;/**
+&nbsp; * JPA repository for Feedback entity
+&nbsp; *
+&nbsp; * @author 2480027
+&nbsp; * @version 1.0
+&nbsp; * @since 26-02-2026
+&nbsp; */
+&nbsp;public interface FeedbackRepository extends JpaRepository&lt;FeedBack, String&gt; {
+&nbsp;
+&nbsp;    Page&lt;FeedBack&gt; findByEventId(String eventId, Pageable pageable);
+&nbsp;
+&nbsp;    Page&lt;FeedBack&gt; findByEventIdAndAttendeeId(String eventId, String attendeeId, Pageable pageable);
+&nbsp;
+&nbsp;    Page&lt;FeedBack&gt; findByEventIdAndDateBetween(String eventId, LocalDateTime start, LocalDateTime end, Pageable pageable);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

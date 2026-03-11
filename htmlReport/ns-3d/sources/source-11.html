@@ -1,0 +1,188 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UserServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: UserServiceImpl (com.cts.eventsphere.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.service.impl;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.mapper.user.UserResponseDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.user.UserRequestDto;
+&nbsp;import com.cts.eventsphere.dto.user.UserResponseDto;
+&nbsp;import com.cts.eventsphere.exception.user.EmailAlreadyExistsException;
+&nbsp;import com.cts.eventsphere.exception.user.UserNotFoundException;
+&nbsp;import com.cts.eventsphere.model.User;
+&nbsp;import com.cts.eventsphere.repository.UserRepository;
+&nbsp;import com.cts.eventsphere.service.UserService;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * [Detailed description of the class&#39;s responsibility]
+&nbsp; * * @author 2480010
+&nbsp; *
+&nbsp; * @version 1.0
+&nbsp; * @since 03-03-2026
+&nbsp; */
+&nbsp;@Service
+&nbsp;@RequiredArgsConstructor
+&nbsp;public class UserServiceImpl implements UserService {
+&nbsp;    private final UserRepository userRepository;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;UserResponseDto&gt; getAllUsers() {
+<b class="nc">&nbsp;        List&lt;User&gt; userList = userRepository.findAll();</b>
+<b class="nc">&nbsp;        return userList.stream().map(user -&gt; UserResponseDtoMapper.toDTO(user)).toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public UserResponseDto getUser(String userId) {
+<b class="nc">&nbsp;        User user =userRepository.findById(userId).orElseThrow(()-&gt;new UserNotFoundException(userId));</b>
+<b class="nc">&nbsp;        UserResponseDto userResponseDto = UserResponseDtoMapper.toDTO(user);</b>
+<b class="nc">&nbsp;        return userResponseDto;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public UserResponseDto updateUserDetails(String userId, UserRequestDto userRequestDto) {
+<b class="nc">&nbsp;        if(!userRepository.existsById(userId)){</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;User with user id &quot;+userId+&quot; does not exist&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        User user = userRepository.findById(userId).orElseThrow(()-&gt;new UserNotFoundException(userId));</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        if (userRequestDto.email() != null &amp;&amp; !userRequestDto.email().equalsIgnoreCase(user.getEmail())) {</b>
+&nbsp;            // Optionally check uniqueness
+<b class="nc">&nbsp;            if (userRepository.existsByEmail(userRequestDto.email())) {</b>
+<b class="nc">&nbsp;                throw new EmailAlreadyExistsException(userRequestDto.email());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            user.setEmail(userRequestDto.email());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (userRequestDto.name() != null) user.setName(userRequestDto.name());</b>
+<b class="nc">&nbsp;        if (userRequestDto.role() != null) user.setRole(userRequestDto.role());</b>
+<b class="nc">&nbsp;        if (userRequestDto.phone() != null) user.setPhone(userRequestDto.phone());</b>
+&nbsp;
+&nbsp;        // Handle password (hash it)
+<b class="nc">&nbsp;        if (userRequestDto.password() != null &amp;&amp; !userRequestDto.password().isBlank()) {</b>
+&nbsp;            // String hashed = passwordEncoder.encode(dto.password());
+<b class="nc">&nbsp;            String hashed = userRequestDto.password(); // replace with encoder above</b>
+<b class="nc">&nbsp;            user.setPassword(hashed);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        User saved = userRepository.save(user);</b>
+<b class="nc">&nbsp;        return UserResponseDtoMapper.toDTO(saved);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

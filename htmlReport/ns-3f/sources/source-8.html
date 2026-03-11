@@ -1,0 +1,121 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ResourceService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.service</a>
+</div>
+
+<h1>Coverage Summary for Class: ResourceService (com.cts.eventsphere.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ResourceService</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.service;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.resource.ResourceListElementDto;
+&nbsp;import com.cts.eventsphere.dto.resource.ResourceRequestDto;
+&nbsp;import com.cts.eventsphere.dto.resource.ResourceResponseDto;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Service interface for managing resource inventory and allocations.
+&nbsp; */
+&nbsp;public interface ResourceService {
+&nbsp;
+&nbsp;    // --- Inventory CRUD Operations ---
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds a new resource to the inventory.
+&nbsp;     */
+&nbsp;    ResourceResponseDto createResource(ResourceRequestDto resourceRequestDto);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieves all available resources.
+&nbsp;     */
+&nbsp;    List&lt;ResourceResponseDto&gt; getAllResources();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds a specific resource by its UUID.
+&nbsp;     */
+&nbsp;    ResourceResponseDto getResourceById(String resourceId);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Updates resource details (e.g., cost rate, availability status).
+&nbsp;     */
+&nbsp;    ResourceResponseDto updateResource(String resourceId, ResourceRequestDto resourceRequestDto);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes a resource from the system.
+&nbsp;     */
+&nbsp;    void deleteResource(String resourceId);
+&nbsp;
+&nbsp;
+&nbsp;    // --- Allocation &amp; Workflow Operations ---
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initiates a request for resources and notifies the Approval Manager.
+&nbsp;     */
+&nbsp;    void requestAllocation(String eventId, String bookingId, String venueId, List&lt;ResourceListElementDto&gt; resources);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieves all resources associated with a specific venue.
+&nbsp;     */
+&nbsp;    List&lt;ResourceResponseDto&gt; getResourcesByVenue(String venueId);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

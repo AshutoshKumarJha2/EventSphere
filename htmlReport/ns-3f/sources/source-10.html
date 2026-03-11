@@ -1,0 +1,118 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BookingService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.service</a>
+</div>
+
+<h1>Coverage Summary for Class: BookingService (com.cts.eventsphere.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">BookingService</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.service;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.booking.BookingRequestDto;
+&nbsp;import com.cts.eventsphere.dto.booking.BookingResponseDto;
+&nbsp;import com.cts.eventsphere.model.data.BookingStatus;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Service interface for Booking operations
+&nbsp; *
+&nbsp; * @author 2479476
+&nbsp; * @version 1.0
+&nbsp; * @since 04-03-2026
+&nbsp; */
+&nbsp;public interface BookingService {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new booking with an initial status (typically &#39;pending&#39;)
+&nbsp;     * * @param bookingRequestDto the booking details from the organizer
+&nbsp;     * @return the created booking response
+&nbsp;     */
+&nbsp;    BookingResponseDto createBooking(BookingRequestDto bookingRequestDto);
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieves all bookings in the system
+&nbsp;     * * @return list of booking responses
+&nbsp;     */
+&nbsp;    List&lt;BookingResponseDto&gt; getAllBookings();
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    List&lt;BookingResponseDto&gt; getBookingsByEvent(String eventId);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Updates the status of an existing booking (e.g., from pending to confirmed)
+&nbsp;     * * @param bookingId the ID of the booking to update
+&nbsp;     * @return the updated booking response
+&nbsp;     */
+&nbsp;
+&nbsp;
+&nbsp;    BookingResponseDto updateBookingStatus(String bookingId, BookingStatus status);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Cancels/Deletes a booking record
+&nbsp;     * * @param bookingId the ID of the booking to remove
+&nbsp;     */
+&nbsp;    void deleteBooking(String bookingId);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,177 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > VenueController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: VenueController (com.cts.eventsphere.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">VenueController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (1/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.8%
+  </span>
+  <span class="absValue">
+    (1/26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.controller;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.venue.VenueRequestDto;
+&nbsp;import com.cts.eventsphere.dto.venue.VenueResponseDto;
+&nbsp;import com.cts.eventsphere.model.data.AvailabilityStatus;
+&nbsp;import com.cts.eventsphere.service.impl.VenueServiceImpl;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@RestController
+<b class="fc">&nbsp;@Slf4j</b>
+&nbsp;@RequestMapping(&quot;/api/v1/venue&quot;)
+&nbsp;@RequiredArgsConstructor
+&nbsp;public class VenueController {
+&nbsp;
+&nbsp;    private final VenueServiceImpl venueService;
+&nbsp;
+&nbsp;    @PostMapping
+&nbsp;    public ResponseEntity&lt;VenueResponseDto&gt; addVenue(@RequestBody VenueRequestDto venueRequestDto) {
+<b class="nc">&nbsp;        log.info(&quot;REST request to add a new venue: {}&quot;, venueRequestDto);</b>
+<b class="nc">&nbsp;        log.debug(&quot;Venue creation payload: {}&quot;, venueRequestDto);</b>
+&nbsp;
+<b class="nc">&nbsp;        VenueResponseDto created = venueService.create(venueRequestDto);</b>
+&nbsp;
+<b class="nc">&nbsp;        log.info(&quot;Venue created successfully with ID: {}&quot;, created);</b>
+<b class="nc">&nbsp;        return new ResponseEntity&lt;&gt;(created, HttpStatus.CREATED);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping
+&nbsp;    public ResponseEntity&lt;List&lt;VenueResponseDto&gt;&gt; getAllVenue() {
+<b class="nc">&nbsp;        log.info(&quot;Request to fetch all venues&quot;);</b>
+<b class="nc">&nbsp;        List&lt;VenueResponseDto&gt; venues = venueService.findAll();</b>
+<b class="nc">&nbsp;        log.debug(&quot;Total venues retrieved: {}&quot;, venues);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(venues);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/location/{location}&quot;)
+&nbsp;    public ResponseEntity&lt;List&lt;VenueResponseDto&gt;&gt; getVenueByLocation(@PathVariable String location) {
+<b class="nc">&nbsp;        log.info(&quot;Searching for venues in location: {}&quot;, location);</b>
+<b class="nc">&nbsp;        List&lt;VenueResponseDto&gt; venues = venueService.findByLocation(location);</b>
+<b class="nc">&nbsp;        log.info(&quot;Found {} venues in {}&quot;, venues.size(), location);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(venues);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/capacity/{capacity}&quot;)
+&nbsp;    public ResponseEntity&lt;List&lt;VenueResponseDto&gt;&gt; getVenueByCapacity(@PathVariable int capacity) {
+<b class="nc">&nbsp;        log.info(&quot;Searching for venues with minimum capacity: {}&quot;, capacity);</b>
+<b class="nc">&nbsp;        List&lt;VenueResponseDto&gt; venues = venueService.findByCapacity(capacity);</b>
+<b class="nc">&nbsp;        log.info(&quot;Found {} venues meeting capacity {}&quot;, venues.size(), capacity);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(venues);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/status/{status}&quot;)
+&nbsp;    public ResponseEntity&lt;List&lt;VenueResponseDto&gt;&gt; getVenueByStatus(@PathVariable AvailabilityStatus status) {
+<b class="nc">&nbsp;        log.info(&quot;Filtering venues by status: {}&quot;, status);</b>
+<b class="nc">&nbsp;        List&lt;VenueResponseDto&gt; venues = venueService.findByAvailablityStatus(status);</b>
+<b class="nc">&nbsp;        log.info(&quot;Found {} venues with status {}&quot;, venues.size(), status);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(venues);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/date/{date}&quot;)
+&nbsp;    public ResponseEntity&lt;List&lt;VenueResponseDto&gt;&gt; getVenueByDate(@PathVariable String date) {
+<b class="nc">&nbsp;        log.info(&quot;Checking venue availability for date: {}&quot;, date);</b>
+<b class="nc">&nbsp;        List&lt;VenueResponseDto&gt; venues = venueService.findByDate(date);</b>
+<b class="nc">&nbsp;        log.info(&quot;Found {} venues available on {}&quot;, venues.size(), date);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(venues);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

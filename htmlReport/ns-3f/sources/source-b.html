@@ -1,0 +1,101 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EventService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.service</a>
+</div>
+
+<h1>Coverage Summary for Class: EventService (com.cts.eventsphere.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">EventService</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.service;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.event.EventRequestDto;
+&nbsp;import com.cts.eventsphere.dto.event.EventResponseDto;
+&nbsp;import com.cts.eventsphere.dto.schedule.ScheduleRequestDto;
+&nbsp;import com.cts.eventsphere.dto.schedule.ScheduleResponseDto;
+&nbsp;import com.cts.eventsphere.exception.event.EventNotFoundException;
+&nbsp;import com.cts.eventsphere.model.Schedule;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Service Interface for Event Entity.
+&nbsp; * * @author 2479623
+&nbsp; *
+&nbsp; * @version 1.0
+&nbsp; * @since 27-02-2026
+&nbsp; */
+&nbsp;public interface EventService {
+&nbsp;    public EventResponseDto create(EventRequestDto event);
+&nbsp;
+&nbsp;    public List&lt;EventResponseDto&gt; findAllEvents();
+&nbsp;
+&nbsp;    public EventResponseDto findById(String eventId) throws EventNotFoundException;
+&nbsp;
+&nbsp;    public boolean updateById(String eventId, EventRequestDto eventRequest) throws EventNotFoundException;
+&nbsp;
+&nbsp;    public boolean deleteById(String eventId) throws EventNotFoundException;
+&nbsp;
+&nbsp;    public ScheduleResponseDto addActivity(String eventId, ScheduleRequestDto schedule);
+&nbsp;
+&nbsp;    public List&lt;ScheduleResponseDto&gt; findAllSchedules(String eventId);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

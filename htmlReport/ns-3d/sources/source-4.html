@@ -1,0 +1,228 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DeliveryServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: DeliveryServiceImpl (com.cts.eventsphere.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DeliveryServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (1/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.3%
+  </span>
+  <span class="absValue">
+    (1/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.service.impl;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.delivery.DeliveryRequestDto;
+&nbsp;import com.cts.eventsphere.dto.delivery.DeliveryResponseDto;
+&nbsp;import com.cts.eventsphere.dto.mapper.delivery.DeliveryRequestDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.mapper.delivery.DeliveryResponseDtoMapper;
+&nbsp;import com.cts.eventsphere.exception.delivery.DeliveryNotFoundException;
+&nbsp;import com.cts.eventsphere.model.Delivery;
+&nbsp;import com.cts.eventsphere.repository.DeliveryRepository;
+&nbsp;import com.cts.eventsphere.service.DeliveryService;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Implementation for Delivery Service
+&nbsp; *
+&nbsp; * @author 2480177
+&nbsp; * @version 1.0
+&nbsp; * @since 03-03-2026
+&nbsp; */
+&nbsp;
+&nbsp;@Service
+&nbsp;@RequiredArgsConstructor
+<b class="fc">&nbsp;@Slf4j</b>
+&nbsp;public class DeliveryServiceImpl implements DeliveryService {
+&nbsp;
+&nbsp;    private final DeliveryRepository deliveryRepository;
+&nbsp;    private final DeliveryRequestDtoMapper requestDtoMapper;
+&nbsp;    private final DeliveryResponseDtoMapper responseDtoMapper;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param request
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public DeliveryResponseDto createDelivery(DeliveryRequestDto request){
+<b class="nc">&nbsp;        log.info(&quot;Creating delivery...&quot;);</b>
+<b class="nc">&nbsp;        Delivery delivery = requestDtoMapper.toEntity(request);</b>
+<b class="nc">&nbsp;        Delivery saved = deliveryRepository.save(delivery);</b>
+<b class="nc">&nbsp;        log.info(&quot;Delivery created with ID={}&quot;, saved.getDeliveryId());</b>
+<b class="nc">&nbsp;        return responseDtoMapper.toDto(saved);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param deliveryId
+&nbsp;     * @return
+&nbsp;     * @throws DeliveryNotFoundException
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public DeliveryResponseDto getDeliveryById(String deliveryId){
+<b class="nc">&nbsp;        log.info(&quot;Fetching delivery ID={}&quot;, deliveryId);</b>
+&nbsp;
+<b class="nc">&nbsp;        Delivery delivery = deliveryRepository.findById(deliveryId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new DeliveryNotFoundException(deliveryId));</b>
+&nbsp;
+<b class="nc">&nbsp;        return responseDtoMapper.toDto(delivery);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public List&lt;DeliveryResponseDto&gt; getAllDeliveries(){
+<b class="nc">&nbsp;        log.info(&quot;Fetching all deliveries&quot;);</b>
+<b class="nc">&nbsp;        return deliveryRepository.findAll()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(responseDtoMapper::toDto)</b>
+<b class="nc">&nbsp;                .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param deliveryId
+&nbsp;     * @param request
+&nbsp;     * @return
+&nbsp;     * @throws DeliveryNotFoundException
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public DeliveryResponseDto updateDelivery(String deliveryId, DeliveryRequestDto request){
+<b class="nc">&nbsp;        log.info(&quot;Updating delivery ID={}&quot;, deliveryId);</b>
+&nbsp;
+<b class="nc">&nbsp;        Delivery delivery = deliveryRepository.findById(deliveryId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new DeliveryNotFoundException(deliveryId));</b>
+&nbsp;
+<b class="nc">&nbsp;        delivery.setInvoiceId(request.invoiceId());</b>
+<b class="nc">&nbsp;        delivery.setItem(request.item());</b>
+<b class="nc">&nbsp;        delivery.setQuantity(request.quantity());</b>
+<b class="nc">&nbsp;        delivery.setDeliveryDate(request.deliveryDate());</b>
+<b class="nc">&nbsp;        delivery.setStatus(request.status());</b>
+<b class="nc">&nbsp;        delivery.setTrackingNumber(request.trackingNumber());</b>
+&nbsp;
+<b class="nc">&nbsp;        Delivery updated = deliveryRepository.save(delivery);</b>
+<b class="nc">&nbsp;        return responseDtoMapper.toDto(updated);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param deliveryId
+&nbsp;     * @throws DeliveryNotFoundException
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void deleteDelivery(String deliveryId){
+<b class="nc">&nbsp;        log.warn(&quot;Deleting delivery ID={}&quot;, deliveryId);</b>
+&nbsp;
+<b class="nc">&nbsp;        if(!deliveryRepository.existsById(deliveryId)){</b>
+<b class="nc">&nbsp;            throw new DeliveryNotFoundException(deliveryId);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        deliveryRepository.deleteById(deliveryId);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>
