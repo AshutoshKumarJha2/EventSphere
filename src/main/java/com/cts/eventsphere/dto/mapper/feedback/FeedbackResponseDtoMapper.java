@@ -18,16 +18,16 @@ public class FeedbackResponseDtoMapper {
         if (entity == null) {
             return null;
         }
-        return new FeedbackResponseDto(
-                entity.getFeedbackId(),
-                entity.getEventId(),
-                entity.getAttendeeId(),
-                entity.getRating(),
-                entity.getComments(),
-                entity.getDate(),
-                entity.getCreatedAt(),
-                entity.getUpdatedAt()
-        );
-    }
 
+        return FeedbackResponseDto.builder()
+                .feedbackId(entity.getFeedbackId())
+                .eventId(entity.getEventId())
+                .attendeeId(entity.getAttendeeId())
+                .rating(entity.getRating())
+                .comments(entity.getComments())
+                .date(entity.getDate())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .build();
+    }
 }
