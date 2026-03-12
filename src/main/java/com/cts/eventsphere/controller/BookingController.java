@@ -28,7 +28,7 @@ public class BookingController {
     @PostMapping("/bookings")
     @PreAuthorize("hasRole('ORGANIZER')")
     public ResponseEntity<BookingResponseDto> createBooking(@RequestBody BookingRequestDto bookingRequestDto) {
-        log.info("REST request to create Booking for event: {}", bookingRequestDto.eventId());
+        log.info("REST request to create Booking for event: {}", bookingRequestDto);
         BookingResponseDto response = bookingService.createBooking(bookingRequestDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }

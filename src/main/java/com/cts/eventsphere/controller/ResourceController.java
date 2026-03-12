@@ -79,6 +79,17 @@ public class ResourceController {
     }
 
     /**
+     * Approve a resource allocation and deduct units from inventory.
+     */
+    @PatchMapping("/resources/allocation/{allocationId}/approve")
+    @PreAuthorize("hasRole('VENUE_MANAGER')")
+    public ResponseEntity<String> approveAllocation(@PathVariable String allocationId) {
+        log.info("REST request to approve allocation: {}", allocationId);
+        resourceService.approveAllocation(allocationId);
+        return ResponseEntity.ok("Resource allocation approved and inventory updated.");
+    }
+
+    /**
      * Update an existing resource.
      */
     @PutMapping("/resources/{resourceId}")

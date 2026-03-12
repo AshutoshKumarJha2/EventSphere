@@ -1,7 +1,7 @@
 package com.cts.eventsphere.dto.resource;
 
 public record ResourceListElementDto(
-        String resourceName,
+        String resourceId,
         Integer quantity
 ) {
 }

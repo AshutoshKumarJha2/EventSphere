@@ -50,7 +50,6 @@ import static org.mockito.Mockito.*;
     @DisplayName("Should successfully create a venue and return response DTO")
     void create_ShouldReturnSavedVenueResponse() {
         VenueRequestDto requestDto = new VenueRequestDto(
-                faker.idNumber().valid(),
                 faker.university().name(),
                 faker.address().city(),
                 faker.number().numberBetween(100, 1000),
@@ -61,7 +60,7 @@ import static org.mockito.Mockito.*;
         venueEntity.setName(requestDto.name());
 
         Venue savedVenue = new Venue();
-        savedVenue.setVenueId(requestDto.venueId());
+        savedVenue.setVenueId("");
         savedVenue.setName(requestDto.name());
 
 
