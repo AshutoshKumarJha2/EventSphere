@@ -12,4 +12,6 @@ public interface ResourceAllocationRepository extends JpaRepository<ResourceAllo
     List<ResourceAllocation> findByEvent_EventId(String eventId);
 
     boolean existsByResourceNameAndVenueVenueId(String resourceName, String venueId);
+
+    List<ResourceAllocation> findByEvent_EventIdAndVenue_VenueId(String eventId, String venueId);
 }
