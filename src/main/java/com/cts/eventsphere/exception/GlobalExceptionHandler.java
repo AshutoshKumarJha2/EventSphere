@@ -9,6 +9,10 @@ import com.cts.eventsphere.exception.registration.RegistrationNotFoundException;
 import com.cts.eventsphere.exception.ticket.TicketAlreadyExistsException;
 import com.cts.eventsphere.exception.ticket.TicketNotFoundException;
 
+import com.cts.eventsphere.exception.user.EmailAlreadyExistsException;
+import com.cts.eventsphere.exception.user.InvalidPasswordException;
+import com.cts.eventsphere.exception.user.UserAlreadyExistsException;
+import com.cts.eventsphere.exception.user.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
@@ -75,6 +79,26 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RegistrationNotFoundException.class)
     public ResponseEntity<GenericErrorResponse> registrationNotFoundException(RegistrationNotFoundException e){
         return new ResponseEntity<>(new GenericErrorResponse("Registration not found"), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<GenericErrorResponse> emailAlreadyExistsException(EmailAlreadyExistsException e){
+        return new ResponseEntity<>(new GenericErrorResponse("Email already exists"), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<GenericErrorResponse> invalidPasswordException(InvalidPasswordException e){
+        return new ResponseEntity<>(new GenericErrorResponse("Invalid password"), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<GenericErrorResponse> userAlreadyExistsException(UserAlreadyExistsException e){
+        return new ResponseEntity<>(new GenericErrorResponse("User already exists"), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<GenericErrorResponse> userNotFoundException(UserNotFoundException e){
+        return new ResponseEntity<>(new GenericErrorResponse("User not found"), HttpStatus.NOT_FOUND);
     }
 
 
