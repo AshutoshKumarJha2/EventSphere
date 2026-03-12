@@ -58,4 +58,7 @@ public class Event {
 
     @OneToMany(mappedBy = "event" , cascade = CascadeType.ALL)
     private List<Expense> expenses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    private List<Contract> contracts = new ArrayList<>();
 }
