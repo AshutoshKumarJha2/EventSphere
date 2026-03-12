@@ -1,6 +1,6 @@
 spring:
   application:
-    name: config_server
+    name: event-manager
   main:
     allow-bean-definition-overriding: true
   jpa:
