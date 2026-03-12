@@ -46,23 +46,22 @@ import static org.mockito.Mockito.*;
         faker = new Faker();
     }
 
-    // @Test
-    // @DisplayName("Should successfully create a venue and return response DTO")
-    // void create_ShouldReturnSavedVenueResponse() {
-    //     VenueRequestDto requestDto = new VenueRequestDto(
-    //             faker.idNumber().valid(),
-    //             faker.university().name(),
-    //             faker.address().city(),
-    //             faker.number().numberBetween(100, 1000),
-    //             AvailabilityStatus.available
-    //     );
+    @Test
+    @DisplayName("Should successfully create a venue and return response DTO")
+    void create_ShouldReturnSavedVenueResponse() {
+        VenueRequestDto requestDto = new VenueRequestDto(
+                faker.university().name(),
+                faker.address().city(),
+                faker.number().numberBetween(100, 1000),
+                AvailabilityStatus.available
+        );
 
     //     Venue venueEntity = new Venue();
     //     venueEntity.setName(requestDto.name());
 
-    //     Venue savedVenue = new Venue();
-    //     savedVenue.setVenueId(requestDto.venueId());
-    //     savedVenue.setName(requestDto.name());
+        Venue savedVenue = new Venue();
+        savedVenue.setVenueId("");
+        savedVenue.setName(requestDto.name());
 
 
     //     VenueResponseDto expectedResponse = new VenueResponseDto(

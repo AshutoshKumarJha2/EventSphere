@@ -21,4 +21,8 @@ public interface UserService {
     public UserResponseDto getUser(String userId);
 
     public UserResponseDto updateUserDetails(String userId, UserRequestDto userRequestDto);
+
+    public void changeUserStatus(String userId, String status);
+
+    public void changeUserRole(String userId, String role);
 }

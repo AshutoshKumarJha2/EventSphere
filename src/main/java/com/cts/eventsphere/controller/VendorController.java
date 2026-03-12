@@ -3,8 +3,11 @@ package com.cts.eventsphere.controller;
 import com.cts.eventsphere.dto.vendor.VendorRequestDto;
 import com.cts.eventsphere.dto.vendor.VendorResponseDto;
 import com.cts.eventsphere.service.VendorService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,12 +24,14 @@ import java.util.List;
 @RequestMapping("/api/v1/vendors")
 @Slf4j
 @RequiredArgsConstructor
+@Validated
 public class VendorController {
 
     private final VendorService vendorService;
 
     @PostMapping
-    public VendorResponseDto create(@RequestBody VendorRequestDto request) {
+    @PreAuthorize("hasRole('VENDOR')")
+    public @Valid VendorResponseDto create(@Valid @RequestBody VendorRequestDto request) {
         log.info("Creating vendor with name={}", request.name());
         VendorResponseDto response = vendorService.createVendor(request);
         log.info("Vendor created successfully with ID={}", response.vendorId());
@@ -34,21 +39,22 @@ public class VendorController {
     }
 
     @GetMapping("/{id}")
-    public VendorResponseDto getById(@PathVariable String id) {
+    public @Valid VendorResponseDto getById(@PathVariable String id) {
         log.info("Fetching vendor with ID={}", id);
         return vendorService.getVendorById(id);
     }
 
     @GetMapping
-    public List<VendorResponseDto> getAll() {
+    public List<@Valid VendorResponseDto> getAll() {
         log.info("Fetching all vendors");
         return vendorService.getAllVendors();
     }
 
     @PutMapping("/{id}")
-    public VendorResponseDto update(
+    @PreAuthorize("hasRole('VENDOR')")
+    public @Valid VendorResponseDto update(
             @PathVariable String id,
-            @RequestBody VendorRequestDto request) {
+            @Valid @RequestBody VendorRequestDto request) {
 
         log.info("Updating vendor with ID={}", id);
         VendorResponseDto response = vendorService.updateVendor(id, request);
@@ -57,6 +63,7 @@ public class VendorController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('VENDOR','ADMIN')")
     public void delete(@PathVariable String id) {
         log.warn("Request to delete vendor with ID={}", id);
         vendorService.deleteVendor(id);

@@ -2,6 +2,7 @@ package com.cts.eventsphere.service;
 
 import com.cts.eventsphere.dto.delivery.DeliveryRequestDto;
 import com.cts.eventsphere.dto.delivery.DeliveryResponseDto;
+import com.cts.eventsphere.model.data.DeliveryStatus;
 
 import java.util.List;
 
@@ -19,6 +20,8 @@ public interface DeliveryService {
     DeliveryResponseDto getDeliveryById(String deliveryId);
 
     List<DeliveryResponseDto> getAllDeliveries();
+
+    DeliveryResponseDto updateDeliveryStatus(String deliveryId, DeliveryStatus status);
 
     DeliveryResponseDto updateDelivery(String deliveryId, DeliveryRequestDto request);
 

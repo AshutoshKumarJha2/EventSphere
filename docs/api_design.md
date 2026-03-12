@@ -60,7 +60,7 @@
 | POST	   | /api/v1/events/{eventId}/budget	           | Set budget of evnet	                                    | organizer               |
 | GET	    | /api/v1/events/{eventId}/expenses	         | Get expenses for a event	                               | organizer/finance/admin |
 | GET	    | /api/v1/expenses	                          | Get all expenses (supports filter)	                     | organizer/finance/admin |
-| POST	   | /api/v1/evnets/{eventId}/expenses	         | Log an expense	                                         | organizer               |
+| POST	   | /api/v1/events/{eventId}/expenses	         | Log an expense	                                         | organizer               |
 | DELETE	 | /api/v1/expenses/{expenseId}	              | Deletes an expense	                                     | organizer/admin         |
 | PATCH	  | /api/v1/expenses/{expenseId}/status	       | Approve/Reject an expense	                              | finance                 |
 | POST	   | /api/v1/expenses/{expenseId}/payment	      | Marks payment as complete	                              | finance                 |

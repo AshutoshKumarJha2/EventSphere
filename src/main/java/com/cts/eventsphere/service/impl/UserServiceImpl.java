@@ -6,6 +6,8 @@ import com.cts.eventsphere.dto.user.UserResponseDto;
 import com.cts.eventsphere.exception.user.EmailAlreadyExistsException;
 import com.cts.eventsphere.exception.user.UserNotFoundException;
 import com.cts.eventsphere.model.User;
+import com.cts.eventsphere.model.data.UserRoles;
+import com.cts.eventsphere.model.data.UserStatus;
 import com.cts.eventsphere.repository.UserRepository;
 import com.cts.eventsphere.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -67,6 +69,22 @@ public class UserServiceImpl implements UserService {
 
         User saved = userRepository.save(user);
         return UserResponseDtoMapper.toDTO(saved);
+    }
+
+    @Override
+    public void changeUserStatus(String userId, String status) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        String enumStatus = String.valueOf(UserStatus.valueOf(status));
+        user.setStatus(UserStatus.valueOf(enumStatus));
+        userRepository.save(user);
+    }
+
+    @Override
+    public void changeUserRole(String userId, String role) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        String enumRole = String.valueOf(UserRoles.valueOf(role));
+        user.setStatus(UserStatus.valueOf(enumRole));
+        userRepository.save(user);
     }
 
 }

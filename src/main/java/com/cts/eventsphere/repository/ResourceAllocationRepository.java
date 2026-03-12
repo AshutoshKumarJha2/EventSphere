@@ -10,4 +10,8 @@ import java.util.List;
 public interface ResourceAllocationRepository extends JpaRepository<ResourceAllocation,String> {
 
     List<ResourceAllocation> findByEvent_EventId(String eventId);
+
+    boolean existsByResourceNameAndVenueVenueId(String resourceName, String venueId);
+
+    List<ResourceAllocation> findByEvent_EventIdAndVenue_VenueId(String eventId, String venueId);
 }
