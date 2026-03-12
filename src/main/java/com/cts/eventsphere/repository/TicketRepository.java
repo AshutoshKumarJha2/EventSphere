@@ -1,9 +1,12 @@
 package com.cts.eventsphere.repository;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.cts.eventsphere.model.Ticket;
+
+import java.util.Optional;
 
 /**
  * Ticket repository for getting ticket and saving tickets
@@ -13,5 +16,6 @@ import com.cts.eventsphere.model.Ticket;
  * @since 2026-03-02
  */
 public interface TicketRepository extends JpaRepository<Ticket, String> {
-    Page<Ticket> findByEventId(String eventId, org.springframework.data.domain.Pageable pageable);
+    Page<Ticket> findByEventId(String eventId, Pageable pageable);
+    Optional<Ticket> findByType(String type);
 }

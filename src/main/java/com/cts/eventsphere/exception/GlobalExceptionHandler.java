@@ -1,8 +1,16 @@
 package com.cts.eventsphere.exception;
 
+import com.cts.eventsphere.dto.shared.GenericErrorResponse;
 import com.cts.eventsphere.exception.finance.BudgetNotFoundException;
 import com.cts.eventsphere.exception.finance.ExpenseNotFoundException;
 import com.cts.eventsphere.exception.finance.PaymentNotFoundException;
+import com.cts.eventsphere.exception.registration.RegistrationAlreadyExistsException;
+import com.cts.eventsphere.exception.registration.RegistrationNotFoundException;
+import com.cts.eventsphere.exception.ticket.TicketAlreadyExistsException;
+import com.cts.eventsphere.exception.ticket.TicketNotFoundException;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -21,6 +29,7 @@ import java.util.Map;
  */
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -47,5 +56,39 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handlePaymentNotFound(PaymentNotFoundException e){
         return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(TicketAlreadyExistsException.class)
+    public ResponseEntity<GenericErrorResponse> ticketAlreadyExistsException(TicketAlreadyExistsException e){
+        return new ResponseEntity<>(new GenericErrorResponse("Ticket already exists"),HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(TicketNotFoundException.class)
+    public  ResponseEntity<GenericErrorResponse> ticketNotFoundException(TicketNotFoundException e){
+        return new ResponseEntity<>(new GenericErrorResponse("Ticket not found"), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(RegistrationAlreadyExistsException.class)
+    public  ResponseEntity<GenericErrorResponse> registrationAlreadyExistsException(RegistrationAlreadyExistsException e){
+        return new ResponseEntity<>(new GenericErrorResponse("Registration already Exists"), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(RegistrationNotFoundException.class)
+    public ResponseEntity<GenericErrorResponse> registrationNotFoundException(RegistrationNotFoundException e){
+        return new ResponseEntity<>(new GenericErrorResponse("Registration not found"), HttpStatus.NOT_FOUND);
+    }
+
+
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<GenericErrorResponse> handleUnexpectedExceptions(Exception ex) {
+        String traceId = java.util.UUID.randomUUID().toString();
+        log.error("Unhandled exception. traceId={}", traceId, ex);
+
+        GenericErrorResponse body = new GenericErrorResponse(
+            "An unexpected error occurred. Please contact support with traceId: " + traceId
+        );
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
 }
