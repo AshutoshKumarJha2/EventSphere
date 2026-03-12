@@ -1,0 +1,202 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > VenueServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: VenueServiceImpl (com.cts.eventsphere.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">VenueServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.2%
+  </span>
+  <span class="absValue">
+    (16/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.service.impl;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.mapper.venue.VenueRequestDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.mapper.venue.VenueResponseDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.venue.VenueRequestDto;
+&nbsp;import com.cts.eventsphere.dto.venue.VenueResponseDto;
+&nbsp;import com.cts.eventsphere.model.Venue;
+&nbsp;import com.cts.eventsphere.model.data.AvailabilityStatus;
+&nbsp;import com.cts.eventsphere.repository.VenueRepository;
+&nbsp;import com.cts.eventsphere.service.VenueService;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.time.format.DateTimeParseException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@RequiredArgsConstructor
+&nbsp;@Service
+&nbsp;public class VenueServiceImpl implements VenueService {
+&nbsp;
+&nbsp;    private final VenueRepository venueRepository;
+&nbsp;    private final VenueRequestDtoMapper venueRequestDtoMapper;
+&nbsp;    private final VenueResponseDtoMapper venueResponseDtoMapper;
+&nbsp;
+&nbsp;    public  List&lt;VenueResponseDto&gt; convertHelper(List&lt;Venue&gt; venueList){
+<b class="fc">&nbsp;        List&lt;VenueResponseDto&gt; convertedList = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        for(Venue v : venueList){</b>
+<b class="fc">&nbsp;            convertedList.add(venueResponseDtoMapper.toDto(v));</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return convertedList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public VenueResponseDto create(VenueRequestDto dto) {
+<b class="fc">&nbsp;        Venue venue = venueRequestDtoMapper.toEntity(dto);</b>
+<b class="fc">&nbsp;        Venue savedVenue = venueRepository.save(venue);</b>
+&nbsp;
+<b class="fc">&nbsp;        return venueResponseDtoMapper.toDto(savedVenue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;VenueResponseDto&gt; findAll() {
+<b class="fc">&nbsp;        List&lt;Venue&gt; venues = venueRepository.findAll();</b>
+<b class="fc">&nbsp;        return convertHelper(venues);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;VenueResponseDto&gt; findByLocation(String location) {
+<b class="fc">&nbsp;        List&lt;Venue&gt; locationList = venueRepository.findByLocation(location);</b>
+<b class="fc">&nbsp;        return convertHelper(locationList);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;VenueResponseDto&gt; findByDate(String date) {
+&nbsp;        try {
+<b class="fc">&nbsp;            LocalDate localDate = LocalDate.parse(date);</b>
+&nbsp;
+<b class="fc">&nbsp;            List&lt;Venue&gt; freeVenues = venueRepository.findAvailableVenues(</b>
+&nbsp;                    localDate,
+&nbsp;                    AvailabilityStatus.available,
+&nbsp;                    null
+&nbsp;            );
+&nbsp;
+<b class="fc">&nbsp;            return convertHelper(freeVenues);</b>
+&nbsp;
+&nbsp;        } catch (DateTimeParseException e) {
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Invalid date format. Please use yyyy-MM-dd&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;VenueResponseDto&gt; findByCapacity(int capacity) {
+<b class="fc">&nbsp;        List&lt;Venue&gt; byCapacityList = venueRepository.findByCapacityGreaterThanEqual(capacity);</b>
+<b class="fc">&nbsp;        return convertHelper(byCapacityList);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;VenueResponseDto&gt; findByAvailablityStatus(AvailabilityStatus status) {
+<b class="nc">&nbsp;        List&lt;Venue&gt; byStatus = venueRepository.findByAvailabilityStatus(status);</b>
+<b class="nc">&nbsp;        return convertHelper(byStatus);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

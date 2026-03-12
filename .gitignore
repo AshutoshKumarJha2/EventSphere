@@ -32,3 +32,8 @@ build/
 .vscode/
 
 src/main/resources/application-local.properties
+
+flyway.conf
+todo.md
+
+logs/

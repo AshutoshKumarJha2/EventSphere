@@ -1,0 +1,226 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > InvoiceServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: InvoiceServiceImpl (com.cts.eventsphere.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InvoiceServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (1/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.6%
+  </span>
+  <span class="absValue">
+    (1/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.service.impl;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.invoice.InvoiceRequestDto;
+&nbsp;import com.cts.eventsphere.dto.invoice.InvoiceResponseDto;
+&nbsp;import com.cts.eventsphere.dto.mapper.invoice.InvoiceRequestDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.mapper.invoice.InvoiceResponseDtoMapper;
+&nbsp;import com.cts.eventsphere.exception.invoice.InvoiceNotFoundException;
+&nbsp;import com.cts.eventsphere.model.Invoice;
+&nbsp;import com.cts.eventsphere.repository.InvoiceRepository;
+&nbsp;import com.cts.eventsphere.service.InvoiceService;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Implementation for Invoice Service
+&nbsp; *
+&nbsp; * @author 2480177
+&nbsp; * @version 1.0
+&nbsp; * @since 03-03-2026
+&nbsp; */
+&nbsp;
+&nbsp;@Service
+&nbsp;@RequiredArgsConstructor
+<b class="fc">&nbsp;@Slf4j</b>
+&nbsp;public class InvoiceServiceImpl implements InvoiceService {
+&nbsp;
+&nbsp;    private final InvoiceRepository invoiceRepository;
+&nbsp;    private final InvoiceRequestDtoMapper requestDtoMapper;
+&nbsp;    private final InvoiceResponseDtoMapper responseDtoMapper;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param request
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public InvoiceResponseDto createInvoice(InvoiceRequestDto request){
+<b class="nc">&nbsp;        log.info(&quot;Creating invoice...&quot;);</b>
+<b class="nc">&nbsp;        Invoice invoice = requestDtoMapper.toEntity(request);</b>
+<b class="nc">&nbsp;        Invoice saved = invoiceRepository.save(invoice);</b>
+<b class="nc">&nbsp;        log.info(&quot;Invoice created with ID={}&quot;, saved.getInvoiceId());</b>
+<b class="nc">&nbsp;        return responseDtoMapper.toDto(saved);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param invoiceId
+&nbsp;     * @return
+&nbsp;     * @throws InvoiceNotFoundException
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public InvoiceResponseDto getInvoiceById(String invoiceId){
+<b class="nc">&nbsp;        log.info(&quot;Fetching invoice ID={}&quot;, invoiceId);</b>
+&nbsp;
+<b class="nc">&nbsp;        Invoice invoice = invoiceRepository.findById(invoiceId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new InvoiceNotFoundException(invoiceId));</b>
+&nbsp;
+<b class="nc">&nbsp;        return responseDtoMapper.toDto(invoice);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public List&lt;InvoiceResponseDto&gt; getAllInvoices(){
+<b class="nc">&nbsp;        log.info(&quot;Fetching all invoices&quot;);</b>
+<b class="nc">&nbsp;        return invoiceRepository.findAll()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(responseDtoMapper::toDto)</b>
+<b class="nc">&nbsp;                .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param invoiceId
+&nbsp;     * @param request
+&nbsp;     * @return
+&nbsp;     * @throws InvoiceNotFoundException
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public InvoiceResponseDto updateInvoice(String invoiceId, InvoiceRequestDto request){
+<b class="nc">&nbsp;        log.info(&quot;Updating invoice ID={}&quot;, invoiceId);</b>
+&nbsp;
+<b class="nc">&nbsp;        Invoice invoice = invoiceRepository.findById(invoiceId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new InvoiceNotFoundException(invoiceId));</b>
+&nbsp;
+<b class="nc">&nbsp;        invoice.setContractId(request.contractId());</b>
+<b class="nc">&nbsp;        invoice.setTotalAmount(request.totalAmount());</b>
+<b class="nc">&nbsp;        invoice.setDueDate(request.dueDate());</b>
+<b class="nc">&nbsp;        invoice.setStatus(request.status());</b>
+&nbsp;
+<b class="nc">&nbsp;        Invoice updated = invoiceRepository.save(invoice);</b>
+<b class="nc">&nbsp;        return responseDtoMapper.toDto(updated);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param invoiceId
+&nbsp;     * @throws InvoiceNotFoundException
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void deleteInvoice(String invoiceId){
+<b class="nc">&nbsp;        log.warn(&quot;Deleting invoice ID={}&quot;, invoiceId);</b>
+&nbsp;
+<b class="nc">&nbsp;        if(!invoiceRepository.existsById(invoiceId)){</b>
+<b class="nc">&nbsp;            throw new InvoiceNotFoundException(invoiceId);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        invoiceRepository.deleteById(invoiceId);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,233 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ExpenseServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: ExpenseServiceImpl (com.cts.eventsphere.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExpenseServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (38/38)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.service.impl;
+&nbsp;
+&nbsp;import com.cts.eventsphere.dto.expense.ExpenseRequestDto;
+&nbsp;import com.cts.eventsphere.dto.expense.ExpenseResponseDto;
+&nbsp;import com.cts.eventsphere.dto.mapper.expense.ExpenseRequestDtoMapper;
+&nbsp;import com.cts.eventsphere.dto.mapper.expense.ExpenseResponseDtoMapper;
+&nbsp;import com.cts.eventsphere.exception.event.EventNotFoundException;
+&nbsp;import com.cts.eventsphere.exception.finance.ExpenseNotFoundException;
+&nbsp;import com.cts.eventsphere.model.Event;
+&nbsp;import com.cts.eventsphere.model.Expense;
+&nbsp;import com.cts.eventsphere.model.data.ExpenseStatus;
+&nbsp;import com.cts.eventsphere.repository.EventRepository;
+&nbsp;import com.cts.eventsphere.repository.ExpenseRepository;
+&nbsp;import com.cts.eventsphere.service.ExpenseService;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * [Detailed description of the class&#39;s responsibility]
+&nbsp; *
+&nbsp; * @author 2480081
+&nbsp; * @version 1.0
+&nbsp; * @since 01-03-2026
+&nbsp; */
+&nbsp;@Service
+&nbsp;@RequiredArgsConstructor
+<b class="fc">&nbsp;@Slf4j</b>
+&nbsp;public class ExpenseServiceImpl implements ExpenseService {
+&nbsp;
+&nbsp;    private final ExpenseRepository expenseRepository;
+&nbsp;    private final EventRepository eventRepository;
+&nbsp;    private final ExpenseRequestDtoMapper expenseRequestDtoMapper;
+&nbsp;    private final ExpenseResponseDtoMapper expenseResponseDtoMapper;
+&nbsp;
+&nbsp;    /**
+&nbsp;     *
+&nbsp;     * @param eventId of the event
+&nbsp;     * @param request of the expense
+&nbsp;     * @return saved expense along with the HTTP status code
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public ExpenseResponseDto createExpense(String eventId , ExpenseRequestDto request) throws EventNotFoundException{
+<b class="fc">&nbsp;        log.info(&quot;Creating expense for eventId: {} with details: {}&quot;, eventId, request);</b>
+<b class="fc">&nbsp;        Event event = eventRepository.findById(eventId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new EventNotFoundException(eventId));</b>
+<b class="fc">&nbsp;        Expense expense = expenseRequestDtoMapper.toEntity(request);</b>
+<b class="fc">&nbsp;        expense.setEvent(event);</b>
+<b class="fc">&nbsp;        Expense savedExpense = expenseRepository.save(expense);</b>
+<b class="fc">&nbsp;        ExpenseResponseDto response = expenseResponseDtoMapper.toDTO(savedExpense);</b>
+<b class="fc">&nbsp;        log.info(&quot;Successfully saved expense for eventId: {}. Response: {}&quot;, eventId, response);</b>
+<b class="fc">&nbsp;        return response;</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieve all expenses from the system
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public List&lt;ExpenseResponseDto&gt; getAllExpenses() {
+<b class="fc">&nbsp;        log.info(&quot;Fetching all expenses from the database&quot;);</b>
+<b class="fc">&nbsp;        List&lt;ExpenseResponseDto&gt; expenses = expenseRepository.findAll().stream()</b>
+<b class="fc">&nbsp;                .map(expenseResponseDtoMapper::toDTO)</b>
+<b class="fc">&nbsp;                .toList();</b>
+<b class="fc">&nbsp;        log.info(&quot;Retrieved {} expenses in total&quot;, expenses.size());</b>
+<b class="fc">&nbsp;        return expenses;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get Expense of an event
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public List&lt;ExpenseResponseDto&gt; getExpenseByEvent(String eventId) throws EventNotFoundException{
+<b class="fc">&nbsp;        log.info(&quot;Fetching expenses for eventId: {}&quot;, eventId);</b>
+<b class="fc">&nbsp;        Event event = eventRepository.findById(eventId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new EventNotFoundException(eventId));</b>
+<b class="fc">&nbsp;        List&lt;ExpenseResponseDto&gt; expenses = expenseRepository.findAll().stream()</b>
+<b class="fc">&nbsp;                .filter(expense -&gt; expense.getEvent().getEventId().equals(event.getEventId()))</b>
+<b class="fc">&nbsp;                .map(expenseResponseDtoMapper::toDTO)</b>
+<b class="fc">&nbsp;                .toList();</b>
+<b class="fc">&nbsp;        log.info(&quot;Retrieved {} expenses for eventId: {}&quot;, expenses.size(), eventId);</b>
+<b class="fc">&nbsp;        return expenses;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Delete an Expense
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void deleteExpense(String expenseId) throws ExpenseNotFoundException{
+<b class="fc">&nbsp;        log.info(&quot;Attempting to delete expense with ID: {}&quot;, expenseId);</b>
+<b class="fc">&nbsp;        if(!expenseRepository.existsById(expenseId)){</b>
+<b class="fc">&nbsp;            throw new ExpenseNotFoundException(expenseId);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        expenseRepository.deleteById(expenseId);</b>
+<b class="fc">&nbsp;        log.info(&quot;Successfully deleted expense with ID: {}&quot;, expenseId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Updates the status of an Expense
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public ExpenseResponseDto updateExpenseStatus(String expenseId , ExpenseStatus status) throws ExpenseNotFoundException{
+<b class="fc">&nbsp;        log.info(&quot;Request to update status for expenseId: {} to {}&quot;, expenseId, status);</b>
+<b class="fc">&nbsp;        Expense expense = expenseRepository.findById(expenseId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new ExpenseNotFoundException(expenseId));</b>
+<b class="fc">&nbsp;        expense.setStatus(status);</b>
+<b class="fc">&nbsp;        Expense updatedExpense = expenseRepository.save(expense);</b>
+<b class="fc">&nbsp;        ExpenseResponseDto response = expenseResponseDtoMapper.toDTO(updatedExpense);</b>
+<b class="fc">&nbsp;        log.info(&quot;Successfully updated expenseId: {} to status: {}&quot;, expenseId, response.status());</b>
+<b class="fc">&nbsp;        return response;</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>

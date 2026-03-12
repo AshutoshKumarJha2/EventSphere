@@ -1,0 +1,244 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JwtUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cts.eventsphere.security</a>
+</div>
+
+<h1>Coverage Summary for Class: JwtUtil (com.cts.eventsphere.security)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JwtUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.5%
+  </span>
+  <span class="absValue">
+    (1/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    2.9%
+  </span>
+  <span class="absValue">
+    (1/35)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JwtUtil$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    11.1%
+  </span>
+  <span class="absValue">
+    (1/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    2.8%
+  </span>
+  <span class="absValue">
+    (1/36)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cts.eventsphere.security;
+&nbsp;
+&nbsp;import io.jsonwebtoken.JwtException;
+&nbsp;import io.jsonwebtoken.Jwts;
+&nbsp;import io.jsonwebtoken.SignatureAlgorithm;
+&nbsp;import io.jsonwebtoken.security.Keys;
+&nbsp;import org.springframework.beans.factory.annotation.Value;
+&nbsp;import org.springframework.security.core.authority.SimpleGrantedAuthority;
+&nbsp;import org.springframework.stereotype.Component;
+&nbsp;
+&nbsp;import javax.crypto.SecretKey;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * JwtUtil is a utility class responsible for generating and validating JWT tokens. It provides methods to create access and refresh tokens based on user email and role, as well as methods to extract user information from the token and validate its type. The class uses a secret key for signing the tokens and configurable expiration times for both access and refresh tokens.
+&nbsp; * * @author 2480010
+&nbsp; *
+&nbsp; * @version 1.0
+&nbsp; * @since 03-03-2026
+&nbsp; */
+&nbsp;@Component
+<b class="fc">&nbsp;public class JwtUtil {</b>
+&nbsp;    @Value(&quot;${jwt.secret:nvjfenvjnjv53352434rnnc19dnwqdneciu439jn}&quot;)
+&nbsp;    private String SECRET_KEY;
+&nbsp;
+&nbsp;    @Value(&quot;${jwt.access.expiration-in-m:15}&quot;)
+&nbsp;    private  long ACCESS_EXPIRATION_TIME_IN_M; // Default to 15 minutes
+&nbsp;
+&nbsp;    @Value(&quot;${jwt.refresh.expiration-in-d:7}&quot;)
+&nbsp;    private long REFRESH_EXPIRATION_TIME_IN_D; // Default to 7 days
+&nbsp;
+&nbsp;    private SecretKey getSigningKey() {
+<b class="nc">&nbsp;        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String buildToken(String userId, String email, String role, TokenType type) {
+<b class="nc">&nbsp;        var typeString = switch (type){</b>
+<b class="nc">&nbsp;            case ACCESS -&gt; &quot;ACCESS&quot;;</b>
+<b class="nc">&nbsp;            case REFRESH -&gt; &quot;REFRESH&quot;;</b>
+&nbsp;        };
+<b class="nc">&nbsp;        var expirationMillis = switch (type){</b>
+<b class="nc">&nbsp;            case ACCESS -&gt; ACCESS_EXPIRATION_TIME_IN_M * 60 * 1000;</b>
+<b class="nc">&nbsp;            case REFRESH -&gt; REFRESH_EXPIRATION_TIME_IN_D * 24 * 60 * 60 * 1000;</b>
+&nbsp;        };
+<b class="nc">&nbsp;        return Jwts.builder()</b>
+<b class="nc">&nbsp;                .setSubject(email)</b>
+<b class="nc">&nbsp;                .claim(&quot;userId&quot;, userId)</b>
+<b class="nc">&nbsp;                .claim(&quot;email&quot;, email)</b>
+<b class="nc">&nbsp;                .claim(&quot;role&quot;, role)</b>
+<b class="nc">&nbsp;                .claim(&quot;type&quot;, typeString)</b>
+<b class="nc">&nbsp;                .setIssuedAt(new Date())</b>
+<b class="nc">&nbsp;                .setExpiration(new Date(System.currentTimeMillis() + expirationMillis))</b>
+<b class="nc">&nbsp;                .signWith(getSigningKey(), SignatureAlgorithm.HS256)</b>
+<b class="nc">&nbsp;                .compact();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String extractEmail(String token) {
+<b class="nc">&nbsp;        return Jwts.parserBuilder().setSigningKey(getSigningKey()).build()</b>
+<b class="nc">&nbsp;                .parseClaimsJws(token).getBody().getSubject();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean validateToken(String token, TokenType expectedType) {
+&nbsp;        try {
+<b class="nc">&nbsp;            var claims = Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);</b>
+<b class="nc">&nbsp;            var tokenType = claims.getBody().get(&quot;type&quot;, String.class);</b>
+<b class="nc">&nbsp;            return expectedType.name().equals(tokenType);</b>
+&nbsp;        } catch (JwtException | IllegalArgumentException e) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    UserPrincipal extractUserPrincipal(String token, TokenType expectedType) {
+<b class="nc">&nbsp;        var claims = Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);</b>
+<b class="nc">&nbsp;        var tokenType = claims.getBody().get(&quot;type&quot;, String.class);</b>
+<b class="nc">&nbsp;        if (!expectedType.name().equals(tokenType)) {</b>
+<b class="nc">&nbsp;            throw new JwtException(&quot;Invalid token type. Expected: &quot; + expectedType.name() + &quot;, Found: &quot; + tokenType);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String email = claims.getBody().get(&quot;email&quot;, String.class);</b>
+<b class="nc">&nbsp;        String role = claims.getBody().get(&quot;role&quot;, String.class);</b>
+<b class="nc">&nbsp;        String userId = claims.getBody().get(&quot;userId&quot;, String.class);</b>
+<b class="nc">&nbsp;        String roleAuthority = &quot;ROLE_&quot; + role.toUpperCase();</b>
+<b class="nc">&nbsp;        return new UserPrincipal(userId, email, role, List.of(new SimpleGrantedAuthority(roleAuthority)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;     public String generateAccessToken(String userId, String email, String role) {
+<b class="nc">&nbsp;         return buildToken(userId, email, role, TokenType.ACCESS);</b>
+&nbsp;     }
+&nbsp;
+&nbsp;     public String generateRefreshToken(String userId, String email, String role) {
+<b class="nc">&nbsp;         return buildToken(userId, email, role, TokenType.REFRESH);</b>
+&nbsp;     }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-10 17:09</div>
+</div>
+</body>
+</html>
