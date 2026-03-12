@@ -4,9 +4,11 @@ import com.cts.eventsphere.dto.delivery.DeliveryRequestDto;
 import com.cts.eventsphere.dto.delivery.DeliveryResponseDto;
 import com.cts.eventsphere.model.data.DeliveryStatus;
 import com.cts.eventsphere.service.DeliveryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,31 +25,32 @@ import java.util.List;
 @RequestMapping("/api/v1/deliveries")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class DeliveryController {
 
     private final DeliveryService deliveryService;
 
     @PostMapping
-    public DeliveryResponseDto create(@RequestBody DeliveryRequestDto request) {
+    public @Valid DeliveryResponseDto create(@Valid @RequestBody DeliveryRequestDto request) {
         log.info("Creating delivery");
         return deliveryService.createDelivery(request);
     }
 
     @GetMapping("/{id}")
-    public DeliveryResponseDto getById(@PathVariable String id) {
+    public @Valid DeliveryResponseDto getById(@PathVariable String id) {
         log.info("Fetching delivery with id: {}", id);
         return deliveryService.getDeliveryById(id);
     }
 
     @GetMapping
-    public List<DeliveryResponseDto> getAll() {
+    public List<@Valid DeliveryResponseDto> getAll() {
         log.info("Fetching all deliveries");
         return deliveryService.getAllDeliveries();
     }
 
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasRole('VENDOR')")
-    public DeliveryResponseDto updateStatus(
+    public @Valid DeliveryResponseDto updateStatus(
             @PathVariable String id,
             @RequestParam DeliveryStatus status) {
 
@@ -57,9 +60,9 @@ public class DeliveryController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('VENDOR')")
-    public DeliveryResponseDto update(
+    public @Valid DeliveryResponseDto update(
             @PathVariable String id,
-            @RequestBody DeliveryRequestDto request) {
+            @Valid @RequestBody DeliveryRequestDto request) {
 
         log.info("Updating delivery with id: {}", id);
         return deliveryService.updateDelivery(id, request);
