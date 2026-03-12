@@ -49,9 +49,13 @@ public class AuthService {
 
     public LoginResponseDto login(LoginRequestDto loginDto) {
         User user = userRepository.findByEmail(loginDto.email())
-                .orElseThrow(() -> new UserNotFoundException(loginDto.email()));
+                .orElseThrow(() ->{
+                    log.warn("Login failed for email: {} - user not found", loginDto.email());
+                    return new UserNotFoundException(loginDto.email());
+                });
 
         if (!passwordEncoder.matches(loginDto.password(), user.getPassword())) {
+            log.warn("Login failed: invalid password");
             throw new InvalidPasswordException("Invalid password provided");
         }
 

@@ -33,7 +33,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private UserRoles role;
+    private UserRoles role = UserRoles.attendee;
 
     @Column(nullable = false, length = 100)
     private String email;

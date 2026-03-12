@@ -26,7 +26,8 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class UserController {
     private final UserService userService;
-    @GetMapping
+    @GetMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponseDto>>getAllUsers(){
         return ResponseEntity.ok(userService.getAllUsers());
     }
@@ -47,4 +48,19 @@ public class UserController {
         String authenticatedUserId = userPrincipal.userId();
         return ResponseEntity.ok(userService.getUser(authenticatedUserId));
     }
+
+    @PatchMapping("/users/{userId}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> changeUserStatus(@PathVariable String userId, @RequestParam String status) {
+        userService.changeUserStatus(userId, status);
+        return ResponseEntity.ok("User status updated successfully.");
+    }
+
+    @PatchMapping("/users/{userId}/role")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> changeUserRole(@PathVariable String userId, @RequestParam String role) {
+        userService.changeUserRole(userId, role);
+        return ResponseEntity.ok("User role updated successfully.");
+    }
+
 }

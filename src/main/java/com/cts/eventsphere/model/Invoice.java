@@ -68,8 +68,8 @@ public class Invoice {
         delivery.setInvoiceId(this.invoiceId);
     }
 
-    public void removeDelivery(Delivery delivery) {
-        deliveries.remove(delivery);
-        delivery.setInvoice(null);
+    public void addPayment(Payment payment) {
+        payments.add(payment);
+        payment.setInvoice(this);
     }
 }

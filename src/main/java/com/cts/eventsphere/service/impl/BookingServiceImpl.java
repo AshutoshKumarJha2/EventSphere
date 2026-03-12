@@ -6,15 +6,12 @@ import com.cts.eventsphere.dto.mapper.booking.BookingRequestDtoMapper;
 import com.cts.eventsphere.dto.mapper.booking.BookingResponseDtoMapper;
 import com.cts.eventsphere.dto.resource.ResourceListElementDto;
 import com.cts.eventsphere.exception.booking.BookingNotFoundException;
+import com.cts.eventsphere.exception.resource.InsufficientResourceException;
 import com.cts.eventsphere.exception.venue.VenueNotFoundException;
-import com.cts.eventsphere.model.Booking;
-import com.cts.eventsphere.model.ResourceAllocation;
-import com.cts.eventsphere.model.Venue;
+import com.cts.eventsphere.model.*;
 import com.cts.eventsphere.model.data.AvailabilityStatus;
 import com.cts.eventsphere.model.data.BookingStatus;
-import com.cts.eventsphere.repository.BookingRepository;
-import com.cts.eventsphere.repository.ResourceAllocationRepository;
-import com.cts.eventsphere.repository.VenueRepository;
+import com.cts.eventsphere.repository.*;
 import com.cts.eventsphere.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +39,8 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingRequestDtoMapper requestMapper;
     private final BookingResponseDtoMapper responseMapper;
+    private final EventRepository eventRepository;
+    private  final ResourceRepository resourceRepository;
 
     @Override
     @Transactional
@@ -145,19 +144,42 @@ public class BookingServiceImpl implements BookingService {
     public BookingResponseDto updateBookingStatus(String bookingId, BookingStatus newStatus) {
         log.info("Updating status for booking ID: {} to {}", bookingId, newStatus);
 
+        // 1. Fetch the Booking
         Booking existingBooking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> {
-                    log.error("Update failed: Booking ID {} not found", bookingId);
-                    return new BookingNotFoundException("Update failed: Booking ID " + bookingId + " does not exist.");
-                });
+                .orElseThrow(() -> new BookingNotFoundException("Booking ID " + bookingId + " not found."));
 
+        // 2. Logic for Confirmation/Approval
         if (newStatus == BookingStatus.confirmed) {
-            log.debug("Booking confirmed. Updating venue availability for venue ID: {}", existingBooking.getVenue().getVenueId());
-            Venue venue = venueRepository.findByVenueId(existingBooking.getVenue().getVenueId());
+
+            // Update Venue Availability
+            Venue venue = existingBooking.getVenue();
             venue.setAvailabilityStatus(AvailabilityStatus.unavailable);
             venueRepository.save(venue);
+
+            // Deduct Resources
+            // We find all resource allocations linked to this specific event and venue
+            List<ResourceAllocation> allocations = resourceAllocationRepository
+                    .findByEvent_EventIdAndVenue_VenueId(existingBooking.getEventId(), venue.getVenueId());
+
+            for (ResourceAllocation allocation : allocations) {
+                Resource resource = allocation.getResource();
+                int requestedQty = allocation.getQuantity();
+                int availableQty = resource.getUnit();
+
+                if (availableQty < requestedQty) {
+                    throw new InsufficientResourceException("Not enough " + resource.getName() + " available.");
+                }
+
+                // Subtract from the master Resource table
+                resource.setUnit(availableQty - requestedQty);
+                resourceRepository.save(resource);
+
+                log.debug("Subtracted {} from resource {}. New balance: {}",
+                        requestedQty, resource.getName(), resource.getUnit());
+            }
         }
 
+        // 3. Update Status and Save
         existingBooking.setStatus(newStatus);
         Booking updatedBooking = bookingRepository.save(existingBooking);
 

@@ -3,9 +3,11 @@ package com.cts.eventsphere.controller;
 import com.cts.eventsphere.dto.vendor.VendorRequestDto;
 import com.cts.eventsphere.dto.vendor.VendorResponseDto;
 import com.cts.eventsphere.service.VendorService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,13 +24,14 @@ import java.util.List;
 @RequestMapping("/api/v1/vendors")
 @Slf4j
 @RequiredArgsConstructor
+@Validated
 public class VendorController {
 
     private final VendorService vendorService;
 
     @PostMapping
     @PreAuthorize("hasRole('VENDOR')")
-    public VendorResponseDto create(@RequestBody VendorRequestDto request) {
+    public @Valid VendorResponseDto create(@Valid @RequestBody VendorRequestDto request) {
         log.info("Creating vendor with name={}", request.name());
         VendorResponseDto response = vendorService.createVendor(request);
         log.info("Vendor created successfully with ID={}", response.vendorId());
@@ -36,22 +39,22 @@ public class VendorController {
     }
 
     @GetMapping("/{id}")
-    public VendorResponseDto getById(@PathVariable String id) {
+    public @Valid VendorResponseDto getById(@PathVariable String id) {
         log.info("Fetching vendor with ID={}", id);
         return vendorService.getVendorById(id);
     }
 
     @GetMapping
-    public List<VendorResponseDto> getAll() {
+    public List<@Valid VendorResponseDto> getAll() {
         log.info("Fetching all vendors");
         return vendorService.getAllVendors();
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('VENDOR')")
-    public VendorResponseDto update(
+    public @Valid VendorResponseDto update(
             @PathVariable String id,
-            @RequestBody VendorRequestDto request) {
+            @Valid @RequestBody VendorRequestDto request) {
 
         log.info("Updating vendor with ID={}", id);
         VendorResponseDto response = vendorService.updateVendor(id, request);
