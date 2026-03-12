@@ -27,6 +27,7 @@ public class InvoiceController {
     private final InvoiceService invoiceService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('FINANCE_MANAGER','VENDOR','ADMIN')")
     public InvoiceResponseDto create(@RequestBody InvoiceRequestDto request) {
         log.info("Received request to create invoice for contractId={}", request.contractId());
         InvoiceResponseDto response = invoiceService.createInvoice(request);
@@ -35,7 +36,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('FINANCE','VENDOR','ADMIN')")
+    @PreAuthorize("hasAnyRole('FINANCE_MANAGER','VENDOR','ADMIN')")
     public InvoiceResponseDto getById(@PathVariable String id) {
         log.info("Fetching invoice with ID={}", id);
         return invoiceService.getInvoiceById(id);

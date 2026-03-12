@@ -51,7 +51,7 @@ public class ExpenseController {
      * Get all Expenses
      */
     @GetMapping("/expenses")
-    @PreAuthorize("hasAnyRole('admin','finance_manager')")
+    @PreAuthorize("hasAnyRole('ADMIN','FINANCE_MANAGER')")
     public ResponseEntity<List<ExpenseResponseDto>> getAllExpenses(){
         log.info("Request to fetch all expenses");
         List<ExpenseResponseDto> response = expenseService.getAllExpenses();
@@ -63,7 +63,7 @@ public class ExpenseController {
      * Get all expense for an event
      */
     @GetMapping("/events/{eventId}/expenses")
-    @PreAuthorize("hasAnyRole('admin', 'organizer', 'finance_manager')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER', 'FINANCE_MANAGER')")
     public ResponseEntity<List<ExpenseResponseDto>> getEventExpenses(@PathVariable String eventId ){
         log.info("Request to fetch expenses for eventId: {} ", eventId);
         List<ExpenseResponseDto> response = expenseService.getExpenseByEvent(eventId );
@@ -75,7 +75,7 @@ public class ExpenseController {
      * Log an Expense
      */
     @PostMapping("/events/{eventId}/expenses")
-    @PreAuthorize("hasAnyRole('admin', 'organizer', 'finance_manager')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER', 'FINANCE_MANAGER')")
     public ResponseEntity<ExpenseResponseDto> createExpense(@PathVariable String eventId ,@Valid @RequestBody ExpenseRequestDto request){
         log.info("Request to create expense for eventId: {} with data: {}", eventId, request);
         ExpenseResponseDto response = expenseService.createExpense(eventId , request);
@@ -87,7 +87,7 @@ public class ExpenseController {
      * Delete an Expense
      */
     @DeleteMapping("/expenses/{expenseId}")
-    @PreAuthorize("hasAnyRole('admin','organizer')")
+    @PreAuthorize("hasAnyRole('ADMIN','ORGANIZER')")
     public ResponseEntity<Void> deleteExpense(@PathVariable String expenseId){
         log.info("Request to delete expense with ID: {}", expenseId);
         expenseService.deleteExpense(expenseId);
@@ -99,7 +99,7 @@ public class ExpenseController {
      * Approve or Reject Expense
      */
     @PatchMapping("expenses/{expenseId}/status")
-    @PreAuthorize("hasAnyRole('admin','finance_manager')")
+    @PreAuthorize("hasAnyRole('ADMIN','FINANCE_MANAGER')")
     public ResponseEntity<ExpenseResponseDto> updateExpenseStatus(@PathVariable String expenseId , @RequestParam ExpenseStatus status){
         log.info("Request to update status for expenseId: {} to status: {}", expenseId, status);
         ExpenseResponseDto response = expenseService.updateExpenseStatus(expenseId , status);
@@ -111,7 +111,7 @@ public class ExpenseController {
      * Mark Payment complete
      */
     @PostMapping("expenses/{expenseId}/payment")
-    @PreAuthorize("hasAnyRole('admin','finance_manager')")
+    @PreAuthorize("hasAnyRole('ADMIN','FINANCE_MANAGER')")
     public ResponseEntity<PaymentResponseDto> makePayment(@PathVariable String expenseId ,@Valid @RequestBody PaymentRequestDto request){
         log.info("Request to process payment for expenseId: {} with data: {}", expenseId, request);
         PaymentResponseDto response = paymentService.markPayment(expenseId , request);
