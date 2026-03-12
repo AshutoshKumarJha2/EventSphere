@@ -29,7 +29,7 @@ public class NotificationController {
 
     /**
      * Infinite Scroll Endpoint
-     * Usage: /api/v1/notifications/user-123/scroll?limit=10&lastTimestamp=2023-10-27T10:15:30
+     * Usage: {@code /api/v1/notifications/user-123/scroll?limit=10&lastTimestamp=2023-10-27T10:15:30}
      */
     @GetMapping("/{userId}/scroll")
     public ResponseEntity<List<Notification>> getNotificationsScroll(

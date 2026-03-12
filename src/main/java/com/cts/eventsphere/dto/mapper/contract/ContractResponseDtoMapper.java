@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ContractResponseDtoMapper {
     public ContractResponseDto toDto(Contract contract){
+        if (contract == null) {
+            return null;
+        }
         return new ContractResponseDto(
                 contract.getContractId(),
                 contract.getVendorId(),

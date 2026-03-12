@@ -11,7 +11,6 @@ import java.util.List;
  */
 public interface ResourceService {
 
-    // --- Inventory CRUD Operations ---
 
     /**
      * Adds a new resource to the inventory.
@@ -22,6 +21,9 @@ public interface ResourceService {
      * Retrieves all available resources.
      */
     List<ResourceResponseDto> getAllResources();
+
+    // In ResourceService.java
+    void approveAllocation(String allocationId);
 
     /**
      * Finds a specific resource by its UUID.

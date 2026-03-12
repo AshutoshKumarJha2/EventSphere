@@ -25,7 +25,7 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @PostMapping("/{id}")
-    @PreAuthorize("hasAnyRole('admin', 'organizer', 'venue_manager')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER', 'VENUE_MANAGER')")
     public ResponseEntity<ScheduleResponseDto> update(@PathVariable String eventId, @PathVariable String id, @RequestBody ScheduleRequestDto scheduleRequest){
         log.info("Received request to update schedule with ID: {} for event ID: {}", id, eventId);
         ScheduleResponseDto response = scheduleService.updateById(eventId, id, scheduleRequest);

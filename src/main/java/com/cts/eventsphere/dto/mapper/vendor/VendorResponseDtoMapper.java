@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class VendorResponseDtoMapper{
     public VendorResponseDto toDto(Vendor vendor){
+        if (vendor == null) {
+            return null;
+        }
         return new VendorResponseDto(
                 vendor.getVendorId(),
                 vendor.getName(),

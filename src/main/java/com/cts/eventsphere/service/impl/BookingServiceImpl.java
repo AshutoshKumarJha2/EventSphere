@@ -5,6 +5,7 @@ import com.cts.eventsphere.dto.booking.BookingResponseDto;
 import com.cts.eventsphere.dto.mapper.booking.BookingRequestDtoMapper;
 import com.cts.eventsphere.dto.mapper.booking.BookingResponseDtoMapper;
 import com.cts.eventsphere.dto.resource.ResourceListElementDto;
+import com.cts.eventsphere.exception.booking.BookingNotFoundException;
 import com.cts.eventsphere.exception.venue.VenueNotFoundException;
 import com.cts.eventsphere.model.Booking;
 import com.cts.eventsphere.model.ResourceAllocation;
@@ -147,7 +148,7 @@ public class BookingServiceImpl implements BookingService {
         Booking existingBooking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> {
                     log.error("Update failed: Booking ID {} not found", bookingId);
-                    return new RuntimeException("Update failed: Booking ID " + bookingId + " does not exist.");
+                    return new BookingNotFoundException("Update failed: Booking ID " + bookingId + " does not exist.");
                 });
 
         if (newStatus == BookingStatus.confirmed) {

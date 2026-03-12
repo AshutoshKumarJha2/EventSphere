@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class InvoiceResponseDtoMapper {
     public InvoiceResponseDto toDto(Invoice invoice){
+        if (invoice == null) {
+            return null;
+        }
         return new InvoiceResponseDto(
                 invoice.getInvoiceId(),
                 invoice.getContractId(),

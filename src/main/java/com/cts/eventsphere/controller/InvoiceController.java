@@ -5,6 +5,7 @@ import com.cts.eventsphere.dto.invoice.InvoiceResponseDto;
 import com.cts.eventsphere.service.InvoiceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,12 +35,14 @@ public class InvoiceController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('FINANCE','VENDOR','ADMIN')")
     public InvoiceResponseDto getById(@PathVariable String id) {
         log.info("Fetching invoice with ID={}", id);
         return invoiceService.getInvoiceById(id);
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('FINANCE','VENDOR','ADMIN')")
     public List<InvoiceResponseDto> getAll() {
         log.info("Fetching all invoices");
         return invoiceService.getAllInvoices();

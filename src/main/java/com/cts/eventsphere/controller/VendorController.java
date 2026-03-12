@@ -5,6 +5,7 @@ import com.cts.eventsphere.dto.vendor.VendorResponseDto;
 import com.cts.eventsphere.service.VendorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class VendorController {
     private final VendorService vendorService;
 
     @PostMapping
+    @PreAuthorize("hasRole('VENDOR')")
     public VendorResponseDto create(@RequestBody VendorRequestDto request) {
         log.info("Creating vendor with name={}", request.name());
         VendorResponseDto response = vendorService.createVendor(request);
@@ -46,6 +48,7 @@ public class VendorController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('VENDOR')")
     public VendorResponseDto update(
             @PathVariable String id,
             @RequestBody VendorRequestDto request) {
@@ -57,6 +60,7 @@ public class VendorController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('VENDOR','ADMIN')")
     public void delete(@PathVariable String id) {
         log.warn("Request to delete vendor with ID={}", id);
         vendorService.deleteVendor(id);
