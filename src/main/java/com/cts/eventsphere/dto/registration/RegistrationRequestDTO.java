@@ -1,5 +1,7 @@
 package com.cts.eventsphere.dto.registration;
 
+import jakarta.validation.constraints.NotNull;
+
 /**
  * DTO object for creating registration request
  *
@@ -8,6 +10,7 @@ package com.cts.eventsphere.dto.registration;
  * @since 2026-03-05
  */
 public record RegistrationRequestDTO(
+        @NotNull(message = "Ticket id is requred")
         String ticketId
     ) {
 }

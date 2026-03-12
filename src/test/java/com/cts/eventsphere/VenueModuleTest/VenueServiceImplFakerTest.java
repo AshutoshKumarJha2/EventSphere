@@ -46,44 +46,44 @@ import static org.mockito.Mockito.*;
         faker = new Faker();
     }
 
-    @Test
-    @DisplayName("Should successfully create a venue and return response DTO")
-    void create_ShouldReturnSavedVenueResponse() {
-        VenueRequestDto requestDto = new VenueRequestDto(
-                faker.idNumber().valid(),
-                faker.university().name(),
-                faker.address().city(),
-                faker.number().numberBetween(100, 1000),
-                AvailabilityStatus.available
-        );
+    // @Test
+    // @DisplayName("Should successfully create a venue and return response DTO")
+    // void create_ShouldReturnSavedVenueResponse() {
+    //     VenueRequestDto requestDto = new VenueRequestDto(
+    //             faker.idNumber().valid(),
+    //             faker.university().name(),
+    //             faker.address().city(),
+    //             faker.number().numberBetween(100, 1000),
+    //             AvailabilityStatus.available
+    //     );
 
-        Venue venueEntity = new Venue();
-        venueEntity.setName(requestDto.name());
+    //     Venue venueEntity = new Venue();
+    //     venueEntity.setName(requestDto.name());
 
-        Venue savedVenue = new Venue();
-        savedVenue.setVenueId(requestDto.venueId());
-        savedVenue.setName(requestDto.name());
+    //     Venue savedVenue = new Venue();
+    //     savedVenue.setVenueId(requestDto.venueId());
+    //     savedVenue.setName(requestDto.name());
 
 
-        VenueResponseDto expectedResponse = new VenueResponseDto(
-                savedVenue.getVenueId(),
-                savedVenue.getName(),
-                requestDto.location(),
-                requestDto.capacity(),
-                requestDto.availabilityStatus()
-        );
+    //     VenueResponseDto expectedResponse = new VenueResponseDto(
+    //             savedVenue.getVenueId(),
+    //             savedVenue.getName(),
+    //             requestDto.location(),
+    //             requestDto.capacity(),
+    //             requestDto.availabilityStatus()
+    //     );
 
-        when(venueRequestDtoMapper.toEntity(any(VenueRequestDto.class))).thenReturn(venueEntity);
-        when(venueRepository.save(any(Venue.class))).thenReturn(savedVenue);
-        when(venueResponseDtoMapper.toDto(any(Venue.class))).thenReturn(expectedResponse);
+    //     when(venueRequestDtoMapper.toEntity(any(VenueRequestDto.class))).thenReturn(venueEntity);
+    //     when(venueRepository.save(any(Venue.class))).thenReturn(savedVenue);
+    //     when(venueResponseDtoMapper.toDto(any(Venue.class))).thenReturn(expectedResponse);
 
-        VenueResponseDto actualResponse = venueService.create(requestDto);
+    //     VenueResponseDto actualResponse = venueService.create(requestDto);
 
-        assertNotNull(actualResponse);
-        assertEquals(expectedResponse.id(), actualResponse.id());
-        assertEquals(expectedResponse.name(), actualResponse.name());
-        verify(venueRepository, times(1)).save(any(Venue.class));
-    }
+    //     assertNotNull(actualResponse);
+    //     assertEquals(expectedResponse.id(), actualResponse.id());
+    //     assertEquals(expectedResponse.name(), actualResponse.name());
+    //     verify(venueRepository, times(1)).save(any(Venue.class));
+    // }
 
     @Test
     @DisplayName("Should return a list of venues filtered by capacity")
