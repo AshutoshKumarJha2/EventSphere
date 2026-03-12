@@ -2,6 +2,8 @@ package com.cts.eventsphere.dto.ticket;
 
 import com.cts.eventsphere.model.data.TicketStatus;
 
+import jakarta.validation.constraints.NotNull;
+
 /**
  * DTO object for creating ticket request
  *
@@ -10,8 +12,12 @@ import com.cts.eventsphere.model.data.TicketStatus;
  * @since 2026-03-05
  */
 public record CreateTicketRequest(
+        @NotNull(message = "Ticket type is required")
         String type,
+
+        @NotNull(message = "Ticket price is required")
         double price,
+
         TicketStatus status
     ) {
     
