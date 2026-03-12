@@ -4,6 +4,7 @@ import com.cts.eventsphere.dto.mapper.ticket.TicketDTOMapper;
 import com.cts.eventsphere.dto.shared.GenericResponse;
 import com.cts.eventsphere.dto.ticket.TicketListResponseDTO;
 import com.cts.eventsphere.dto.ticket.TicketResponseDTO;
+import com.cts.eventsphere.exception.ticket.TicketAlreadyExistsException;
 import com.cts.eventsphere.exception.ticket.TicketNotFoundException;
 import com.cts.eventsphere.model.Ticket;
 import com.cts.eventsphere.model.data.TicketStatus;
@@ -23,10 +24,15 @@ import java.math.BigDecimal;
 public class TicketServiceImpl implements TicketService {
     private final TicketRepository ticketRepository;
     @Override
-    public GenericResponse createTicket(String eventId, String type, double price, TicketStatus status) {
+    public GenericResponse createTicket(String eventId, String type, double price, TicketStatus status) throws TicketAlreadyExistsException {
+        var normalizedType = type.toLowerCase();
+        var existingTicket = ticketRepository.findByType(normalizedType);
+        if (existingTicket.isPresent()){
+            throw new TicketAlreadyExistsException(String.format("Ticket type %s already exists", normalizedType));
+        }
         var ticket = Ticket.builder()
                 .eventId(eventId)
-                .type(type)
+                .type(normalizedType)
                 .price(BigDecimal.valueOf(price))
                 .status(status)
                 .build();

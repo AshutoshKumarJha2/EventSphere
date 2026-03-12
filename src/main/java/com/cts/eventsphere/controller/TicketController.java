@@ -5,6 +5,7 @@ import com.cts.eventsphere.dto.ticket.TicketListResponseDTO;
 import com.cts.eventsphere.security.UserPrincipal;
 import com.cts.eventsphere.service.TicketService;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.DynamicInsert;
@@ -32,7 +33,7 @@ public class TicketController {
 
     @PostMapping("/events/{eventId}/tickets")
     @PreAuthorize("hasRole('ORGANIZER')")
-    public ResponseEntity<GenericResponse> createTicket(@RequestBody CreateTicketRequest request, @PathVariable String eventId, @AuthenticationPrincipal UserPrincipal userDetails) {
+    public ResponseEntity<GenericResponse> createTicket(@RequestBody @Valid CreateTicketRequest request, @PathVariable String eventId, @AuthenticationPrincipal UserPrincipal userDetails) {
         log.info("Creating ticket for eventId: {}, userId: {}, request: {}", eventId, userDetails.userId(), request);
         return ResponseEntity.ok(ticketService.createTicket(eventId, request.type(), request.price(), request.status()));
     }

@@ -1,16 +1,21 @@
 package com.cts.eventsphere.controller;
 
+import com.cts.eventsphere.dto.registration.RegistrationListResponseDTO;
 import com.cts.eventsphere.dto.registration.RegistrationRequestDTO;
 import com.cts.eventsphere.dto.shared.GenericResponse;
 import com.cts.eventsphere.security.UserPrincipal;
 import com.cts.eventsphere.service.RegistrationService;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 /**
  * RegistrationController class is responsible for handling HTTP requests related to event registrations.
@@ -29,12 +34,20 @@ public class RegistrationController {
 
     @PostMapping("/events/{eventId}/registrations")
     @PreAuthorize("hasRole('ATTENDEE')")
-    public ResponseEntity<GenericResponse> createRegistration(@PathVariable String eventId, @AuthenticationPrincipal UserPrincipal userDetails, @RequestBody RegistrationRequestDTO request) {
+    public ResponseEntity<GenericResponse> createRegistration(@PathVariable String eventId, @AuthenticationPrincipal UserPrincipal userDetails, @RequestBody @Valid RegistrationRequestDTO request) {
         var userId = userDetails.userId();
         var ticketId = request.ticketId();
         log.info("Creating registration for eventId: {}, userId: {}, ticketId: {}", eventId, userId, ticketId);
         return ResponseEntity.ok(registrationService.registerForEvent(userId, eventId, ticketId));
     }
+
+    @GetMapping("/events/{eventId}/registrations")
+    @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN')")
+    public ResponseEntity<RegistrationListResponseDTO> getAllRegistrationsByEvent(@PathVariable String eventId, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "0") int page) {
+        log.info("Getting all events for eventId: {}", eventId);
+        return ResponseEntity.ok(registrationService.getRegistrationsByEventId(eventId, size, page));
+    }
+    
 
     @PatchMapping("/registrations/{registrationId}/cancel")
     @PreAuthorize("hasRole('ATTENDEE')")
