@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.cts.eventsphere.model.Registration;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Registration repository for getting registration and saving registration
@@ -16,7 +17,7 @@ import java.util.List;
  * @since 2026-03-02
  */
 public interface RegistrationRepository extends JpaRepository<Registration, String> {
-    Registration findByAttendeeIdAndEventId(String userId, String eventId);
+    Optional<Registration> findByAttendeeIdAndEventId(String userId, String eventId);
 //    List<Registration> findByAttendeeId(String userId);
 //    List<Registration> findByEventId(String eventId);
     Page<Registration> findByAttendeeId(String userId, Pageable pageable);

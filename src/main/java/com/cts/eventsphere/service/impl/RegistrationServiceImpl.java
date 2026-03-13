@@ -39,7 +39,7 @@ public class RegistrationServiceImpl implements RegistrationService {
      */
     @Override
     public GenericResponse registerForEvent(String userId, String eventId, String ticketId) {
-        var registration = registrationRepo.findByAttendeeIdAndEventId(userId, eventId);
+        var registration = registrationRepo.findByAttendeeIdAndEventId(userId, eventId).orElseThrow(() -> new RegistrationNotFoundException(String.format("Registration with userId: %s and eventId: %s not found", userId, eventId)));
         if (registration != null) {
             throw new RegistrationAlreadyExistsException(String.format("User %s is already registered for event %s", userId, eventId));
         }
@@ -224,10 +224,7 @@ public class RegistrationServiceImpl implements RegistrationService {
      */
     @Override
     public RegistrationDTO getRegistrationByEventIdAndUserId(String eventId, String userId) {
-        var registration = registrationRepo.findByAttendeeIdAndEventId(userId, eventId);
-        if (registration == null) {
-            throw new RegistrationNotFoundException(String.format("Registration for user %s and event %s not found", userId, eventId));
-        }
+        var registration = registrationRepo.findByAttendeeIdAndEventId(userId, eventId).orElseThrow(() -> new RegistrationNotFoundException(String.format("Registration with eventId: %s and userId: %s not found", eventId, userId)));
         log.info("Fetched registration for userId: {}, eventId: {}", userId, eventId);
         return RegistrationDTOMapper.toDTO(registration);
     }
