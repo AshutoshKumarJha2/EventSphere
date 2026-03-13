@@ -73,19 +73,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changeUserStatus(String userId, String status) {
+    public UserResponseDto changeUserStatus(String userId, String status) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         String enumStatus = String.valueOf(UserStatus.valueOf(status));
         user.setStatus(UserStatus.valueOf(enumStatus));
-        userRepository.save(user);
+        return UserResponseDtoMapper.toDTO(userRepository.save(user));
     }
 
     @Override
-    public void changeUserRole(String userId, String role) {
+    public UserResponseDto changeUserRole(String userId, String role) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         String enumRole = String.valueOf(UserRoles.valueOf(role));
         user.setStatus(UserStatus.valueOf(enumRole));
-        userRepository.save(user);
+        return UserResponseDtoMapper.toDTO(userRepository.save(user));
     }
 
 }
