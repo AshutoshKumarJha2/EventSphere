@@ -14,7 +14,7 @@ public record UserRequestDto(
         String name,
         String email,
         String password,
-        String phone,
-        UserRoles role
+        String phone
+//        UserRoles role
 ) {
 }

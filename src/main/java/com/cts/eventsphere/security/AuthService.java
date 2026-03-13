@@ -40,11 +40,12 @@ public class AuthService {
         user.setName(dto.name());
         user.setEmail(dto.email());
         user.setPhone(dto.phone());
-        user.setRole(dto.role());
+//        user.setRole(dto.role());
         user.setPassword(passwordEncoder.encode(dto.password())); // Hashing
         userRepository.save(user);
         log.info("User registered with details: {}", user);
-        return "User registered successfully";
+//        return String.valueOf(user.getRole());
+        return "User registered successfully with email: " + user.getEmail();
     }
 
     public LoginResponseDto login(LoginRequestDto loginDto) {

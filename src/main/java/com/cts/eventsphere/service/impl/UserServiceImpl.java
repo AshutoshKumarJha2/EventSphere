@@ -57,7 +57,8 @@ public class UserServiceImpl implements UserService {
         }
 
         if (userRequestDto.name() != null) user.setName(userRequestDto.name());
-        if (userRequestDto.role() != null) user.setRole(userRequestDto.role());
+//        if (userRequestDto.role() != null) user.setRole(userRequestDto.role());
+
         if (userRequestDto.phone() != null) user.setPhone(userRequestDto.phone());
 
         // Handle password (hash it)

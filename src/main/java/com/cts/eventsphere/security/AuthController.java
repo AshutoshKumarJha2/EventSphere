@@ -28,6 +28,11 @@ public class AuthController {
         return ResponseEntity.ok(authService.register(dto));
     }
 
+    /**
+     * Handles user login requests. It accepts a LoginRequestDto containing the user's email and password, and returns a LoginResponseDto with the authentication token and user details if the login is successful.
+     * @param dto
+     * @return
+     */
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto dto) {
         var response = authService.login(dto);
