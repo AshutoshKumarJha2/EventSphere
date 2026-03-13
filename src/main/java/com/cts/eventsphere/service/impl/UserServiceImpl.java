@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto changeUserRole(String userId, String role) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         String enumRole = String.valueOf(UserRoles.valueOf(role));
-        user.setStatus(UserStatus.valueOf(enumRole));
+        user.setRole(UserRoles.valueOf(enumRole));
         return UserResponseDtoMapper.toDTO(userRepository.save(user));
     }
 
