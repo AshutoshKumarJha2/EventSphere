@@ -1,6 +1,7 @@
 package com.cts.eventsphere.exception;
 
 import com.cts.eventsphere.dto.shared.GenericErrorResponse;
+import com.cts.eventsphere.dto.shared.GenericResponse;
 import com.cts.eventsphere.exception.finance.BudgetNotFoundException;
 import com.cts.eventsphere.exception.finance.ExpenseNotFoundException;
 import com.cts.eventsphere.exception.finance.PaymentNotFoundException;
@@ -15,6 +16,7 @@ import com.cts.eventsphere.exception.user.UserAlreadyExistsException;
 import com.cts.eventsphere.exception.user.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -47,33 +49,33 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ExpenseNotFoundException.class)
-    public ResponseEntity<String> handleExpenseNotFound(ExpenseNotFoundException e){
-        return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+    public ResponseEntity<GenericErrorResponse> handleExpenseNotFound(ExpenseNotFoundException e){
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()),HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(BudgetNotFoundException.class)
-    public ResponseEntity<String> handleBudgetNotFound(BudgetNotFoundException e){
-        return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+    public ResponseEntity<GenericErrorResponse> handleBudgetNotFound(BudgetNotFoundException e){
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()),HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(PaymentNotFoundException.class)
-    public ResponseEntity<String> handlePaymentNotFound(PaymentNotFoundException e){
-        return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+    public ResponseEntity<GenericErrorResponse> handlePaymentNotFound(PaymentNotFoundException e){
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()),HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(TicketAlreadyExistsException.class)
     public ResponseEntity<GenericErrorResponse> ticketAlreadyExistsException(TicketAlreadyExistsException e){
-        return new ResponseEntity<>(new GenericErrorResponse("Ticket already exists"),HttpStatus.CONFLICT);
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()),HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(TicketNotFoundException.class)
     public  ResponseEntity<GenericErrorResponse> ticketNotFoundException(TicketNotFoundException e){
-        return new ResponseEntity<>(new GenericErrorResponse("Ticket not found"), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(RegistrationAlreadyExistsException.class)
     public  ResponseEntity<GenericErrorResponse> registrationAlreadyExistsException(RegistrationAlreadyExistsException e){
-        return new ResponseEntity<>(new GenericErrorResponse("Registration already Exists"), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(RegistrationNotFoundException.class)
@@ -102,15 +104,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<GenericErrorResponse> handleUnexpectedExceptions(Exception ex) {
+    public ResponseEntity< GenericErrorResponse> handleUnexpectedExceptions(Exception ex) {
         String traceId = java.util.UUID.randomUUID().toString();
         log.error("Unhandled exception. traceId={}", traceId, ex);
-
         GenericErrorResponse body = new GenericErrorResponse(
             "An unexpected error occurred. Please contact support with traceId: " + traceId
         );
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
-
-
 }
