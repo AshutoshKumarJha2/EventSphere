@@ -104,7 +104,7 @@ class UserControllerTest {
     @DisplayName("Change User Status - Should return Success message")
     void changeUserStatus_Success() {
         // Act
-        ResponseEntity<String> response = userController.changeUserStatus(userId, "inactive");
+        ResponseEntity<UserResponseDto> response = userController.changeUserStatus(userId, "inactive");
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
