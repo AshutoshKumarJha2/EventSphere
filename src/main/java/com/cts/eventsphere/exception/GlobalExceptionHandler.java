@@ -101,8 +101,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new GenericErrorResponse("User not found"), HttpStatus.NOT_FOUND);
     }
 
-
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<GenericErrorResponse> handleUnexpectedExceptions(Exception ex) {
         String traceId = java.util.UUID.randomUUID().toString();

@@ -17,8 +17,8 @@ public record UserResponseDto(
         String email,
 //        String password,
         String phone,
-        UserStatus status,
-        String createdAt,
-        String updatedAt
+        UserStatus status
+//        String createdAt,
+//        String updatedAt
 ) {
 }
