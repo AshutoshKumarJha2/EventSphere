@@ -2,6 +2,7 @@ package com.cts.eventsphere.security;
 
 import com.cts.eventsphere.dto.auth.LoginRequestDto;
 import com.cts.eventsphere.dto.auth.LoginResponseDto;
+import com.cts.eventsphere.dto.auth.RegisterResponseDto;
 import com.cts.eventsphere.dto.user.UserRequestDto;
 import com.cts.eventsphere.dto.user.UserResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody UserRequestDto dto) {
+    public ResponseEntity<RegisterResponseDto> register(@RequestBody UserRequestDto dto) {
         return ResponseEntity.ok(authService.register(dto));
     }
 
