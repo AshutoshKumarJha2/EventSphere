@@ -82,7 +82,7 @@ import static org.mockito.Mockito.*;
     //     assertEquals(expectedResponse.id(), actualResponse.id());
     //     assertEquals(expectedResponse.name(), actualResponse.name());
     //     verify(venueRepository, times(1)).save(any(Venue.class));
-    // }
+     }
 
     @Test
     @DisplayName("Should return a list of venues filtered by capacity")
