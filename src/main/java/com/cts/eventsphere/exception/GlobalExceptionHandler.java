@@ -1,15 +1,21 @@
 package com.cts.eventsphere.exception;
 
 import com.cts.eventsphere.dto.shared.GenericErrorResponse;
+import com.cts.eventsphere.exception.booking.BookingNotFoundException;
 import com.cts.eventsphere.exception.finance.BudgetNotFoundException;
 import com.cts.eventsphere.exception.finance.ExpenseNotFoundException;
 import com.cts.eventsphere.exception.finance.PaymentNotFoundException;
+import com.cts.eventsphere.exception.resource.InsufficientResourceException;
+import com.cts.eventsphere.exception.resource.ResourceAlreadyExistsException;
+import com.cts.eventsphere.exception.resource.ResourceDuplicateAllocationException;
+import com.cts.eventsphere.exception.resource.ResourceNotFoundException;
 import com.cts.eventsphere.exception.user.*;
 import com.cts.eventsphere.exception.registration.RegistrationAlreadyExistsException;
 import com.cts.eventsphere.exception.registration.RegistrationNotFoundException;
 import com.cts.eventsphere.exception.ticket.TicketAlreadyExistsException;
 import com.cts.eventsphere.exception.ticket.TicketNotFoundException;
 
+import com.cts.eventsphere.exception.venue.VenueNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
@@ -61,6 +67,36 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TicketAlreadyExistsException.class)
     public ResponseEntity<GenericErrorResponse> ticketAlreadyExistsException(TicketAlreadyExistsException e){
         return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()),HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(VenueNotFoundException.class)
+    public ResponseEntity<String> handleVenueNotFoundException(VenueNotFoundException e){
+        return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InsufficientResourceException.class)
+    public ResponseEntity<String> handleInsufficientResource(InsufficientResourceException e) {
+               return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<String> handleResourceAlreadyExists(ResourceAlreadyExistsException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ResourceDuplicateAllocationException.class)
+    public ResponseEntity<String> handleResourceDuplicateAllocation(ResourceDuplicateAllocationException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(BookingNotFoundException.class)
+    public ResponseEntity<String> handleBookingNotFound(BookingNotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(TicketNotFoundException.class)
