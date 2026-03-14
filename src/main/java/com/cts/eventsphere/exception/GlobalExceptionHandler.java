@@ -1,8 +1,9 @@
 package com.cts.eventsphere.exception;
 
-import com.cts.eventsphere.exception.finance.BudgetNotFoundException;
-import com.cts.eventsphere.exception.finance.ExpenseNotFoundException;
-import com.cts.eventsphere.exception.finance.PaymentNotFoundException;
+import com.cts.eventsphere.exception.Feedback.FeedbackNotFoundException;
+import com.cts.eventsphere.exception.engagement.EngagementNotFoundException;
+import com.cts.eventsphere.exception.finance.*;
+import com.cts.eventsphere.model.Engagement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -47,5 +48,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handlePaymentNotFound(PaymentNotFoundException e){
         return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(FeedbackNotFoundException.class)
+    public ResponseEntity<String> handleFeedbackFound(FeedbackNotFoundException e){
+        return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(FeedbackNotFoundException.class)
+    public ResponseEntity<String> handleEngagementFound(EngagementNotFoundException e){
+        return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+    }
+
+
 
 }

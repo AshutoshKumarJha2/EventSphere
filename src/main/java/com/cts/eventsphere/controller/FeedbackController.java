@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,38 +32,39 @@ public class FeedbackController {
 
     @PostMapping
     @PreAuthorize("hasRole('ATTENDEE')")
-    public FeedbackResponseDto create(@Valid @RequestBody FeedbackRequestDto feedbackRequestDto) {
+    public ResponseEntity<FeedbackResponseDto> create(@Valid @RequestBody FeedbackRequestDto feedbackRequestDto) {
         log.info("REST request to save Feedback : {}", feedbackRequestDto);
         FeedbackResponseDto result = feedbackService.create(feedbackRequestDto);
         log.info("Feedback created successfully with data: {}", result);
-        return result;
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ATTENDEE','ORGANIZER','ADMIN')")
-    public Optional<FeedbackResponseDto> getById(@PathVariable String id) {
+    public ResponseEntity<FeedbackResponseDto> getById(@PathVariable String id) {
         log.info("REST request to get Feedback by ID : {}", id);
-        Optional<FeedbackResponseDto> response = feedbackService.getById(id);
-        if (response.isEmpty()) {
+        FeedbackResponseDto response = feedbackService.getById(id);
+        if (response.feedbackId() == null) {
             log.warn("Feedback with ID : {} not found", id);
         }
-        return response;
+        return  ResponseEntity.ok(response);
     }
 
     @GetMapping("/event/{eventId}")
     @PreAuthorize("hasAnyRole('ATTENDEE','ORGANIZER','ADMIN')")
-    public Page<FeedbackResponseDto> listByEvent(@PathVariable String eventId, Pageable pageable) {
+    public ResponseEntity<Page<FeedbackResponseDto>> listByEvent(@PathVariable String eventId, Pageable pageable) {
         log.info("REST request to get a page of Feedbacks for Event ID : {} with Pageable: {}", eventId, pageable);
         Page<FeedbackResponseDto> page = feedbackService.listByEvent(eventId, pageable);
         log.info("Fetched {} feedback records for Event ID : {}", page.getNumberOfElements(), eventId);
-        return page;
+        return ResponseEntity.ok(page);
     }
 
     @DeleteMapping("/{feedbackId}")
     @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')")
-    public void deleteFeedback(@PathVariable String feedbackId) {
+    public ResponseEntity<Void> deleteFeedback(@PathVariable String feedbackId) {
         log.info("REST request to delete Feedback ID : {}", feedbackId);
         feedbackService.delete(feedbackId);
         log.info("Successfully deleted Feedback ID : {}", feedbackId);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -20,7 +20,7 @@ public interface FeedbackService {
 
     FeedbackResponseDto create(FeedbackRequestDto request);
 
-    Optional<FeedbackResponseDto> getById(String feedbackId);
+    FeedbackResponseDto getById(String feedbackId);
 
     Page<FeedbackResponseDto> listByEvent(String eventId, Pageable pageable);
 

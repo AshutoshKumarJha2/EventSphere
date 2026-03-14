@@ -152,23 +152,23 @@ class FeedbackServiceImplFakerTest {
     }
 
     @Test
-    void getById_found_returnsMappedOptional() throws Exception {
+    void getById_found_returnsMappedDto() throws Exception {
         String id = faker.internet().uuid();
         FeedBack entity = mock(FeedBack.class);
         FeedbackResponseDto mapped = mock(FeedbackResponseDto.class);
 
-        when(feedbackRepository.existsById(id)).thenReturn(true);
         when(feedbackRepository.findById(id)).thenReturn(Optional.of(entity));
 
         try (MockedStatic<FeedbackResponseDtoMapper> respMap = Mockito.mockStatic(FeedbackResponseDtoMapper.class)) {
             respMap.when(() -> FeedbackResponseDtoMapper.toDTO(entity)).thenReturn(mapped);
 
-            Optional<FeedbackResponseDto> result = service.getById(id);
+            FeedbackResponseDto result = service.getById(id);
 
-            assertTrue(result.isPresent());
-            assertSame(mapped, result.get());
-            verify(feedbackRepository).existsById(id);
+            assertNotNull(result);
+            assertSame(mapped, result);
+
             verify(feedbackRepository).findById(id);
+            verify(feedbackRepository, never()).existsById(id);
         }
     }
 

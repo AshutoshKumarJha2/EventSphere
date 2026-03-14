@@ -55,16 +55,15 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<FeedbackResponseDto> getById(String feedbackId) throws FeedbackNotFoundException {
+    public FeedbackResponseDto getById(String feedbackId) throws FeedbackNotFoundException {
         log.info("Fetching feedback id={}", feedbackId);
 
-        if (!feedbackRepository.existsById(feedbackId)) {
-            log.warn("Feedback not found id={}", feedbackId);
-            throw new FeedbackNotFoundException("Feedback does not exist");
-        }
-
         return feedbackRepository.findById(feedbackId)
-                .map(FeedbackResponseDtoMapper::toDTO);
+                .map(FeedbackResponseDtoMapper::toDTO)
+                .orElseThrow(() -> {
+                    log.warn("Feedback not found id={}", feedbackId);
+                    return new FeedbackNotFoundException("Feedback does not exist");
+                });
     }
 
     @Override
