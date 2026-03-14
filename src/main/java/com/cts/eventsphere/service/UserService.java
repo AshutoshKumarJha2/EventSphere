@@ -22,7 +22,7 @@ public interface UserService {
 
     public UserResponseDto updateUserDetails(String userId, UserRequestDto userRequestDto);
 
-    public void changeUserStatus(String userId, String status);
+    public UserResponseDto changeUserStatus(String userId, String status);
 
-    public void changeUserRole(String userId, String role);
+    public UserResponseDto changeUserRole(String userId, String role);
 }

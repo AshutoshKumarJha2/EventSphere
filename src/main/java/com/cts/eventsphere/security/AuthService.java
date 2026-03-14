@@ -2,6 +2,7 @@ package com.cts.eventsphere.security;
 
 import com.cts.eventsphere.dto.auth.LoginRequestDto;
 import com.cts.eventsphere.dto.auth.LoginResponseDto;
+import com.cts.eventsphere.dto.auth.RegisterResponseDto;
 import com.cts.eventsphere.dto.user.UserRequestDto;
 import com.cts.eventsphere.exception.user.InvalidPasswordException;
 import com.cts.eventsphere.exception.user.UserAlreadyExistsException;
@@ -29,7 +30,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public String register(UserRequestDto dto) {
+    public RegisterResponseDto register(UserRequestDto dto) {
         var existingUser = userRepository.findByEmail(dto.email());
 
         if (existingUser.isPresent()) {
@@ -40,11 +41,13 @@ public class AuthService {
         user.setName(dto.name());
         user.setEmail(dto.email());
         user.setPhone(dto.phone());
-        user.setRole(dto.role());
+//        user.setRole(dto.role());
         user.setPassword(passwordEncoder.encode(dto.password())); // Hashing
         userRepository.save(user);
-        log.info("User registered with details: {}", user);
-        return "User registered successfully";
+        log.info("User {} registered with id {}", user.getName(),user.getUserId());
+//        return String.valueOf(user.getRole());
+        String successRegistration = "User registered successfully with email: " + user.getEmail();
+        return new RegisterResponseDto(user.getUserId(), user.getName(), user.getEmail(), user.getRole().name(), user.getPhone(), user.getStatus().name(), successRegistration);
     }
 
     public LoginResponseDto login(LoginRequestDto loginDto) {

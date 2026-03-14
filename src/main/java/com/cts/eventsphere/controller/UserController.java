@@ -51,16 +51,16 @@ public class UserController {
 
     @PatchMapping("/users/{userId}/status")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> changeUserStatus(@PathVariable String userId, @RequestParam String status) {
-        userService.changeUserStatus(userId, status);
-        return ResponseEntity.ok("User status updated successfully.");
+    public ResponseEntity<UserResponseDto> changeUserStatus(@PathVariable String userId, @RequestParam String status) {
+        UserResponseDto updatedUserStatus = userService.changeUserStatus(userId, status);
+        return ResponseEntity.ok(updatedUserStatus);
     }
 
     @PatchMapping("/users/{userId}/role")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> changeUserRole(@PathVariable String userId, @RequestParam String role) {
-        userService.changeUserRole(userId, role);
-        return ResponseEntity.ok("User role updated successfully.");
+    public ResponseEntity<UserResponseDto> changeUserRole(@PathVariable String userId, @RequestParam String role) {
+        UserResponseDto updatedUserRole = userService.changeUserRole(userId, role);
+        return ResponseEntity.ok(updatedUserRole);
     }
 
 }
