@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Controller for Venue Management API Endpoints
- * Workflow: Venue Managers list venues -> Organizers search/view venues for booking.
+ *  Rest Controller for Venue Entity
  *
- *
+ * @author 2479476
+ * @since 05-03-2026
  */
 @RestController
 @Slf4j
