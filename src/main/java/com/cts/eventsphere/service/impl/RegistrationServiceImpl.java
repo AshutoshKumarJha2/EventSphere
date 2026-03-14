@@ -39,8 +39,8 @@ public class RegistrationServiceImpl implements RegistrationService {
      */
     @Override
     public GenericResponse registerForEvent(String userId, String eventId, String ticketId) {
-        var registration = registrationRepo.findByAttendeeIdAndEventId(userId, eventId).orElseThrow(() -> new RegistrationNotFoundException(String.format("Registration with userId: %s and eventId: %s not found", userId, eventId)));
-        if (registration != null) {
+        var registration = registrationRepo.findByAttendeeIdAndEventId(userId, eventId);
+        if (registration.isPresent()) {
             throw new RegistrationAlreadyExistsException(String.format("User %s is already registered for event %s", userId, eventId));
         }
         var newRegistration = Registration.builder()
