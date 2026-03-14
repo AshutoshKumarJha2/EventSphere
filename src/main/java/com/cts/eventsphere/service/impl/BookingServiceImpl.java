@@ -2,9 +2,12 @@ package com.cts.eventsphere.service.impl;
 
 import com.cts.eventsphere.dto.booking.BookingRequestDto;
 import com.cts.eventsphere.dto.booking.BookingResponseDto;
+import com.cts.eventsphere.dto.booking.BookingResponseVenueManagerDto;
+import com.cts.eventsphere.dto.mapper.booking.BookingRepsonseVenueManagerDtoMapper;
 import com.cts.eventsphere.dto.mapper.booking.BookingRequestDtoMapper;
 import com.cts.eventsphere.dto.mapper.booking.BookingResponseDtoMapper;
 import com.cts.eventsphere.dto.resource.ResourceListElementDto;
+import com.cts.eventsphere.dto.resource.ResourceVenueManagerResponseDto;
 import com.cts.eventsphere.exception.booking.BookingNotFoundException;
 import com.cts.eventsphere.exception.resource.InsufficientResourceException;
 import com.cts.eventsphere.exception.venue.VenueNotFoundException;
@@ -24,8 +27,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Service Implementation for Booking operations
- * @author 2479476
+ * Service Implementation for Booking operations.
+ * Handles the logic for creating, updating, and retrieving booking records.
+ * * @author 2479476
  * @version 1.1
  * @since 04-03-2026
  */
@@ -39,9 +43,16 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingRequestDtoMapper requestMapper;
     private final BookingResponseDtoMapper responseMapper;
+    private final BookingRepsonseVenueManagerDtoMapper bookingRepsonseVenueManagerDtoMapper;
     private final EventRepository eventRepository;
-    private  final ResourceRepository resourceRepository;
+    private final ResourceRepository resourceRepository;
 
+    /**
+     * Creates a new booking and associates it with a venue.
+     * * @param bookingRequestDto the details of the booking request
+     * @return the created booking details as a response DTO
+     * @throws VenueNotFoundException if the specified venue ID does not exist
+     */
     @Override
     @Transactional
     public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) {
@@ -71,6 +82,10 @@ public class BookingServiceImpl implements BookingService {
         return responseMapper.toDto(savedBooking, new ArrayList<>());
     }
 
+    /**
+     * Retrieves all bookings with their associated resource allocations.
+     * * @return a list of all booking response DTOs
+     */
     @Override
     public List<BookingResponseDto> getAllBookingsServ() {
         log.info("Fetching all bookings from database");
@@ -91,25 +106,34 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves all bookings for a specific venue ID.
+     * * @param venueId the unique identifier of the venue
+     * @return a list of bookings associated with the venue
+     */
     @Override
-    public List<BookingResponseDto> getBookingsByVenue(String venueId) {
+    public List<BookingResponseVenueManagerDto> getBookingsByVenue(String venueId) {
         log.info("Fetching bookings for venue ID: {}", venueId);
 
         return bookingRepository.findByVenue_VenueId(venueId)
                 .stream()
                 .map(booking -> {
-                    // Fetch resources for the event associated with this booking
-                    List<ResourceListElementDto> resources = resourceAllocationRepository
+                    List<ResourceVenueManagerResponseDto> resources = resourceAllocationRepository
                             .findByEvent_EventId(booking.getEventId())
                             .stream()
-                            .map(a -> new ResourceListElementDto(a.getResource().getName(), a.getQuantity()))
+                            .map(a -> new ResourceVenueManagerResponseDto(a.getResource().getName(), a.getQuantity()))
                             .toList();
 
-                    return responseMapper.toDto(booking, resources);
+                    return bookingRepsonseVenueManagerDtoMapper.toDto(booking, resources);
                 })
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves bookings associated with a specific event ID.
+     * * @param eventId the unique identifier of the event
+     * @return a list of booking response DTOs for the event
+     */
     @Override
     public List<BookingResponseDto> getBookingsByEvent(String eventId) {
         log.info("Fetching bookings for event ID: {}", eventId);
@@ -139,25 +163,27 @@ public class BookingServiceImpl implements BookingService {
         }).toList();
     }
 
+    /**
+     * Updates the status of a booking and handles resource inventory deduction upon confirmation.
+     * * @param bookingId the unique identifier of the booking
+     * @param newStatus the new status to apply
+     * @return the updated booking details
+     * @throws BookingNotFoundException if the booking ID is not found
+     * @throws InsufficientResourceException if resources are unavailable for confirmation
+     */
     @Override
     @Transactional
     public BookingResponseDto updateBookingStatus(String bookingId, BookingStatus newStatus) {
         log.info("Updating status for booking ID: {} to {}", bookingId, newStatus);
 
-        // 1. Fetch the Booking
         Booking existingBooking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Booking ID " + bookingId + " not found."));
 
-        // 2. Logic for Confirmation/Approval
         if (newStatus == BookingStatus.confirmed) {
-
-            // Update Venue Availability
             Venue venue = existingBooking.getVenue();
             venue.setAvailabilityStatus(AvailabilityStatus.unavailable);
             venueRepository.save(venue);
 
-            // Deduct Resources
-            // We find all resource allocations linked to this specific event and venue
             List<ResourceAllocation> allocations = resourceAllocationRepository
                     .findByEvent_EventIdAndVenue_VenueId(existingBooking.getEventId(), venue.getVenueId());
 
@@ -170,7 +196,6 @@ public class BookingServiceImpl implements BookingService {
                     throw new InsufficientResourceException("Not enough " + resource.getName() + " available.");
                 }
 
-                // Subtract from the master Resource table
                 resource.setUnit(availableQty - requestedQty);
                 resourceRepository.save(resource);
 
@@ -179,7 +204,6 @@ public class BookingServiceImpl implements BookingService {
             }
         }
 
-        // 3. Update Status and Save
         existingBooking.setStatus(newStatus);
         Booking updatedBooking = bookingRepository.save(existingBooking);
 
@@ -187,6 +211,11 @@ public class BookingServiceImpl implements BookingService {
         return responseMapper.toDto(updatedBooking, new ArrayList<>());
     }
 
+    /**
+     * Deletes a booking record based on the provided ID.
+     * * @param bookingId the unique identifier of the booking to delete
+     * @throws RuntimeException if the booking does not exist
+     */
     @Override
     public void deleteBooking(String bookingId) {
         log.info("Attempting to delete booking ID: {}", bookingId);
