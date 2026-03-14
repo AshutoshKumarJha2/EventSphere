@@ -4,10 +4,9 @@ import com.cts.eventsphere.dto.auth.LoginRequestDto;
 import com.cts.eventsphere.dto.auth.LoginResponseDto;
 import com.cts.eventsphere.dto.auth.RegisterResponseDto;
 import com.cts.eventsphere.dto.user.UserRequestDto;
-import com.cts.eventsphere.exception.user.InvalidPasswordException;
-import com.cts.eventsphere.exception.user.UserAlreadyExistsException;
-import com.cts.eventsphere.exception.user.UserNotFoundException;
+import com.cts.eventsphere.exception.user.*;
 import com.cts.eventsphere.model.User;
+import com.cts.eventsphere.model.data.UserStatus;
 import com.cts.eventsphere.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,11 +40,9 @@ public class AuthService {
         user.setName(dto.name());
         user.setEmail(dto.email());
         user.setPhone(dto.phone());
-//        user.setRole(dto.role());
         user.setPassword(passwordEncoder.encode(dto.password())); // Hashing
         userRepository.save(user);
         log.info("User {} registered with id {}", user.getName(),user.getUserId());
-//        return String.valueOf(user.getRole());
         String successRegistration = "User registered successfully with email: " + user.getEmail();
         return new RegisterResponseDto(user.getUserId(), user.getName(), user.getEmail(), user.getRole().name(), user.getPhone(), user.getStatus().name(), successRegistration);
     }
@@ -74,6 +71,21 @@ public class AuthService {
         String userId = principal.userId();
         String email = principal.email();
         String roleName = principal.role();
+        var user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+
+        if(!user.getRole().name().equals(roleName)){
+            throw new RefreshFailedException(userId);
+        }
+
+        roleName = user.getRole().name();
+
+        if(user.getStatus().equals(UserStatus.inactive)){
+            throw new UserNotActiveException(userId);
+        }
+
+        if(user.getStatus().equals(UserStatus.suspended)){
+            throw  new UserSuspendedException(userId);
+        }
 
         String newAccessToken = jwtUtil.generateAccessToken(userId, email, roleName);
         String newRefreshToken = jwtUtil.generateRefreshToken(userId, email, roleName);

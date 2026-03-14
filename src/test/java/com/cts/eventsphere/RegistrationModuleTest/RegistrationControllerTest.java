@@ -161,7 +161,7 @@ class RegistrationControllerTest {
     @Test
     void approveRegistration_ThrowsRegistrationNotFoundException() throws Exception {
         lenient().when(registrationService.approveRegistration(registrationId))
-                .thenThrow(new RegistrationNotFoundException("Registration not found"));
+                .thenThrow(new RegistrationNotFoundException(registrationId));
 
         mockMvc.perform(patch("/api/v1/registrations/{registrationId}/approve", registrationId))
                 .andExpect(result -> assertInstanceOf(RegistrationNotFoundException.class, result.getResolvedException()))

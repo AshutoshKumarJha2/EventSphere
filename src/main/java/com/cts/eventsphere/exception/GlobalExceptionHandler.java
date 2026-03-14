@@ -1,22 +1,17 @@
 package com.cts.eventsphere.exception;
 
 import com.cts.eventsphere.dto.shared.GenericErrorResponse;
-import com.cts.eventsphere.dto.shared.GenericResponse;
 import com.cts.eventsphere.exception.finance.BudgetNotFoundException;
 import com.cts.eventsphere.exception.finance.ExpenseNotFoundException;
 import com.cts.eventsphere.exception.finance.PaymentNotFoundException;
+import com.cts.eventsphere.exception.user.*;
 import com.cts.eventsphere.exception.registration.RegistrationAlreadyExistsException;
 import com.cts.eventsphere.exception.registration.RegistrationNotFoundException;
 import com.cts.eventsphere.exception.ticket.TicketAlreadyExistsException;
 import com.cts.eventsphere.exception.ticket.TicketNotFoundException;
 
-import com.cts.eventsphere.exception.user.EmailAlreadyExistsException;
-import com.cts.eventsphere.exception.user.InvalidPasswordException;
-import com.cts.eventsphere.exception.user.UserAlreadyExistsException;
-import com.cts.eventsphere.exception.user.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -101,6 +96,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<GenericErrorResponse> userNotFoundException(UserNotFoundException e){
         return new ResponseEntity<>(new GenericErrorResponse("User not found"), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(RefreshFailedException.class)
+    public ResponseEntity<GenericErrorResponse> handleRefreshFailedException(RefreshFailedException e){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new GenericErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(UserNotActiveException.class)
+    public ResponseEntity<GenericErrorResponse> handleUserNotActiveException(UserNotActiveException e){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new GenericErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(UserSuspendedException.class)
+    public ResponseEntity<GenericErrorResponse> handleUserSuspendedException(UserSuspendedException e){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new GenericErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

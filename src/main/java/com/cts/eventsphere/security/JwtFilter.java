@@ -1,5 +1,7 @@
 package com.cts.eventsphere.security;
 
+import com.cts.eventsphere.repository.UserRepository;
+import com.cts.eventsphere.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
