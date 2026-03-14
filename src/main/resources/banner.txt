@@ -1,0 +1,22 @@
+${AnsiColor.BRIGHT_CYAN}
+ ____                           __    ____            __
+/\  _`\                        /\ \__/\  _`\         /\ \
+\ \ \L\_\  __  __     __    ___\ \ ,_\ \,\L\_\  _____\ \ \___      __   _ __    __
+ \ \  _\L /\ \/\ \  /'__`\/' _ `\ \ \/\/_\__ \ /\ '__`\ \  _ `\  /'__`\/\`'__\/'__`\
+  \ \ \L\ \ \ \_/ |/\  __//\ \/\ \ \ \_ /\ \L\ \ \ \L\ \ \ \ \ \/\  __/\ \ \//\  __/
+   \ \____/\ \___/ \ \____\ \_\ \_\ \__\\ `\____\ \ ,__/\ \_\ \_\ \____\\ \_\\ \____\
+    \/___/  \/__/   \/____/\/_/\/_/\/__/ \/_____/\ \ \/  \/_/\/_/\/____/ \/_/ \/____/
+                                                  \ \_\
+                                                   \/_/
+${AnsiColor.DEFAULT}
+
+${AnsiColor.BRIGHT_WHITE}:: EventSphere ::${AnsiColor.DEFAULT}
+${AnsiColor.GREEN}Event Management & Orchestration Platform${AnsiColor.DEFAULT}
+${AnsiColor.WHITE}
+ Application : ${AnsiColor.BRIGHT_WHITE}${spring.application.name:EventSphere}
+ Version     : ${AnsiColor.BRIGHT_WHITE}${application.formatted-version:1.0.0-SNAPSHOT}
+ Spring Boot : ${AnsiColor.BRIGHT_WHITE}${spring-boot.version}
+ Java        : ${AnsiColor.BRIGHT_WHITE}${java.version}
+ Profile(s)  : ${AnsiColor.BRIGHT_WHITE}${spring.profiles.active:default}
+ PID         : ${AnsiColor.BRIGHT_WHITE}${PID}
+${AnsiColor.DEFAULT}

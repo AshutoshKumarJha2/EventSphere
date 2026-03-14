@@ -2,6 +2,7 @@ package com.cts.eventsphere.service;
 
 import com.cts.eventsphere.dto.booking.BookingRequestDto;
 import com.cts.eventsphere.dto.booking.BookingResponseDto;
+import com.cts.eventsphere.dto.booking.BookingResponseVenueManagerDto;
 import com.cts.eventsphere.model.data.BookingStatus;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public interface BookingService {
 
 
 
-    List<BookingResponseDto> getBookingsByVenue(String venueId);
+    List<BookingResponseVenueManagerDto> getBookingsByVenue(String venueId);
 
 
     /**
