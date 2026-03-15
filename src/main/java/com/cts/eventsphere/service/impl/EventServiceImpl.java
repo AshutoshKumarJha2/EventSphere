@@ -14,6 +14,7 @@ import com.cts.eventsphere.model.Schedule;
 import com.cts.eventsphere.repository.EventRepository;
 import com.cts.eventsphere.repository.ScheduleRepository;
 import com.cts.eventsphere.service.EventService;
+import com.cts.eventsphere.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,9 +23,12 @@ import java.util.List;
 
 /**
  * Implementation for Service Interface for Event Class.
- * * @author 2479623
+ * Provides business logic for creating, retrieving, updating, and deleting events,
+ * as well as managing schedules associated with events. Also triggers notifications
+ * with dynamic event details when events are created, updated, or deleted.
  *
- * @version 1.0
+ * @author 2479623
+ * @version 1.2
  * @since 27-02-2026
  */
 @Service
@@ -37,10 +41,13 @@ public class EventServiceImpl implements EventService {
     private final ScheduleRepository scheduleRepository;
     private final ScheduleResponseDtoMapper scheduleResponseDtoMapper;
     private final ScheduleRequestDtoMapper scheduleRequestDtoMapper;
+    private final NotificationService notificationService;
 
     /**
-     * @param eventRequest
-     * @return
+     * Creates a new event in the system and triggers a notification with event details.
+     *
+     * @param eventRequest the DTO containing event details to be created
+     * @return the response DTO representing the newly created event
      */
     @Override
     public EventResponseDto create(EventRequestDto eventRequest) {
@@ -49,11 +56,23 @@ public class EventServiceImpl implements EventService {
         Event savedEvent = eventRepository.save(event);
         log.info("Successfully saved event with ID: {}", savedEvent.getEventId());
 
+        notificationService.sendNotification(
+                savedEvent.getEventId(),
+                eventRequest.organizerId(),
+                "New Event Created: " + eventRequest.name() +
+                        " at venue " + eventRequest.venueId() +
+                        " from " + eventRequest.startDate() +
+                        " to " + eventRequest.endDate(),
+                eventRequest.status().name()
+        );
+
         return eventResponseDtoMapper.toDTO(savedEvent);
     }
 
     /**
-     * @return
+     * Retrieves all events available in the system.
+     *
+     * @return a list of response DTOs representing all events
      */
     @Override
     public List<EventResponseDto> findAllEvents() {
@@ -66,9 +85,11 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * @param eventId
-     * @return
-     * @throws EventNotFoundException
+     * Finds an event by its unique identifier.
+     *
+     * @param eventId the unique identifier of the event
+     * @return the response DTO representing the event
+     * @throws EventNotFoundException if no event exists with the given ID
      */
     @Override
     public EventResponseDto findById(String eventId) throws EventNotFoundException {
@@ -83,9 +104,12 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * @param eventId
-     * @return
-     * @throws EventNotFoundException
+     * Updates an existing event by its unique identifier and triggers a notification with updated details.
+     *
+     * @param eventId the unique identifier of the event to update
+     * @param eventRequest the DTO containing updated event details
+     * @return true if the update was successful, false otherwise
+     * @throws EventNotFoundException if no event exists with the given ID
      */
     @Override
     public boolean updateById(String eventId, EventRequestDto eventRequest) throws EventNotFoundException {
@@ -100,13 +124,25 @@ public class EventServiceImpl implements EventService {
         eventRepository.save(event);
         log.info("Successfully updated event ID: {}", eventId);
 
+        notificationService.sendNotification(
+                eventId,
+                eventRequest.organizerId(),
+                "Event Updated: " + eventRequest.name() +
+                        " at venue " + eventRequest.venueId() +
+                        " from " + eventRequest.startDate() +
+                        " to " + eventRequest.endDate(),
+                eventRequest.status().name()
+        );
+
         return true;
     }
 
     /**
-     * @param eventId
-     * @return
-     * @throws EventNotFoundException
+     * Deletes an event by its unique identifier and triggers a notification.
+     *
+     * @param eventId the unique identifier of the event to delete
+     * @return true if the deletion was successful, false otherwise
+     * @throws EventNotFoundException if no event exists with the given ID
      */
     @Override
     public boolean deleteById(String eventId) throws EventNotFoundException {
@@ -118,12 +154,23 @@ public class EventServiceImpl implements EventService {
         eventRepository.deleteById(eventId);
         log.info("Successfully deleted event ID: {}", eventId);
 
+        notificationService.sendNotification(
+                eventId,
+                "system@eventsphere.com",
+                "Event Deleted with ID: " + eventId,
+                "EVENT"
+        );
+
         return true;
     }
 
     /**
-     * @param scheduleRequest
-     * @return
+     * Adds a new activity (schedule) to an existing event and triggers a notification.
+     *
+     * @param eventId the unique identifier of the event to which the activity belongs
+     * @param scheduleRequest the DTO containing schedule details
+     * @return the response DTO representing the added schedule
+     * @throws EventNotFoundException if the parent event does not exist
      */
     @Override
     public ScheduleResponseDto addActivity(String eventId, ScheduleRequestDto scheduleRequest) {
@@ -138,11 +185,22 @@ public class EventServiceImpl implements EventService {
         Schedule savedSchedule = scheduleRepository.save(schedule);
         log.info("Successfully added activity ID: {} to event ID: {}", savedSchedule.getScheduleId(), eventId);
 
+        notificationService.sendNotification(
+                eventId,
+                event.getOrganizerId(),
+                "New Activity Added to Event: " + event.getName() +
+                        " | Activity ID: " + savedSchedule.getScheduleId(),
+                "SCHEDULE"
+        );
+
         return scheduleResponseDtoMapper.toDTO(savedSchedule);
     }
 
     /**
-     * @return
+     * Retrieves all schedules associated with a specific event.
+     *
+     * @param eventId the unique identifier of the event
+     * @return a list of response DTOs representing all schedules for the event
      */
     @Override
     public List<ScheduleResponseDto> findAllSchedules(String eventId) {
