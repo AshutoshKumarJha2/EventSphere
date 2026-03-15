@@ -15,6 +15,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserResponseDtoMapper {
+    /**
+    * Converts User entity to UserResponseDto
+    * * @param user
+    * @return UserResponseDto
+     * @author 2480010
+     * @version 1.0
+     * @since 28-02-2026
+    */
     public static UserResponseDto toDTO(User user){
         return new UserResponseDto(
                 user.getUserId(),
