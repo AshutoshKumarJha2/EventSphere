@@ -30,7 +30,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * Controller for Expense Operation
+ * Controller for managing Expense operations in the EventSphere application.
+ *
+ * <p>This REST controller provides endpoints to create, retrieve, update,
+ * and delete expenses, as well as process related payments. It delegates
+ * business logic to {@link ExpenseService} and {@link PaymentService} and
+ * enforces authorization rules using {@code @PreAuthorize} annotations.</p>
+ *
+ * <p>Only users with specific roles (ADMIN, ORGANIZER, FINANCE_MANAGER)
+ * are permitted to perform expense and payment operations.</p>
  *
  * @author 2480081
  * @version 1.0
@@ -48,10 +56,13 @@ public class ExpenseController {
 
 
     /**
-     * Get all Expenses
+     * Retrieves all expenses in the system.
+     *
+     * @return a ResponseEntity containing a list of {@link ExpenseResponseDto}
+     *         objects and HTTP status 200 (OK)
      */
     @GetMapping("/expenses")
-    @PreAuthorize("hasAnyRole('admin','finance_manager')")
+    @PreAuthorize("hasAnyRole('ADMIN','FINANCE_MANAGER')")
     public ResponseEntity<List<ExpenseResponseDto>> getAllExpenses(){
         log.info("Request to fetch all expenses");
         List<ExpenseResponseDto> response = expenseService.getAllExpenses();
@@ -60,10 +71,14 @@ public class ExpenseController {
     }
 
     /**
-     * Get all expense for an event
+     * Retrieves all expenses for a specific event.
+     *
+     * @param eventId the unique identifier of the event
+     * @return a ResponseEntity containing a list of {@link ExpenseResponseDto}
+     *         objects for the given event and HTTP status 200 (OK)
      */
     @GetMapping("/events/{eventId}/expenses")
-    @PreAuthorize("hasAnyRole('admin', 'organizer', 'finance_manager')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER', 'FINANCE_MANAGER')")
     public ResponseEntity<List<ExpenseResponseDto>> getEventExpenses(@PathVariable String eventId ){
         log.info("Request to fetch expenses for eventId: {} ", eventId);
         List<ExpenseResponseDto> response = expenseService.getExpenseByEvent(eventId );
@@ -72,10 +87,15 @@ public class ExpenseController {
     }
 
     /**
-     * Log an Expense
+     * Creates a new expense for a specific event.
+     *
+     * @param eventId the unique identifier of the event
+     * @param request the validated expense request payload
+     * @return a ResponseEntity containing the created {@link ExpenseResponseDto}
+     *         and HTTP status 201 (CREATED)
      */
     @PostMapping("/events/{eventId}/expenses")
-    @PreAuthorize("hasAnyRole('admin', 'organizer', 'finance_manager')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER', 'FINANCE_MANAGER')")
     public ResponseEntity<ExpenseResponseDto> createExpense(@PathVariable String eventId ,@Valid @RequestBody ExpenseRequestDto request){
         log.info("Request to create expense for eventId: {} with data: {}", eventId, request);
         ExpenseResponseDto response = expenseService.createExpense(eventId , request);
@@ -84,10 +104,13 @@ public class ExpenseController {
     }
 
     /**
-     * Delete an Expense
+     * Deletes an expense by its ID.
+     *
+     * @param expenseId the unique identifier of the expense
+     * @return a ResponseEntity with HTTP status 204 (NO_CONTENT) if deletion is successful
      */
     @DeleteMapping("/expenses/{expenseId}")
-    @PreAuthorize("hasAnyRole('admin','organizer')")
+    @PreAuthorize("hasAnyRole('ADMIN','ORGANIZER')")
     public ResponseEntity<Void> deleteExpense(@PathVariable String expenseId){
         log.info("Request to delete expense with ID: {}", expenseId);
         expenseService.deleteExpense(expenseId);
@@ -96,10 +119,15 @@ public class ExpenseController {
     }
 
     /**
-     * Approve or Reject Expense
+     * Updates the status of an expense (approve or reject).
+     *
+     * @param expenseId the unique identifier of the expense
+     * @param status the new status to be applied (e.g., APPROVED, REJECTED)
+     * @return a ResponseEntity containing the updated {@link ExpenseResponseDto}
+     *         and HTTP status 200 (OK)
      */
     @PatchMapping("expenses/{expenseId}/status")
-    @PreAuthorize("hasAnyRole('admin','finance_manager')")
+    @PreAuthorize("hasAnyRole('ADMIN','FINANCE_MANAGER')")
     public ResponseEntity<ExpenseResponseDto> updateExpenseStatus(@PathVariable String expenseId , @RequestParam ExpenseStatus status){
         log.info("Request to update status for expenseId: {} to status: {}", expenseId, status);
         ExpenseResponseDto response = expenseService.updateExpenseStatus(expenseId , status);
@@ -108,10 +136,15 @@ public class ExpenseController {
     }
 
     /**
-     * Mark Payment complete
+     * Marks a payment as complete for a specific expense.
+     *
+     * @param expenseId the unique identifier of the expense
+     * @param request the validated payment request payload
+     * @return a ResponseEntity containing the processed {@link PaymentResponseDto}
+     *         and HTTP status 201 (CREATED)
      */
     @PostMapping("expenses/{expenseId}/payment")
-    @PreAuthorize("hasAnyRole('admin','finance_manager')")
+    @PreAuthorize("hasAnyRole('ADMIN','FINANCE_MANAGER')")
     public ResponseEntity<PaymentResponseDto> makePayment(@PathVariable String expenseId ,@Valid @RequestBody PaymentRequestDto request){
         log.info("Request to process payment for expenseId: {} with data: {}", expenseId, request);
         PaymentResponseDto response = paymentService.markPayment(expenseId , request);
