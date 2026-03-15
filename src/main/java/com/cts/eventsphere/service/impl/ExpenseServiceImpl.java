@@ -12,6 +12,7 @@ import com.cts.eventsphere.model.data.ExpenseStatus;
 import com.cts.eventsphere.repository.EventRepository;
 import com.cts.eventsphere.repository.ExpenseRepository;
 import com.cts.eventsphere.service.ExpenseService;
+import com.cts.eventsphere.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,10 +20,14 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * [Detailed description of the class's responsibility]
+ * Implementation of the {@link ExpenseService} interface.
+ * Provides business logic for managing financial records associated with events.
+ * This includes creating, retrieving, updating status, and deleting expenses.
+ * It also integrates with {@link NotificationService} to alert event organizers
+ * of any financial changes.
  *
  * @author 2480081
- * @version 1.0
+ * @version 1.1
  * @since 01-03-2026
  */
 @Service
@@ -34,12 +39,15 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final EventRepository eventRepository;
     private final ExpenseRequestDtoMapper expenseRequestDtoMapper;
     private final ExpenseResponseDtoMapper expenseResponseDtoMapper;
+    private final NotificationService notificationService;
 
     /**
+     * Records a new expense for a specific event and notifies the organizer.
      *
-     * @param eventId of the event
-     * @param request of the expense
-     * @return saved expense along with the HTTP status code
+     * @param eventId the unique identifier of the event to link the expense to
+     * @param request the DTO containing expense details like amount and category
+     * @return the response DTO representing the saved expense record
+     * @throws EventNotFoundException if no event exists with the provided ID
      */
     @Override
     public ExpenseResponseDto createExpense(String eventId , ExpenseRequestDto request) throws EventNotFoundException{
@@ -49,6 +57,14 @@ public class ExpenseServiceImpl implements ExpenseService {
         Expense expense = expenseRequestDtoMapper.toEntity(request);
         expense.setEvent(event);
         Expense savedExpense = expenseRepository.save(expense);
+        notificationService.sendNotification(
+                eventId,
+                event.getOrganizerId(),
+                "New Expense Created: " + request.description() +
+                        " | Amount: " + request.amount() +
+                        " | Date: " + request.date(),
+                "FINANCE"
+        );
         ExpenseResponseDto response = expenseResponseDtoMapper.toDTO(savedExpense);
         log.info("Successfully saved expense for eventId: {}. Response: {}", eventId, response);
         return response;
@@ -56,7 +72,9 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     /**
-     * Retrieve all expenses from the system
+     * Retrieves all expenses available in the system across all events.
+     *
+     * @return a list of response DTOs representing all recorded expenses
      */
     @Override
     public List<ExpenseResponseDto> getAllExpenses() {
@@ -69,7 +87,11 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     /**
-     * get Expense of an event
+     * Retrieves all expenses associated with a specific event.
+     *
+     * @param eventId the unique identifier of the event
+     * @return a list of response DTOs for the specified event's expenses
+     * @throws EventNotFoundException if the parent event does not exist
      */
     @Override
     public List<ExpenseResponseDto> getExpenseByEvent(String eventId) throws EventNotFoundException{
@@ -85,7 +107,10 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     /**
-     * Delete an Expense
+     * Deletes an expense record and triggers a system-level notification.
+     *
+     * @param expenseId the unique identifier of the expense to delete
+     * @throws ExpenseNotFoundException if no expense exists with the given ID
      */
     @Override
     public void deleteExpense(String expenseId) throws ExpenseNotFoundException{
@@ -95,10 +120,21 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
         expenseRepository.deleteById(expenseId);
         log.info("Successfully deleted expense with ID: {}", expenseId);
+        notificationService.sendNotification(
+                expenseId,
+                "finance-system@eventsphere.com",
+                "Expense Record Deleted with ID: " + expenseId,
+                "FINANCE_DELETED"
+        );
     }
 
     /**
-     * Updates the status of an Expense
+     * Updates the status of an existing expense and notifies the event organizer.
+     *
+     * @param expenseId the unique identifier of the expense to update
+     * @param status the new status to apply (e.g., APPROVED, REJECTED)
+     * @return the response DTO representing the updated expense
+     * @throws ExpenseNotFoundException if no expense exists with the given ID
      */
     @Override
     public ExpenseResponseDto updateExpenseStatus(String expenseId , ExpenseStatus status) throws ExpenseNotFoundException{
@@ -109,6 +145,12 @@ public class ExpenseServiceImpl implements ExpenseService {
         Expense updatedExpense = expenseRepository.save(expense);
         ExpenseResponseDto response = expenseResponseDtoMapper.toDTO(updatedExpense);
         log.info("Successfully updated expenseId: {} to status: {}", expenseId, response.status());
+        notificationService.sendNotification(
+                expense.getEvent().getEventId(),
+                expense.getEvent().getOrganizerId(),
+                "Expense Status Update: " + expense.getDescription() + " is now " + status,
+                "FINANCE_UPDATE"
+        );
         return response;
 
     }
