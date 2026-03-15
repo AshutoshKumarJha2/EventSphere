@@ -2,6 +2,7 @@ package com.cts.eventsphere.controller;
 
 import com.cts.eventsphere.model.Notification;
 import com.cts.eventsphere.service.NotificationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,8 +15,9 @@ import java.util.List;
 
 /**
  * Controller for Notifications.
- * * @author 2479623
+ * Provides endpoints for retrieving, sending, and updating notification status.
  *
+ * @author 2479623
  * @version 1.0
  * @since 10-03-2026
  */
@@ -28,15 +30,20 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     /**
-     * Infinite Scroll Endpoint
-     * Usage: {@code /api/v1/notifications/user-123/scroll?limit=10&lastTimestamp=2023-10-27T10:15:30}
+     * Retrieves notifications for a user using infinite scroll pagination.
+     * Example usage: {@code /api/v1/notifications/user-123/scroll?limit=10&lastTimestamp=2023-10-27T10:15:30}
+     *
+     * @param userId the unique identifier of the user
+     * @param lastTimestamp the timestamp of the last notification retrieved (optional)
+     * @param limit the maximum number of notifications to fetch (default is 20)
+     * @return ResponseEntity containing a list of notifications and HTTP status 200 (OK)
      */
     @GetMapping("/{userId}/scroll")
     public ResponseEntity<List<Notification>> getNotificationsScroll(
             @PathVariable String userId,
-            @RequestParam(required = false)
+            @Valid @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastTimestamp,
-            @RequestParam(defaultValue = "20") int limit) {
+            @Valid @RequestParam(defaultValue = "20") int limit) {
 
         log.info("Fetching notifications for user: {} with limit: {} and lastTimestamp: {}", userId, limit, lastTimestamp);
         List<Notification> notifications = notificationService.getNotificationsScroll(userId, lastTimestamp, limit);
@@ -45,14 +52,20 @@ public class NotificationController {
     }
 
     /**
-     * Trigger a new notification (In-App + Email)
+     * Sends a new notification to a user (In-App + Email).
+     *
+     * @param userId the unique identifier of the user
+     * @param email the email address of the user
+     * @param message the notification message content
+     * @param category the category of the notification (e.g., INFO, ALERT)
+     * @return ResponseEntity with HTTP status 201 (CREATED) if notification is successfully sent
      */
     @PostMapping("/send")
     public ResponseEntity<Void> sendNotification(
-            @RequestParam String userId,
-            @RequestParam String email,
-            @RequestParam String message,
-            @RequestParam String category) {
+            @Valid @RequestParam String userId,
+            @Valid @RequestParam String email,
+            @Valid @RequestParam String message,
+            @Valid @RequestParam String category) {
 
         log.info("Request to send notification to user: {} (Category: {})", userId, category);
         notificationService.sendNotification(userId, email, message, category);
@@ -61,7 +74,10 @@ public class NotificationController {
     }
 
     /**
-     * Mark a specific notification as read
+     * Marks a specific notification as read.
+     *
+     * @param notificationId the unique identifier of the notification
+     * @return ResponseEntity with HTTP status 204 (NO_CONTENT) if update is successful
      */
     @PatchMapping("/{notificationId}/read")
     public ResponseEntity<Void> markAsRead(@PathVariable String notificationId) {

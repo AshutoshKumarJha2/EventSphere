@@ -8,6 +8,13 @@ package com.cts.eventsphere.exception.event;
  * @since 26-02-2026
  */
 public class EventNotFoundException extends RuntimeException {
+    /**
+     * Constructs a new EventNotFoundException with a detailed message.
+     * This exception is thrown when an event lookup fails and the event
+     * with the specified ID cannot be found in the system.
+     *
+     * @param id the unique identifier of the event that could not be found
+     */
     public EventNotFoundException(String id) {
         super("Could not find event with ID: " + id);
     }
