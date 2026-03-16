@@ -3,9 +3,13 @@ package com.cts.eventsphere.exception;
 import com.cts.eventsphere.dto.shared.GenericErrorResponse;
 import com.cts.eventsphere.dto.shared.GenericResponse;
 import com.cts.eventsphere.exception.booking.BookingNotFoundException;
+import com.cts.eventsphere.exception.contract.ContractNotFoundException;
+import com.cts.eventsphere.exception.delivery.DeliveryNotFoundException;
 import com.cts.eventsphere.exception.finance.BudgetNotFoundException;
 import com.cts.eventsphere.exception.finance.ExpenseNotFoundException;
 import com.cts.eventsphere.exception.finance.PaymentNotFoundException;
+import com.cts.eventsphere.exception.invoice.InvoiceNotFoundException;
+import com.cts.eventsphere.exception.invoice.InvoicePdfGenerationException;
 import com.cts.eventsphere.exception.registration.RegistrationAlreadyExistsException;
 import com.cts.eventsphere.exception.registration.RegistrationNotFoundException;
 import com.cts.eventsphere.exception.ticket.TicketAlreadyExistsException;
@@ -15,6 +19,7 @@ import com.cts.eventsphere.exception.user.EmailAlreadyExistsException;
 import com.cts.eventsphere.exception.user.InvalidPasswordException;
 import com.cts.eventsphere.exception.user.UserAlreadyExistsException;
 import com.cts.eventsphere.exception.user.UserNotFoundException;
+import com.cts.eventsphere.exception.vendor.VendorNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.jspecify.annotations.Nullable;
@@ -148,4 +153,31 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
+
+    @ExceptionHandler(ContractNotFoundException.class)
+    public ResponseEntity<GenericErrorResponse> handleContractNotFound(ContractNotFoundException e) {
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvoiceNotFoundException.class)
+    public ResponseEntity<GenericErrorResponse> handleInvoiceNotFound(InvoiceNotFoundException e) {
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvoicePdfGenerationException.class)
+    public ResponseEntity<GenericErrorResponse> handleInvoicePdfError(InvoicePdfGenerationException e) {
+        log.error("PDF System Failure: {}", e.getMessage());
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(VendorNotFoundException.class)
+    public ResponseEntity<GenericErrorResponse> handleVendorNotFound(VendorNotFoundException e) {
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DeliveryNotFoundException.class)
+    public ResponseEntity<GenericErrorResponse> handleDeliveryNotFound(DeliveryNotFoundException e) {
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
 }

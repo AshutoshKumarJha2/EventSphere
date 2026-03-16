@@ -5,7 +5,7 @@ import com.cts.eventsphere.model.Contract;
 import org.springframework.stereotype.Component;
 
 /**
- * Mapper for converting Contract entity to ContractRequestDto
+ * Mapper to convert ContractRequestDto to Contract Entity.
  *
  * @author 2480177
  * @version 1.0
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ContractRequestDtoMapper {
+
     public Contract toEntity(ContractRequestDto dto){
         if (dto == null) {
             return null;

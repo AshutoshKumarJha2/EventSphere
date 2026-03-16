@@ -4,7 +4,7 @@ import com.cts.eventsphere.model.data.VendorStatus;
 import jakarta.validation.constraints.*;
 
 /**
- * Request Dto for Vendor Dto
+ * Request DTO for capturing new vendor details from the finance officer.
  *
  * @author 2480177
  * @version 1.0

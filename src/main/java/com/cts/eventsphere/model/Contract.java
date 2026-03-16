@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a contract between EventSphere and a vendor/client.
+ * Persistence entity representing a formal agreement between EventSphere and a vendor.
+ * Manages the lifecycle of vendor engagements and serves as the parent for billing.
  *
  * @author 2480177
  * @version 1.0
@@ -66,13 +67,22 @@ public class Contract {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-
+    /**
+     * Helper method to maintain bidirectional relationship with Invoices.
+     * Ensures both sides of the JPA relationship are synchronized.
+     *
+     * @param invoice the invoice entity to link to this contract
+     */
     public void addInvoice(Invoice invoice) {
         invoices.add(invoice);
         invoice.setContract(this);
-        invoice.setContractId(this.contractId);
     }
 
+    /**
+     * Helper method to disassociate an invoice from this contract.
+     *
+     * @param invoice the invoice entity to be removed from the contract's tracking list
+     */
     public void removeInvoice(Invoice invoice) {
         invoices.remove(invoice);
         invoice.setContract(null);

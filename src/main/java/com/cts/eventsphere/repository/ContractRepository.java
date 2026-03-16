@@ -4,8 +4,10 @@ import com.cts.eventsphere.model.Contract;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+
 /**
- * Repository for accessing and managing contract entities.
+ * JPA Repository interface for CRUD operations and custom queries on contract entities.
+ * Handles the persistence of legal agreements between organizers and vendors.
  *
  * @author 2480177
  * @version 1.0
@@ -14,4 +16,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ContractRepository extends JpaRepository<Contract, String> {
+
 }
+

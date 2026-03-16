@@ -9,7 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 /**
- * Represents a delivery entry for orders, equipment, or goods.
+ * Represents a delivery entry for event-related goods or resources.
+ * Linked to an Invoice to track fulfillment of contract terms and logistical progress.
  *
  * @author 2480177
  * @version 1.0

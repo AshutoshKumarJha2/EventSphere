@@ -6,7 +6,7 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 /**
- * Request Dto for Delivery Dto
+ * Request DTO for capturing delivery details from the vendor.
  *
  * @author 2480177
  * @version 1.0

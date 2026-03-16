@@ -5,7 +5,7 @@ import com.cts.eventsphere.model.Invoice;
 import org.springframework.stereotype.Component;
 
 /**
- * Mapper for converting Invoice entity to InvoiceRequestDto
+ * Mapper for converting InvoiceRequestDto into Invoice Entity.
  *
  * @author 2480177
  * @version 1.0
@@ -14,6 +14,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class InvoiceRequestDtoMapper {
+
+    /**
+     * Maps InvoiceRequestDto to Invoice Entity.
+     *
+     * @param dto the invoice request details
+     * @return the mapped Invoice entity
+     */
     public Invoice toEntity(InvoiceRequestDto dto){
         if (dto == null) {
             return null;

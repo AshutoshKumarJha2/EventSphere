@@ -3,7 +3,7 @@ package com.cts.eventsphere.exception.contract;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Exception raised when Contract is not found.
+ * Exception thrown when a requested Contract is missing from the database.
  *
  * @author 2480177
  * @version 1.0
@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ContractNotFoundException extends RuntimeException {
     public ContractNotFoundException(String id) {
-        super("Contract not found with ID: " + id);
-        log.error("Contract not found with ID: {}", id);
+        super(id);
+        log.error(id);
     }
 }

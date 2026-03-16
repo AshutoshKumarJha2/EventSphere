@@ -4,8 +4,12 @@ import com.cts.eventsphere.model.Invoice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
- * Repository for persisting and querying invoice entities.
+ * JPA Repository interface for persisting and querying invoice entities.
+ * Provides abstraction for the persistence layer, enabling financial record
+ * management and contract-linked billing queries.
  *
  * @author 2480177
  * @version 1.0
@@ -14,4 +18,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, String> {
+
+    /**
+     * Finds an invoice by the contract ID.
+     * * @param contractId the unique identifier of the associated contract
+     * @return an Optional containing the invoice if found, or empty otherwise
+     */
+    Optional<Invoice> findByContractId(String contractId);
 }

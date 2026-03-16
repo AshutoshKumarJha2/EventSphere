@@ -2,12 +2,17 @@ package com.cts.eventsphere.service;
 
 import com.cts.eventsphere.dto.contract.ContractRequestDto;
 import com.cts.eventsphere.dto.contract.ContractResponseDto;
+import com.cts.eventsphere.dto.delivery.DeliveryRequestDto;
+import com.cts.eventsphere.dto.invoice.InvoiceRequestDto;
+import com.cts.eventsphere.dto.invoice.InvoiceResponseDto;
 import com.cts.eventsphere.model.data.ContractStatus;
 
 import java.util.List;
 
 /**
- * Service interface for Contract Operations
+ * Service interface for Contract Operations.
+ * Orchestrates the lifecycle of vendor agreements and coordinates with
+ * billing and logistics modules.
  *
  * @author 2480177
  * @version 1.0
@@ -15,19 +20,61 @@ import java.util.List;
  */
 
 public interface ContractService {
+
+    /**
+     * Creates a new contract and associates it with a vendor and event.
+     * @param request the contract details from the organizer
+     * @return the created contract response
+     */
     ContractResponseDto createContract(ContractRequestDto request);
 
-    void processContractInvoice(String contractId);
+    /**
+     * Records a new deliverable item against an active contract.
+     * * @param contractId the unique identifier of the contract
+     * @param deliveryDto the delivery details to be added
+     */
+    void addDeliverable(String contractId, DeliveryRequestDto deliveryDto);
 
-    void addDeliverable(String contractId, String item, Integer quantity);
+    /**
+     * Initiates the invoice creation process for a specific contract.
+     * * @param contractId the unique identifier of the contract
+     * @param invoiceDto the billing details for the new invoice
+     * @return the generated invoice response DTO
+     */
+    InvoiceResponseDto createInvoice(String contractId, InvoiceRequestDto invoiceDto);
 
+    /**
+     * Retrieves a contract by its ID.
+     * * @param contractId the unique identifier
+     * @return the contract details response DTO
+     */
     ContractResponseDto getContractById(String contractId);
 
+    /**
+     * Retrieves all contracts in the system.
+     * @return list of contract response DTOs
+     */
     List<ContractResponseDto> getAllContracts();
 
+    /**
+     * Updates the status of an existing contract.
+     * @param contractId the unique identifier
+     * @param status the new contract status
+     * @return the updated contract response
+     */
     ContractResponseDto updateContractStatus(String contractId, ContractStatus status);
 
+    /**
+     * Updates the details of a contract.
+     * @param contractId the unique identifier
+     * @param request the new details
+     * @return the updated contract response
+     */
     ContractResponseDto updateContract(String contractId, ContractRequestDto request);
 
+    /**
+     * Removes a contract record from the system.
+     * @param contractId the unique identifier to delete
+     */
     void deleteContract(String contractId);
 }

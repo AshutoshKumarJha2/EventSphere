@@ -12,6 +12,7 @@ import java.util.List;
 
 /**
  * Represents a vendor entity in the EventSphere system.
+ * Contains core profile information and serves as the root for vendor-related contracts.
  *
  * @author 2480177
  * @version 1.0
