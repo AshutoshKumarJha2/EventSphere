@@ -15,6 +15,13 @@ import java.util.Optional;
  */
 @Repository
 public interface EventRepository extends JpaRepository<Event, String> {
-
+    /**
+     * Finds an event by its unique identifier.
+     * This method queries the underlying data source to retrieve the event
+     * associated with the given event ID.
+     *
+     * @param eventId the unique identifier of the event to be retrieved
+     * @return the Event object corresponding to the provided ID, if found
+     */
     Event findByEventId(String eventId);
 }

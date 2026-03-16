@@ -33,6 +33,14 @@ import java.util.Collections;
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
 
+    /**
+    * Intercepts incoming HTTP requests to validate JWT tokens. It checks the "Authorization" header for a Bearer token, extracts the user information from the token, and sets the authentication in the SecurityContext if the token is valid. If any exceptions occur during token validation, it logs the error and clears the SecurityContext.
+    * * @param request
+    * @return void
+     * @author 2480010
+     * @version 1.0
+     * @since 04-03-2026
+    */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {

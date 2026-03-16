@@ -17,17 +17,64 @@ import java.util.List;
  * @since 27-02-2026
  */
 public interface EventService {
-    public EventResponseDto create(EventRequestDto event);
 
-    public List<EventResponseDto> findAllEvents();
+    /**
+     * Creates a new event in the system.
+     *
+     * @param event the request DTO containing event details
+     * @return the response DTO representing the created event
+     */
+    EventResponseDto create(EventRequestDto event);
 
-    public EventResponseDto findById(String eventId) throws EventNotFoundException;
+    /**
+     * Retrieves all events available in the system.
+     *
+     * @return a list of response DTOs representing all events
+     */
+    List<EventResponseDto> findAllEvents();
 
-    public boolean updateById(String eventId, EventRequestDto eventRequest) throws EventNotFoundException;
+    /**
+     * Finds an event by its unique identifier.
+     *
+     * @param eventId the unique identifier of the event
+     * @return the response DTO representing the event
+     * @throws EventNotFoundException if no event exists with the given ID
+     */
+    EventResponseDto findById(String eventId) throws EventNotFoundException;
 
-    public boolean deleteById(String eventId) throws EventNotFoundException;
+    /**
+     * Updates an existing event by its unique identifier.
+     *
+     * @param eventId the unique identifier of the event to update
+     * @param eventRequest the request DTO containing updated event details
+     * @return true if the update was successful, false otherwise
+     * @throws EventNotFoundException if no event exists with the given ID
+     */
+    boolean updateById(String eventId, EventRequestDto eventRequest) throws EventNotFoundException;
 
-    public ScheduleResponseDto addActivity(String eventId, ScheduleRequestDto schedule);
+    /**
+     * Deletes an event by its unique identifier.
+     *
+     * @param eventId the unique identifier of the event to delete
+     * @return true if the deletion was successful, false otherwise
+     * @throws EventNotFoundException if no event exists with the given ID
+     */
+    boolean deleteById(String eventId) throws EventNotFoundException;
 
-    public List<ScheduleResponseDto> findAllSchedules(String eventId);
+    /**
+     * Adds a new activity (schedule) to an existing event.
+     *
+     * @param eventId the unique identifier of the event
+     * @param schedule the request DTO containing schedule details
+     * @return the response DTO representing the added schedule
+     */
+    ScheduleResponseDto addActivity(String eventId, ScheduleRequestDto schedule);
+
+    /**
+     * Retrieves all schedules associated with a specific event.
+     *
+     * @param eventId the unique identifier of the event
+     * @return a list of response DTOs representing all schedules for the event
+     */
+    List<ScheduleResponseDto> findAllSchedules(String eventId);
 }

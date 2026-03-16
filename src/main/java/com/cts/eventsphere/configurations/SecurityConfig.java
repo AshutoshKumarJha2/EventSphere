@@ -32,11 +32,30 @@ public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
 
+    /**
+    * 
+    * * @param
+    * @return PasswordEncoder
+     * @author 2480010
+     * @since 04-03-2026
+     * @version 1.0
+     *
+    */
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
+    /**
+    *
+    * * @param http
+     * @author 2480010
+     * @since 04-03-2026
+     * @version 1.0
+     *
+    * @return SecurityFilterChain
+     *
+    */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http.csrf(AbstractHttpConfigurer::disable)

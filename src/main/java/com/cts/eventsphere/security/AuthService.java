@@ -30,6 +30,14 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
+    /**
+    * Handles user registration. It checks if a user with the provided email already exists, and if not, it creates a new user with the provided details, hashes the password, and saves the user to the database. If the registration is successful, it returns a RegisterResponseDto containing the registered user's information.
+    * * @param dto
+    * @return RegisterResponseDto
+     * @author 2480010
+     * @version 1.0
+     * @since 04-03-2026
+    */
     public RegisterResponseDto register(UserRequestDto dto) {
         var existingUser = userRepository.findByEmail(dto.email());
 
@@ -50,6 +58,14 @@ public class AuthService {
         return new RegisterResponseDto(user.getUserId(), user.getName(), user.getEmail(), user.getRole().name(), user.getPhone(), user.getStatus().name(), successRegistration);
     }
 
+    /**
+    * Handles user login. It retrieves the user by email, checks if the provided password matches the stored hashed password, and if the authentication is successful, it generates an access token and a refresh token using JwtUtil. If the login fails due to an incorrect email or password, it throws appropriate exceptions.
+    * * @param loginDto
+    * @return LoginResponseDto
+     * @author 2480010
+     * @version 1.0
+     * @since 04-03-2026
+    */
     public LoginResponseDto login(LoginRequestDto loginDto) {
         User user = userRepository.findByEmail(loginDto.email())
                 .orElseThrow(() ->{
@@ -70,6 +86,14 @@ public class AuthService {
         return new LoginResponseDto(accessToken, refreshToken, "Bearer");
     }
 
+    /**
+    * Handles token refresh. It generates new access and refresh tokens for the authenticated user based on their principal information. The new tokens are returned in a LoginResponseDto. This method is typically called when the client requests a token refresh to maintain an authenticated session without requiring the user to log in again.
+    * * @param principal
+    * @return LoginResponseDto
+     * @author 2480010
+     * @version 1.0
+     * @since 04-03-2026
+    */
     public LoginResponseDto refreshToken(UserPrincipal principal) {
         String userId = principal.userId();
         String email = principal.email();
