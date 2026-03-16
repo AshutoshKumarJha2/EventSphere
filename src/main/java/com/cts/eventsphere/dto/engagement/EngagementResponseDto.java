@@ -17,7 +17,5 @@ public record EngagementResponseDto(
         String eventId,
         String attendeeId,
         EngagementType activity,
-        LocalDateTime activityTimestamp,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime activityTimestamp
 ) {}

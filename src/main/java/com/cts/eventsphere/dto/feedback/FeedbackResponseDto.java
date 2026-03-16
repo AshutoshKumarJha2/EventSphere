@@ -17,7 +17,5 @@ public record FeedbackResponseDto(
         String attendeeId,
         int rating,
         String comments,
-        LocalDateTime date,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime date
 ) {}
