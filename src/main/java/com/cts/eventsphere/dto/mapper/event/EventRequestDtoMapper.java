@@ -2,6 +2,7 @@ package com.cts.eventsphere.dto.mapper.event;
 
 import com.cts.eventsphere.dto.event.EventRequestDto;
 import com.cts.eventsphere.model.Event;
+import com.cts.eventsphere.model.data.EventStatus;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,7 +25,7 @@ public class EventRequestDtoMapper {
         event.setStartDate(dto.startDate());
         event.setEndDate(dto.endDate());
         event.setVenueId(dto.venueId());
-        event.setStatus(dto.status());
+        event.setStatus(dto.status() == null ? EventStatus.draft : dto.status());
         return event;
     }
 }

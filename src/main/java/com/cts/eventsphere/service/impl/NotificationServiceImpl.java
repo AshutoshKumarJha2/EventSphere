@@ -2,8 +2,10 @@ package com.cts.eventsphere.service.impl;
 
 import com.cts.eventsphere.model.Notification;
 import com.cts.eventsphere.repository.NotificationRepository;
+import com.cts.eventsphere.repository.UserRepository;
 import com.cts.eventsphere.service.EmailService;
 import com.cts.eventsphere.service.NotificationService;
+import com.cts.eventsphere.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -54,7 +56,7 @@ public class NotificationServiceImpl implements NotificationService {
      */
     @Override
     @Transactional
-    public void sendNotification(String userId, String email, String message, String category) {
+    public void sendNotification(String userId, String message, String category) {
         log.info("Processing notification for user: {} and category: {}", userId, category);
 
         Notification notification = new Notification();
@@ -66,8 +68,8 @@ public class NotificationServiceImpl implements NotificationService {
         Notification savedNotification = notificationRepository.save(notification);
         log.debug("Notification saved to DB with ID: {}", savedNotification.getNotificationId());
 
-        log.info("Dispatching email notification to: {}", email);
-        emailService.sendNotificationEmail(email, "New Notification: " + category, message);
+//        log.info("Dispatching email notification to: {}", email);
+//        emailService.sendNotificationEmail(email, "New Notification: " + category, message);
     }
 
     /**

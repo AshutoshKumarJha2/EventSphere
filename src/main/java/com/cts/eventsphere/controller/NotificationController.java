@@ -68,7 +68,7 @@ public class NotificationController {
             @Valid @RequestParam String category) {
 
         log.info("Request to send notification to user: {} (Category: {})", userId, category);
-        notificationService.sendNotification(userId, email, message, category);
+        notificationService.sendNotification(userId,message, category);
         log.info("Notification sent successfully to user: {}", userId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

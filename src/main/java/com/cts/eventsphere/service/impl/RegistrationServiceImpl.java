@@ -64,7 +64,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         registrationRepo.save(newRegistration);
         log.info("User {} registered for event {} with ticket {}", userId, eventId, ticketId);
         auditService.logAudit(userId, AuditAction.CREATE, Registration.class, newRegistration.getRegistrationId());
-        notificationService.sendNotification(userId);
         return new GenericResponse("Registration successful");
     }
 
