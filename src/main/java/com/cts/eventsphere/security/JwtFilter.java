@@ -1,26 +1,17 @@
 package com.cts.eventsphere.security;
 
-import com.cts.eventsphere.repository.UserRepository;
-import com.cts.eventsphere.service.UserService;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.Collate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
 
 /**
  * JwtFilter is a custom filter that intercepts incoming HTTP requests to validate JWT tokens. It checks the "Authorization" header for a Bearer token, extracts the user information from the token, and sets the authentication in the SecurityContext if the token is valid. If any exceptions occur during token validation, it logs the error and clears the SecurityContext.

@@ -1,18 +1,18 @@
 package com.cts.eventsphere.model;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import com.cts.eventsphere.exception.event.EventNotFoundException;
-import jakarta.persistence.*;
-import org.hibernate.annotations.*;
-
 import com.cts.eventsphere.model.data.RegistrationStatus;
-
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Entity class for Registration table

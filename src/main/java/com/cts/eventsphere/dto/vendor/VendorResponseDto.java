@@ -1,7 +1,8 @@
 package com.cts.eventsphere.dto.vendor;
 
 import com.cts.eventsphere.model.data.VendorStatus;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 

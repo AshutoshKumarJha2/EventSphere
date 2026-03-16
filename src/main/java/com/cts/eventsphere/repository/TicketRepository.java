@@ -1,10 +1,9 @@
 package com.cts.eventsphere.repository;
 
+import com.cts.eventsphere.model.Ticket;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.cts.eventsphere.model.Ticket;
 
 import java.util.Optional;
 

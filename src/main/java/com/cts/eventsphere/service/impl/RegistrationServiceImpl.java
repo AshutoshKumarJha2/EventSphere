@@ -1,31 +1,29 @@
 package com.cts.eventsphere.service.impl;
 
-import com.cts.eventsphere.exception.event.EventNotFoundException;
-import com.cts.eventsphere.exception.ticket.TicketNotFoundException;
-import com.cts.eventsphere.model.User;
-import com.cts.eventsphere.model.data.AuditAction;
-import com.cts.eventsphere.repository.EventRepository;
-import com.cts.eventsphere.repository.TicketRepository;
-import com.cts.eventsphere.service.AuditService;
-import com.cts.eventsphere.service.NotificationService;
-import jakarta.persistence.EntityManager;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-
 import com.cts.eventsphere.dto.mapper.registration.RegistrationDTOMapper;
 import com.cts.eventsphere.dto.registration.RegistrationDTO;
 import com.cts.eventsphere.dto.registration.RegistrationListResponseDTO;
 import com.cts.eventsphere.dto.shared.GenericResponse;
+import com.cts.eventsphere.exception.event.EventNotFoundException;
 import com.cts.eventsphere.exception.registration.RegistrationAlreadyExistsException;
 import com.cts.eventsphere.exception.registration.RegistrationNotFoundException;
+import com.cts.eventsphere.exception.ticket.TicketNotFoundException;
 import com.cts.eventsphere.model.Registration;
+import com.cts.eventsphere.model.User;
+import com.cts.eventsphere.model.data.AuditAction;
 import com.cts.eventsphere.model.data.RegistrationStatus;
+import com.cts.eventsphere.repository.EventRepository;
 import com.cts.eventsphere.repository.RegistrationRepository;
+import com.cts.eventsphere.repository.TicketRepository;
+import com.cts.eventsphere.service.AuditService;
+import com.cts.eventsphere.service.NotificationService;
 import com.cts.eventsphere.service.RegistrationService;
-
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of {@link RegistrationService} for managing event registrations.
