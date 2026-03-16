@@ -1,5 +1,8 @@
 package com.cts.eventsphere.service.impl;
 
+import com.cts.eventsphere.model.User;
+import jakarta.persistence.EntityManager;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RegistrationServiceImpl implements RegistrationService {
     private final RegistrationRepository registrationRepo;
+    private final EntityManager entityManager;
 
     /**
      * Registers a user for an event with a specific ticket.
@@ -39,12 +43,13 @@ public class RegistrationServiceImpl implements RegistrationService {
      */
     @Override
     public GenericResponse registerForEvent(String userId, String eventId, String ticketId) {
-        var registration = registrationRepo.findByAttendeeIdAndEventId(userId, eventId);
+        var registration = registrationRepo.findByAttendeeUserIdAndEventId(userId, eventId);
         if (registration.isPresent()) {
             throw new RegistrationAlreadyExistsException(String.format("User %s is already registered for event %s", userId, eventId));
         }
+        var attendeeRef = entityManager.getReference(User.class, userId);
         var newRegistration = Registration.builder()
-                .attendeeId(userId)
+                .attendee(attendeeRef)
                 .eventId(eventId)
                 .ticketId(ticketId)
                 .status(RegistrationStatus.pending)
@@ -118,6 +123,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         return new GenericResponse("Registration rejected successfully");
     }
 
+
     /**
      * Retrieves a paginated list of registrations for a specific user.
      * * @param userId The unique identifier of the attendee.
@@ -128,7 +134,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public RegistrationListResponseDTO getRegistrationsByUserId(String userId, int size, int page) {
         var pagable = PageRequest.of(page, size);
-        var pages = registrationRepo.findByAttendeeId(userId, pagable);
+        var pages = registrationRepo.findByAttendeeUserId(userId, pagable);
         var registrations = pages.getContent().stream().map(RegistrationDTOMapper::toDTO).toList();
         var pageNo = pages.getNumber();
         var pageSize = pages.getSize();
@@ -154,9 +160,22 @@ public class RegistrationServiceImpl implements RegistrationService {
      * @return A {@link RegistrationListResponseDTO} containing all registrations for the event.
      */
     @Override
-    public RegistrationListResponseDTO getRegistrationsByEventId(String eventId, int size, int page) {
+    public RegistrationListResponseDTO getRegistrationsByEventIdStatus(String eventId,String status, int size, int page) {
         var pagable = PageRequest.of(page, size);
-        var pages = registrationRepo.findByEventId(eventId, pagable);
+        Page<Registration> pages;
+        if(status == null || status.isEmpty()){
+            pages = registrationRepo.findByEventId(eventId, pagable);
+        } else {
+
+            RegistrationStatus statusEnum;
+            try {
+                statusEnum = RegistrationStatus.valueOf(status);
+            } catch (IllegalArgumentException e) {
+                throw new RegistrationNotFoundException(String.format("Invalid query parameter %s", status));
+            }
+            pages = registrationRepo.findByEventIdAndStatus(eventId, statusEnum, pagable);
+        }
+
         var registrations = pages.getContent().stream().map(RegistrationDTOMapper::toDTO).toList();
         var pageNo = pages.getNumber();
         var pageSize = pages.getSize();
@@ -224,7 +243,7 @@ public class RegistrationServiceImpl implements RegistrationService {
      */
     @Override
     public RegistrationDTO getRegistrationByEventIdAndUserId(String eventId, String userId) {
-        var registration = registrationRepo.findByAttendeeIdAndEventId(userId, eventId).orElseThrow(() -> new RegistrationNotFoundException(String.format("Registration with eventId: %s and userId: %s not found", eventId, userId)));
+        var registration = registrationRepo.findByAttendeeUserIdAndEventId(userId, eventId).orElseThrow(() -> new RegistrationNotFoundException(String.format("Registration with eventId: %s and userId: %s not found", eventId, userId)));
         log.info("Fetched registration for userId: {}, eventId: {}", userId, eventId);
         return RegistrationDTOMapper.toDTO(registration);
     }

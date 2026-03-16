@@ -112,7 +112,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RegistrationNotFoundException.class)
     public ResponseEntity<GenericErrorResponse> registrationNotFoundException(RegistrationNotFoundException e){
-        return new ResponseEntity<>(new GenericErrorResponse("Registration not found"), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
@@ -164,6 +164,5 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
-
 
 }

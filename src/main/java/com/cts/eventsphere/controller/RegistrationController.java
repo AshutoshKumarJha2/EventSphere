@@ -1,5 +1,7 @@
 package com.cts.eventsphere.controller;
 
+import com.cts.eventsphere.dto.registration.RegistrationDTO;
+import com.cts.eventsphere.model.data.RegistrationStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -59,18 +61,31 @@ public class RegistrationController {
      * Retrieves a paginated list of all registrations for a specific event.
      * Accessible only by Organizers or Admins.
      *
-     * @param eventId The unique identifier of the event.
-     * @param size    The number of records per page (defaults to 10).
-     * @param page    The page number to retrieve (defaults to 0).
+     * @param eventId            The unique identifier of the event.
+     * @param status Status of the registration
+     * @param size               The number of records per page (defaults to 10).
+     * @param page               The page number to retrieve (defaults to 0).
      * @return A {@link ResponseEntity} containing {@link RegistrationListResponseDTO} with the list of registrations.
      */
     @GetMapping("/events/{eventId}/registrations")
     @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN')")
-    public ResponseEntity<RegistrationListResponseDTO> getAllRegistrationsByEvent(@PathVariable String eventId, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "0") int page) {
-        log.info("Getting all events for eventId: {}", eventId);
-        return ResponseEntity.ok(registrationService.getRegistrationsByEventId(eventId, size, page));
+    public ResponseEntity<RegistrationListResponseDTO> getAllRegistrationsByEvent(@PathVariable String eventId, @RequestParam(required = false) String status , @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "0") int page) {
+        log.info("Getting all events for eventId: {}, size {}, page {}", eventId, size, page);
+        return ResponseEntity.ok(registrationService.getRegistrationsByEventIdStatus(eventId, status, size, page));
     }
-    
+
+    /**
+     * Get registration for a given registration id
+     *
+     * @param registrationId The unique identifier of the registration to cancel.
+     * @return A {@link ResponseEntity} containing a {@link RegistrationDTO} confirming the cancellation.
+     */
+    @GetMapping("/registrations/{registrationId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
+    public ResponseEntity<RegistrationDTO> getRegistrationById(@PathVariable String registrationId) {
+        log.info("Getting registration for id: {}", registrationId);
+        return ResponseEntity.ok(registrationService.getRegistrationById(registrationId));
+    }
 
     /**
      * Cancels an existing registration.

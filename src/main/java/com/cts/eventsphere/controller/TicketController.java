@@ -1,5 +1,8 @@
 package com.cts.eventsphere.controller;
 
+import com.cts.eventsphere.model.Ticket;
+import com.cts.eventsphere.model.data.AuditAction;
+import com.cts.eventsphere.service.AuditService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TicketController {
     private final TicketService ticketService;
+    private final AuditService auditService;
 
     /**
      * Creates a new ticket for a specific event.

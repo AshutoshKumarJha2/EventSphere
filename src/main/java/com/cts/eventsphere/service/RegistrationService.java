@@ -86,11 +86,12 @@ public interface RegistrationService {
      * Retrieves a paginated list of all registrations for a specific event.
      *
      * @param eventId The unique identifier of the event.
+     * @param status  Status of registration. null for all registrations.
      * @param size    The number of records per page.
      * @param page    The page number to retrieve.
      * @return A {@link RegistrationListResponseDTO} containing the event's registrations.
      */
-    RegistrationListResponseDTO getRegistrationsByEventId(String eventId, int size, int page);
+    RegistrationListResponseDTO getRegistrationsByEventIdStatus(String eventId, String status, int size, int page);
 
     /**
      * Retrieves a paginated list of all registrations across the entire system.
