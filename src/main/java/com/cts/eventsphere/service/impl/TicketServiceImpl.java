@@ -50,7 +50,7 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public GenericResponse createTicket(String actorId, String eventId, String type, double price, TicketStatus status) throws TicketAlreadyExistsException {
         var normalizedType = type.toLowerCase();
-        var existingTicket = ticketRepository.findByType(normalizedType);
+        var existingTicket = ticketRepository.findByEventIdAndType(eventId, normalizedType);
         if (existingTicket.isPresent()){
             throw new TicketAlreadyExistsException(String.format("Ticket type %s already exists", normalizedType));
         }

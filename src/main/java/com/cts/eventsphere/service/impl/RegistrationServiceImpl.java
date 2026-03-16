@@ -156,9 +156,11 @@ public class RegistrationServiceImpl implements RegistrationService {
     public RegistrationListResponseDTO getRegistrationsByUserId(String actorId, String userId, int size, int page) {
         var pagable = PageRequest.of(page, size);
         var pages = registrationRepo.findByAttendeeUserId(userId, pagable);
-        var registrations = pages.getContent().stream().map(RegistrationDTOMapper::toDTO).toList();
+        var registrations = pages.getContent().stream()
+                .peek(registration -> auditService.logAudit(actorId, AuditAction.READ, Registration.class, registration.getRegistrationId()))
+                .map(RegistrationDTOMapper::toDTO)
+                .toList();
 
-        auditService.logAudit(actorId, AuditAction.READ, Registration.class, "bulk-user-" + userId);
         log.info("Fetched {} registrations for userId: {} by actor: {}", registrations.size(), userId, actorId);
 
         return new RegistrationListResponseDTO(
@@ -196,8 +198,10 @@ public class RegistrationServiceImpl implements RegistrationService {
             pages = registrationRepo.findByEventIdAndStatus(eventId, statusEnum, pagable);
         }
 
-        var registrations = pages.getContent().stream().map(RegistrationDTOMapper::toDTO).toList();
-        auditService.logAudit(actorId, AuditAction.READ, Registration.class, "bulk-event-" + eventId);
+        var registrations = pages.getContent().stream()
+                .peek(registration -> auditService.logAudit(actorId, AuditAction.READ, Registration.class, registration.getRegistrationId()))
+                .map(RegistrationDTOMapper::toDTO)
+                .toList();
         log.info("Fetched {} registrations for eventId: {} by actor: {}", registrations.size(), eventId, actorId);
 
         return new RegistrationListResponseDTO(
@@ -221,9 +225,11 @@ public class RegistrationServiceImpl implements RegistrationService {
     public RegistrationListResponseDTO getAllRegistrations(String actorId, int size, int page) {
         var pagable = PageRequest.of(page, size);
         var pages = registrationRepo.findAll(pagable);
-        var registrations = pages.getContent().stream().map(RegistrationDTOMapper::toDTO).toList();
+        var registrations = pages.getContent()
+                .stream()
+                .peek(registration -> auditService.logAudit(actorId, AuditAction.READ, Registration.class, registration.getRegistrationId()))
+                .map(RegistrationDTOMapper::toDTO).toList();
 
-        auditService.logAudit(actorId, AuditAction.READ, Registration.class, "all-registrations");
         log.info("Fetched {} registrations by actor: {}", registrations.size(), actorId);
 
         return new RegistrationListResponseDTO(
