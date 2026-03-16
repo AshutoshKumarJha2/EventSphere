@@ -5,7 +5,7 @@ import com.cts.eventsphere.model.Delivery;
 import org.springframework.stereotype.Component;
 
 /**
- * Mapper for converting Delivery entity to DeliveryRequestDto
+ * Mapper to convert DeliveryRequestDto to Delivery Entity.
  *
  * @author 2480177
  * @version 1.0
@@ -14,6 +14,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DeliveryRequestDtoMapper {
+
+    /**
+     * Maps Request DTO to Delivery Entity.
+     *
+     * @param dto the delivery request data
+     * @return a Delivery entity populated with DTO data
+     */
     public Delivery toEntity(DeliveryRequestDto dto){
         if (dto == null) {
             return null;

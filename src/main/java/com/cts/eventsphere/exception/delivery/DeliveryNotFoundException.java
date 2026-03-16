@@ -3,7 +3,7 @@ package com.cts.eventsphere.exception.delivery;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Exception raised when Delivery is not found.
+ * Exception raised when a Delivery entity cannot be found in the database.
  *
  * @author 2480177
  * @version 1.0

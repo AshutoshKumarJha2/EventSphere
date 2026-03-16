@@ -17,7 +17,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controller for Budget Operations
+ * Controller for handling Budget-related operations in the EventSphere application.
+ *
+ * <p>This REST controller exposes endpoints for managing budgets associated
+ * with events. It delegates business logic to the {@link BudgetService} and
+ * ensures proper request validation, authorization, and response formatting.</p>
+ *
+ * <p>Security is enforced using {@code @PreAuthorize}, allowing only users
+ * with roles ADMIN, ORGANIZER, or FINANCE_MANAGER to access budget operations.</p>
  *
  * @author 2480081
  * @version 1.0
@@ -33,9 +40,20 @@ public class BudgetController {
     private final BudgetService budgetService;
 
     /**
-     * Setting Budget for an Event
-     * @param eventId
-     * @return "CREATED" response for successful Budget creation.
+     * Sets the budget for a specific event.
+     *
+     * <p>This endpoint accepts a validated {@link BudgetRequestDto} in the request body
+     * and associates it with the event identified by {@code eventId}. The service layer
+     * handles the creation logic and returns a {@link BudgetResponseDto} containing
+     * the budget details.</p>
+     *
+     * <p>Authorization is restricted to users with roles ADMIN, ORGANIZER, or FINANCE_MANAGER.
+     * On success, the response includes the created budget and HTTP status {@code CREATED} (201).</p>
+     *
+     * @param eventId the unique identifier of the event for which the budget is being set
+     * @param request the validated budget request payload containing budget details
+     * @return a ResponseEntity containing the created {@link BudgetResponseDto} and
+     *         HTTP status {@code CREATED}
      */
     @PostMapping("/{eventId}/budget")
     @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER', 'FINANCE_MANAGER')")

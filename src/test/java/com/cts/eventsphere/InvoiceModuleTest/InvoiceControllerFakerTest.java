@@ -1,65 +1,72 @@
 package com.cts.eventsphere.InvoiceModuleTest;
 
-import org.junit.jupiter.api.BeforeEach;
+import com.cts.eventsphere.controller.InvoiceController;
+import com.cts.eventsphere.service.InvoiceService;
+import com.github.javafaker.Faker;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
+// JUnit 5 Assertions
+import static org.junit.jupiter.api.Assertions.*;
 
+// Mockito Imports
+import static org.mockito.Mockito.*;
+import org.mockito.Mock;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
+
+// Spring Web & HTTP Imports (Crucial for PDF Headers)
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.ContentDisposition; // If using ContentDisposition object
+import org.springframework.http.HttpHeaders;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-import com.cts.eventsphere.controller.InvoiceController;
-import com.cts.eventsphere.service.InvoiceService;
-import com.cts.eventsphere.dto.invoice.InvoiceRequestDto;
-import com.cts.eventsphere.dto.invoice.InvoiceResponseDto;
-import com.cts.eventsphere.model.data.InvoiceStatus;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+// Java Faker & Utilities
 import com.github.javafaker.Faker;
+import java.util.UUID;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+// Your Project Specifics (Adjust package names)
+import com.cts.eventsphere.dto.invoice.InvoiceResponseDto;
+import com.cts.eventsphere.service.InvoiceService;
+import com.cts.eventsphere.controller.InvoiceController;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class InvoiceControllerFakerTest {
-    private MockMvc mockMvc;
+
+    @Mock
+    private InvoiceService invoiceService;
+    @InjectMocks
+    private InvoiceController invoiceController;
     private Faker faker = new Faker();
-    private ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
-
-    @Mock private InvoiceService invoiceService;
-    @InjectMocks private InvoiceController invoiceController;
-
-    @BeforeEach
-    void setup() { mockMvc = MockMvcBuilders.standaloneSetup(invoiceController).build(); }
 
     @Test
-    void createInvoice_ShouldReturnCreated() throws Exception {
-        InvoiceRequestDto request = new InvoiceRequestDto(
-                faker.internet().uuid(), BigDecimal.valueOf(1200.50),
-                LocalDateTime.now().plusDays(30), InvoiceStatus.issued
-        );
+    void downloadInvoice_shouldReturnPdfWithCorrectHeaders() {
+        // Arrange
+        String invoiceId = faker.internet().uuid();
+        byte[] mockPdfContent = "Fake PDF Binary Content".getBytes();
 
-        InvoiceResponseDto response = new InvoiceResponseDto(
-                "INV-99", request.contractId(), request.totalAmount(),
-                request.dueDate(), request.status(), LocalDateTime.now(), LocalDateTime.now()
-        );
+        when(invoiceService.generateInvoicePdf(invoiceId)).thenReturn(mockPdfContent);
 
-        when(invoiceService.createInvoice(any())).thenReturn(response);
+        // Act
+        ResponseEntity<byte[]> response = invoiceController.downloadPdf(invoiceId);
 
-        mockMvc.perform(post("/api/v1/invoices")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.invoiceId").value("INV-99"));
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(MediaType.APPLICATION_PDF, response.getHeaders().getContentType());
+
+        // Check if the filename is set correctly in headers
+        String contentDisposition = response.getHeaders().getContentDisposition().toString();
+        assertTrue(contentDisposition.contains("attachment"));
+        assertTrue(contentDisposition.contains("invoice_" + invoiceId + ".pdf"));
+
+        assertArrayEquals(mockPdfContent, response.getBody());
+        verify(invoiceService, times(1)).generateInvoicePdf(invoiceId);
     }
 }

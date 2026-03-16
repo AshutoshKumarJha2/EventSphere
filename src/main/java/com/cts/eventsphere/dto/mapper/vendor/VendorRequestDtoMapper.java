@@ -6,7 +6,7 @@ import com.cts.eventsphere.model.Vendor;
 import org.springframework.stereotype.Component;
 
 /**
- * Mapper for converting Vendor entity to VendorRequestDto
+ * Mapper for converting VendorRequestDto to Vendor entity
  *
  * @author 2480177
  * @version 1.0

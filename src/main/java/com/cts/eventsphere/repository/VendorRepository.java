@@ -5,7 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Repository for managing vendor entities.
+ * JPA Repository for managing vendor entities.
+ * Provides abstraction for the persistence layer, enabling standard CRUD
+ * operations and custom query execution against the 'vendor' table.
+ * * Adheres to professional coding standards for data access objects.
  *
  * @author 2480177
  * @version 1.0

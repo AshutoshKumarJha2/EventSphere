@@ -5,7 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Repository for CRUD operations on delivery entities.
+ * JPA Repository interface for CRUD operations on delivery entities.
+ * Facilitates the tracking of logistical items and resource fulfillment.
  *
  * @author 2480177
  * @version 1.0
@@ -14,4 +15,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DeliveryRepository extends JpaRepository<Delivery, String> {
+
 }

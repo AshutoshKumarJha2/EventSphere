@@ -10,6 +10,7 @@ import com.cts.eventsphere.model.Event;
 import com.cts.eventsphere.model.Schedule;
 import com.cts.eventsphere.repository.EventRepository;
 import com.cts.eventsphere.repository.ScheduleRepository;
+import com.cts.eventsphere.service.NotificationService;
 import com.cts.eventsphere.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +18,11 @@ import org.springframework.stereotype.Service;
 
 /**
  * Implementation for Service of Schedule Entity.
- * * @author 2479623
+ * Provides business logic for updating and deleting schedules associated with events,
+ * and triggers notifications with dynamic schedule details.
  *
- * @version 1.0
+ * @author 2479623
+ * @version 1.1
  * @since 27-02-2026
  */
 @Service
@@ -30,11 +33,18 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final EventRepository eventRepository;
     private final ScheduleResponseDtoMapper scheduleResponseDtoMapper;
     private final ScheduleRequestDtoMapper scheduleRequestDtoMapper;
+    private final NotificationService notificationService;
 
     /**
-     * @param scheduleRequest
-     * @return
-     * @throws ScheduleNotFoundException
+     * Updates an existing schedule by its unique identifier within a specific event
+     * and triggers a notification with updated schedule details.
+     *
+     * @param eventId the unique identifier of the event to which the schedule belongs
+     * @param id the unique identifier of the schedule to update
+     * @param scheduleRequest the DTO containing updated schedule details
+     * @return the response DTO representing the updated schedule
+     * @throws ScheduleNotFoundException if no schedule exists with the given ID
+     * @throws EventNotFoundException if the parent event does not exist
      */
     @Override
     public ScheduleResponseDto updateById(String eventId, String id, ScheduleRequestDto scheduleRequest) throws ScheduleNotFoundException {
@@ -58,13 +68,25 @@ public class ScheduleServiceImpl implements ScheduleService {
         Schedule updatedSchedule = scheduleRepository.save(schedule);
         log.info("Successfully saved updated schedule ID: {}", updatedSchedule.getScheduleId());
 
+        notificationService.sendNotification(
+                eventId,
+                event.getOrganizerId(),
+                "Schedule Updated for Event: " + event.getName() +
+                        " | Date: " + scheduleRequest.date() +
+                        " | Time Slot: " + scheduleRequest.timeSlot() +
+                        " | Activity: " + scheduleRequest.activity(),
+                scheduleRequest.status().name()
+        );
+
         return scheduleResponseDtoMapper.toDTO(updatedSchedule);
     }
 
     /**
-     * @param id
-     * @return
-     * @throws ScheduleNotFoundException
+     * Deletes a schedule by its unique identifier and triggers a notification.
+     *
+     * @param id the unique identifier of the schedule to delete
+     * @return true if the deletion was successful, false otherwise
+     * @throws ScheduleNotFoundException if no schedule exists with the given ID
      */
     @Override
     public boolean deleteById(String id) throws ScheduleNotFoundException {
@@ -77,6 +99,14 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         scheduleRepository.deleteById(id);
         log.info("Successfully deleted schedule with ID: {}", id);
+
+        notificationService.sendNotification(
+                id,
+                "system@eventsphere.com",
+                "Schedule Deleted with ID: " + id,
+                "SCHEDULE"
+        );
+
         return true;
     }
 }
