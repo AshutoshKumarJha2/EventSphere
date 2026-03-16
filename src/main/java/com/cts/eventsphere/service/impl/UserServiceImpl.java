@@ -9,8 +9,10 @@ import com.cts.eventsphere.model.User;
 import com.cts.eventsphere.model.data.UserRoles;
 import com.cts.eventsphere.model.data.UserStatus;
 import com.cts.eventsphere.repository.UserRepository;
+import com.cts.eventsphere.service.NotificationService;
 import com.cts.eventsphere.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,8 +26,10 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Override
     public List<UserResponseDto> getAllUsers() {
@@ -83,9 +87,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto changeUserRole(String userId, String role) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        String enumRole = String.valueOf(UserRoles.valueOf(role));
-        user.setRole(UserRoles.valueOf(enumRole));
-        return UserResponseDtoMapper.toDTO(userRepository.save(user));
+        UserRoles newRole = UserRoles.valueOf(role);
+        user.setRole(newRole);
+        User updatedUser = userRepository.save(user);
+        try{
+            String message = "Your role has been changed to " + newRole;
+            notificationService.sendNotification(userId, message, "INFO");
+            log.info("Role change notification queued for user: {}", userId);
+        }
+        catch (Exception e){
+            log.error("Failed to send notification for role change to {} : {}", userId, e.getMessage());
+        }
+        return UserResponseDtoMapper.toDTO(updatedUser);
     }
 
 }
