@@ -66,13 +66,21 @@ public class EventController {
      * @param eventRequest the request DTO containing updated event details
      * @return ResponseEntity with HTTP status 204 (NO_CONTENT) if update is successful
      */
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER', 'VENUE_MANAGER')")
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
     public ResponseEntity<Void> update(@PathVariable String id, @Valid @RequestBody EventRequestDto eventRequest) {
         log.info("Received request to update event with ID: {}", id);
         eventService.updateById(id, eventRequest);
         log.info("Successfully updated event with ID: {}", id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<EventResponseDto> getById(@PathVariable String id) {
+        log.info("Received request to get event with ID: {}", id);
+        return ResponseEntity.ok(eventService.findById(id));
+
     }
 
     /**

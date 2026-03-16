@@ -2,10 +2,8 @@ package com.cts.eventsphere.service.impl;
 
 import com.cts.eventsphere.model.Notification;
 import com.cts.eventsphere.repository.NotificationRepository;
-import com.cts.eventsphere.repository.UserRepository;
 import com.cts.eventsphere.service.EmailService;
 import com.cts.eventsphere.service.NotificationService;
-import com.cts.eventsphere.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

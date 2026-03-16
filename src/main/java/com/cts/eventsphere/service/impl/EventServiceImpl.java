@@ -154,13 +154,6 @@ public class EventServiceImpl implements EventService {
         eventRepository.deleteById(eventId);
         log.info("Successfully deleted event ID: {}", eventId);
 
-//        notificationService.sendNotification(
-//                eventId,
-//                "system@eventsphere.com",
-//                "Event Deleted with ID: " + eventId,
-//                "EVENT"
-//        );
-
         return true;
     }
 

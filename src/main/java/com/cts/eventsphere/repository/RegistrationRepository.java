@@ -1,11 +1,10 @@
 package com.cts.eventsphere.repository;
 
+import com.cts.eventsphere.model.Registration;
 import com.cts.eventsphere.model.data.RegistrationStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.cts.eventsphere.model.Registration;
 
 import java.util.Optional;
 

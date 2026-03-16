@@ -9,26 +9,21 @@ import com.cts.eventsphere.exception.finance.ExpenseNotFoundException;
 import com.cts.eventsphere.exception.finance.PaymentNotFoundException;
 import com.cts.eventsphere.exception.invoice.InvoiceNotFoundException;
 import com.cts.eventsphere.exception.invoice.InvoicePdfGenerationException;
+import com.cts.eventsphere.exception.registration.RegistrationAlreadyExistsException;
+import com.cts.eventsphere.exception.registration.RegistrationNotFoundException;
 import com.cts.eventsphere.exception.resource.InsufficientResourceException;
 import com.cts.eventsphere.exception.resource.ResourceAlreadyExistsException;
 import com.cts.eventsphere.exception.resource.ResourceDuplicateAllocationException;
 import com.cts.eventsphere.exception.resource.ResourceNotFoundException;
-import com.cts.eventsphere.exception.user.*;
-import com.cts.eventsphere.exception.registration.RegistrationAlreadyExistsException;
-import com.cts.eventsphere.exception.registration.RegistrationNotFoundException;
 import com.cts.eventsphere.exception.ticket.TicketAlreadyExistsException;
 import com.cts.eventsphere.exception.ticket.TicketNotFoundException;
-
-import com.cts.eventsphere.exception.user.EmailAlreadyExistsException;
-import com.cts.eventsphere.exception.user.InvalidPasswordException;
-import com.cts.eventsphere.exception.user.UserAlreadyExistsException;
-import com.cts.eventsphere.exception.user.UserNotFoundException;
+import com.cts.eventsphere.exception.user.*;
 import com.cts.eventsphere.exception.vendor.VendorNotFoundException;
 import com.cts.eventsphere.exception.venue.VenueNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -164,15 +159,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new GenericErrorResponse(e.getMessage()));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity< GenericErrorResponse> handleUnexpectedExceptions(Exception ex) {
-        String traceId = java.util.UUID.randomUUID().toString();
-        log.error("Unhandled exception. traceId={}", traceId, ex);
-        GenericErrorResponse body = new GenericErrorResponse(
-            "An unexpected error occurred. Please contact support with traceId: " + traceId
-        );
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
-    }
 
     @ExceptionHandler(ContractNotFoundException.class)
     public ResponseEntity<GenericErrorResponse> handleContractNotFound(ContractNotFoundException e) {
@@ -200,5 +186,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<GenericErrorResponse> httpMessageNotRedableException(HttpMessageNotReadableException e){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new GenericErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity< GenericErrorResponse> handleUnexpectedExceptions(Exception ex) {
+        String traceId = java.util.UUID.randomUUID().toString();
+        log.error("Unhandled exception. traceId={}", traceId, ex);
+        GenericErrorResponse body = new GenericErrorResponse(
+                "An unexpected error occurred. Please contact support with traceId: " + traceId
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
 
 }

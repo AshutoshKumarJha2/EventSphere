@@ -4,8 +4,6 @@ import com.cts.eventsphere.model.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 /**
  * JPA Repository for the Event Entity.
  * * @author 2479623

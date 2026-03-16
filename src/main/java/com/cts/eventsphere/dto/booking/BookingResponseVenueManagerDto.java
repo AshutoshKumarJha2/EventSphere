@@ -1,6 +1,5 @@
 package com.cts.eventsphere.dto.booking;
 
-import com.cts.eventsphere.dto.resource.ResourceListElementDto;
 import com.cts.eventsphere.dto.resource.ResourceVenueManagerResponseDto;
 import com.cts.eventsphere.model.data.BookingStatus;
 

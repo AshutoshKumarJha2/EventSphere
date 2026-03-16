@@ -1,8 +1,6 @@
 package com.cts.eventsphere.dto.mapper.booking;
 
-import com.cts.eventsphere.dto.booking.BookingResponseDto;
 import com.cts.eventsphere.dto.booking.BookingResponseVenueManagerDto;
-import com.cts.eventsphere.dto.resource.ResourceListElementDto;
 import com.cts.eventsphere.dto.resource.ResourceVenueManagerResponseDto;
 import com.cts.eventsphere.model.Booking;
 import org.springframework.stereotype.Component;

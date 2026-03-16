@@ -1,12 +1,5 @@
 package com.cts.eventsphere.service.impl;
 
-import java.math.BigDecimal;
-
-import com.cts.eventsphere.service.AuditService;
-import com.cts.eventsphere.model.data.AuditAction;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-
 import com.cts.eventsphere.dto.mapper.ticket.TicketDTOMapper;
 import com.cts.eventsphere.dto.shared.GenericResponse;
 import com.cts.eventsphere.dto.ticket.TicketListResponseDTO;
@@ -14,12 +7,17 @@ import com.cts.eventsphere.dto.ticket.TicketResponseDTO;
 import com.cts.eventsphere.exception.ticket.TicketAlreadyExistsException;
 import com.cts.eventsphere.exception.ticket.TicketNotFoundException;
 import com.cts.eventsphere.model.Ticket;
+import com.cts.eventsphere.model.data.AuditAction;
 import com.cts.eventsphere.model.data.TicketStatus;
 import com.cts.eventsphere.repository.TicketRepository;
+import com.cts.eventsphere.service.AuditService;
 import com.cts.eventsphere.service.TicketService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 /**
  * Service implementation for managing tickets.

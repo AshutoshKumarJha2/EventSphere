@@ -1,7 +1,6 @@
 package com.cts.eventsphere.dto.mapper.payment;
 
 import com.cts.eventsphere.dto.payment.PaymentRequestDto;
-import com.cts.eventsphere.model.Expense;
 import com.cts.eventsphere.model.Payment;
 import org.springframework.stereotype.Component;
 

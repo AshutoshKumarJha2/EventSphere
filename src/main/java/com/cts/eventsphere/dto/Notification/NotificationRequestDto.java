@@ -9,7 +9,6 @@ package com.cts.eventsphere.dto.Notification;
  */
 
 import com.cts.eventsphere.model.data.CategoryType;
-import lombok.Data;
 
 
 public record NotificationRequestDto (
