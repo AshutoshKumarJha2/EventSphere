@@ -1,7 +1,6 @@
 package com.cts.eventsphere.exception;
 
 import com.cts.eventsphere.dto.shared.GenericErrorResponse;
-import com.cts.eventsphere.dto.shared.GenericResponse;
 import com.cts.eventsphere.exception.booking.BookingNotFoundException;
 import com.cts.eventsphere.exception.contract.ContractNotFoundException;
 import com.cts.eventsphere.exception.delivery.DeliveryNotFoundException;
@@ -10,6 +9,11 @@ import com.cts.eventsphere.exception.finance.ExpenseNotFoundException;
 import com.cts.eventsphere.exception.finance.PaymentNotFoundException;
 import com.cts.eventsphere.exception.invoice.InvoiceNotFoundException;
 import com.cts.eventsphere.exception.invoice.InvoicePdfGenerationException;
+import com.cts.eventsphere.exception.resource.InsufficientResourceException;
+import com.cts.eventsphere.exception.resource.ResourceAlreadyExistsException;
+import com.cts.eventsphere.exception.resource.ResourceDuplicateAllocationException;
+import com.cts.eventsphere.exception.resource.ResourceNotFoundException;
+import com.cts.eventsphere.exception.user.*;
 import com.cts.eventsphere.exception.registration.RegistrationAlreadyExistsException;
 import com.cts.eventsphere.exception.registration.RegistrationNotFoundException;
 import com.cts.eventsphere.exception.ticket.TicketAlreadyExistsException;
@@ -20,16 +24,12 @@ import com.cts.eventsphere.exception.user.InvalidPasswordException;
 import com.cts.eventsphere.exception.user.UserAlreadyExistsException;
 import com.cts.eventsphere.exception.user.UserNotFoundException;
 import com.cts.eventsphere.exception.vendor.VendorNotFoundException;
+import com.cts.eventsphere.exception.venue.VenueNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
-import org.jspecify.annotations.Nullable;
-import com.cts.eventsphere.exception.resource.InsufficientResourceException;
-import com.cts.eventsphere.exception.resource.ResourceAlreadyExistsException;
-import com.cts.eventsphere.exception.resource.ResourceDuplicateAllocationException;
-import com.cts.eventsphere.exception.resource.ResourceNotFoundException;
-import com.cts.eventsphere.exception.venue.VenueNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -121,7 +121,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RegistrationNotFoundException.class)
     public ResponseEntity<GenericErrorResponse> registrationNotFoundException(RegistrationNotFoundException e){
-        return new ResponseEntity<>(new GenericErrorResponse("Registration not found"), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
@@ -142,6 +142,26 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<GenericErrorResponse> userNotFoundException(UserNotFoundException e){
         return new ResponseEntity<>(new GenericErrorResponse("User not found"), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(RefreshFailedException.class)
+    public ResponseEntity<GenericErrorResponse> handleRefreshFailedException(RefreshFailedException e){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new GenericErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(UserNotActiveException.class)
+    public ResponseEntity<GenericErrorResponse> handleUserNotActiveException(UserNotActiveException e){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new GenericErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(UserSuspendedException.class)
+    public ResponseEntity<GenericErrorResponse> handleUserSuspendedException(UserSuspendedException e){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new GenericErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<GenericErrorResponse> handleAuthorizationDeniedException(AuthorizationDeniedException e){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new GenericErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
@@ -179,5 +199,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<GenericErrorResponse> handleDeliveryNotFound(DeliveryNotFoundException e) {
         return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
     }
+
 
 }

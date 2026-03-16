@@ -75,6 +75,4 @@ public class Expense {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-
 }

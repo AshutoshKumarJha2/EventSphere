@@ -15,7 +15,7 @@ import java.util.List;
 public interface NotificationService {
     List<Notification> getNotificationsScroll(String userId, LocalDateTime lastTimestamp, int limit);
 
-    void sendNotification(String userId, String email, String message, String category);
+    void sendNotification(String userId, String message, String category);
 
     void markAsRead(String notificationId);
 }

@@ -57,4 +57,10 @@ public class User {
 
     @OneToMany(mappedBy = "approvedBy", cascade = CascadeType.ALL)
     private List<Expense> approvedExpense = new ArrayList<>();
+
+    @OneToMany(mappedBy = "attendee", cascade = CascadeType.ALL)
+    private List<Registration> registrations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<AuditLog> logs = new ArrayList<>();
 }

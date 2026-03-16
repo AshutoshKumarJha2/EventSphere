@@ -54,7 +54,6 @@ public class BudgetServiceImpl  implements BudgetService {
         BudgetResponseDto response = budgetResponseDtoMapper.toDTO(savedBudget);
         log.info("Successfully saved budget. Generated Budget ID: {}", savedBudget.getBudgetId());
         notificationService.sendNotification(
-                eventId,
                 event.getOrganizerId(),
                 "Budget Created for Event: " + event.getName() +
                         " | Total Amount: " + request.plannedAmount(),
