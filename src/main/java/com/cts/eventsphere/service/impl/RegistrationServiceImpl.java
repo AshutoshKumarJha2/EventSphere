@@ -1,7 +1,11 @@
 package com.cts.eventsphere.service.impl;
 
+import com.cts.eventsphere.exception.event.EventNotFoundException;
+import com.cts.eventsphere.exception.ticket.TicketNotFoundException;
 import com.cts.eventsphere.model.User;
 import com.cts.eventsphere.model.data.AuditAction;
+import com.cts.eventsphere.repository.EventRepository;
+import com.cts.eventsphere.repository.TicketRepository;
 import com.cts.eventsphere.service.AuditService;
 import com.cts.eventsphere.service.NotificationService;
 import jakarta.persistence.EntityManager;
@@ -38,6 +42,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final EntityManager entityManager;
     private final NotificationService notificationService;
     private final AuditService auditService;
+    private final EventRepository eventRepository;
+    private final TicketRepository ticketRepository;
 
     /**
      * Registers a user for an event with a specific ticket.
@@ -50,20 +56,27 @@ public class RegistrationServiceImpl implements RegistrationService {
      */
     @Override
     public GenericResponse registerForEvent(String userId, String eventId, String ticketId) {
-        var registration = registrationRepo.findByAttendeeUserIdAndEventId(userId, eventId);
+        var registration = registrationRepo.findByAttendeeUserIdAndEventEventId(userId, eventId);
         if (registration.isPresent()) {
             throw new RegistrationAlreadyExistsException(String.format("User %s is already registered for event %s", userId, eventId));
         }
         var attendeeRef = entityManager.getReference(User.class, userId);
+        var event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+        var ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new TicketNotFoundException(String.format("Ticket with id %s not found", ticketId)));
         var newRegistration = Registration.builder()
                 .attendee(attendeeRef)
-                .eventId(eventId)
-                .ticketId(ticketId)
+                .event(event)
+                .ticket(ticket)
                 .status(RegistrationStatus.pending)
                 .build();
         registrationRepo.save(newRegistration);
         log.info("User {} registered for event {} with ticket {}", userId, eventId, ticketId);
-        auditService.logAudit(userId, AuditAction.CREATE, Registration.class, newRegistration.getRegistrationId());
+        try {
+            notificationService.sendNotification(userId, String.format("Successfully registered for event %s with ticket %s", event.getName(), ticket.getType()), "EVENT");
+            auditService.logAudit(userId, AuditAction.CREATE, Registration.class, newRegistration.getRegistrationId());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
         return new GenericResponse("Registration successful");
     }
 
@@ -77,12 +90,16 @@ public class RegistrationServiceImpl implements RegistrationService {
      */
     @Override
     public GenericResponse deleteRegistration(String actorId, String registrationId) {
-        if (!registrationRepo.existsById(registrationId)) {
-            throw new RegistrationNotFoundException(String.format("Registration with id %s not found", registrationId));
-        }
+        var registration = registrationRepo.findById(registrationId).orElseThrow(() -> new RegistrationNotFoundException(String.format("Registration with id %s not found", registrationId)));
         registrationRepo.deleteById(registrationId);
         auditService.logAudit(actorId, AuditAction.DELETE, Registration.class, registrationId);
-        log.info("Registration with id {} deleted by actor {}", registrationId, actorId);
+        try {
+            log.info("Registration with id {} deleted by actor {}", registrationId, actorId);
+            notificationService.sendNotification(registration.getAttendee().getUserId(), String.format("Your registration for event %s with ticket type %s has been removed", registration.getEvent().getName(), registration.getTicket().getType()), "REGISTRATION");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+
         return new GenericResponse("Registration deleted successfully");
     }
 
@@ -100,7 +117,12 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .orElseThrow(() -> new RegistrationNotFoundException(String.format("Registration with id %s not found", registrationId)));
         registration.setStatus(RegistrationStatus.cancelled);
         registrationRepo.save(registration);
-        auditService.logAudit(actorId, AuditAction.CANCEL, Registration.class, registrationId);
+        try {
+            auditService.logAudit(actorId, AuditAction.CANCEL, Registration.class, registrationId);
+            notificationService.sendNotification(registration.getAttendee().getUserId(), String.format("Your registration for event %s has been cancelled", registration.getEvent().getName()), "REGISTRATION");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
         log.info("Registration with id {} cancelled by actor {}", registrationId, actorId);
         return new GenericResponse("Registration cancelled successfully");
     }
@@ -119,7 +141,12 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .orElseThrow(() -> new RegistrationNotFoundException(String.format("Registration with id %s not found", registrationId)));
         registration.setStatus(RegistrationStatus.confirmed);
         registrationRepo.save(registration);
-        auditService.logAudit(actorId, AuditAction.APPROVE, Registration.class, registrationId);
+        try {
+            auditService.logAudit(actorId, AuditAction.APPROVE, Registration.class, registrationId);
+            notificationService.sendNotification(registration.getAttendee().getUserId(), String.format("Your registration for event %s has been approved", registration.getEvent().getName()), "REGISTRATION");
+        } catch (Exception e){
+            log.error(e.getMessage());
+        }
         log.info("Registration with id {} approved by actor {}", registrationId, actorId);
         return new GenericResponse("Registration approved successfully");
     }
@@ -138,7 +165,12 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .orElseThrow(() -> new RegistrationNotFoundException(String.format("Registration with id %s not found", registrationId)));
         registration.setStatus(RegistrationStatus.cancelled);
         registrationRepo.save(registration);
-        auditService.logAudit(actorId, AuditAction.REJECT, Registration.class, registrationId);
+        try {
+            auditService.logAudit(actorId, AuditAction.REJECT, Registration.class, registrationId);
+            notificationService.sendNotification(registration.getAttendee().getUserId(), String.format("Your registration for event %s has been rejected", registration.getEvent().getName()), "REGISTRATION");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
         log.info("Registration with id {} rejected by actor {}", registrationId, actorId);
         return new GenericResponse("Registration rejected successfully");
     }
@@ -186,8 +218,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     public RegistrationListResponseDTO getRegistrationsByEventIdStatus(String actorId, String eventId, String status, int size, int page) {
         var pagable = PageRequest.of(page, size);
         Page<Registration> pages;
-        if(status == null || status.isEmpty()){
-            pages = registrationRepo.findByEventId(eventId, pagable);
+        if (status == null || status.isEmpty()) {
+            pages = registrationRepo.findByEventEventId(eventId, pagable);
         } else {
             RegistrationStatus statusEnum;
             try {
@@ -195,7 +227,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             } catch (IllegalArgumentException e) {
                 throw new RegistrationNotFoundException(String.format("Invalid query parameter %s", status));
             }
-            pages = registrationRepo.findByEventIdAndStatus(eventId, statusEnum, pagable);
+            pages = registrationRepo.findByEventEventIdAndStatus(eventId, statusEnum, pagable);
         }
 
         var registrations = pages.getContent().stream()
@@ -270,7 +302,7 @@ public class RegistrationServiceImpl implements RegistrationService {
      */
     @Override
     public RegistrationDTO getRegistrationByEventIdAndUserId(String actorId, String eventId, String userId) {
-        var registration = registrationRepo.findByAttendeeUserIdAndEventId(userId, eventId)
+        var registration = registrationRepo.findByAttendeeUserIdAndEventEventId(userId, eventId)
                 .orElseThrow(() -> new RegistrationNotFoundException(String.format("Registration with eventId: %s and userId: %s not found", eventId, userId)));
 
         auditService.logAudit(actorId, AuditAction.READ, Registration.class, registration.getRegistrationId());

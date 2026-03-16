@@ -56,7 +56,7 @@ class RegistrationServiceTest {
 
     @Test
     void registerForEvent_Success() {
-        when(registrationRepo.findByAttendeeUserIdAndEventId(userId, eventId)).thenReturn(Optional.empty());
+        when(registrationRepo.findByAttendeeUserIdAndEventEventId(userId, eventId)).thenReturn(Optional.empty());
         when(registrationRepo.save(any(Registration.class))).thenReturn(mockRegistration);
 
         GenericResponse response = registrationService.registerForEvent(userId, eventId, ticketId);
@@ -67,7 +67,7 @@ class RegistrationServiceTest {
 
     @Test
     void registerForEvent_ThrowsAlreadyExistsException() {
-        when(registrationRepo.findByAttendeeUserIdAndEventId(userId, eventId)).thenReturn(Optional.ofNullable(mockRegistration));
+        when(registrationRepo.findByAttendeeUserIdAndEventEventId(userId, eventId)).thenReturn(Optional.ofNullable(mockRegistration));
 
         RegistrationAlreadyExistsException exception = assertThrows(
                 RegistrationAlreadyExistsException.class,

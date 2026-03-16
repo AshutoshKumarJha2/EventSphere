@@ -3,6 +3,7 @@ package com.cts.eventsphere.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.cts.eventsphere.exception.event.EventNotFoundException;
 import jakarta.persistence.*;
 import org.hibernate.annotations.*;
 
@@ -29,16 +30,18 @@ import lombok.NoArgsConstructor;
 public class Registration {
     @Id
     @UuidGenerator
-    String registrationId;
+    private String registrationId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "eventId")
+    private Event event;
+
+    @ManyToOne
+    @JoinColumn(name = "ticketId")
+    Ticket ticket;
 
     @Column
-    String eventId;
-
-    @Column
-    String ticketId;
-
-    @Column
-    LocalDate date;
+    private  LocalDate date;
 
     @Column(columnDefinition = "ENUM('pending', 'confirmed', 'cancelled', 'checked_in')")
     @Enumerated(EnumType.STRING)
