@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * Response Dto for Contract Dto
+ * Response DTO for returning Contract details to the client.
  *
  * @author 2480177
  * @version 1.0

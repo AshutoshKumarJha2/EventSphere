@@ -2,204 +2,200 @@ package com.cts.eventsphere.service.impl;
 
 import com.cts.eventsphere.dto.contract.ContractRequestDto;
 import com.cts.eventsphere.dto.contract.ContractResponseDto;
+import com.cts.eventsphere.dto.delivery.DeliveryRequestDto;
+import com.cts.eventsphere.dto.invoice.InvoiceRequestDto;
+import com.cts.eventsphere.dto.invoice.InvoiceResponseDto;
 import com.cts.eventsphere.dto.mapper.contract.ContractRequestDtoMapper;
 import com.cts.eventsphere.dto.mapper.contract.ContractResponseDtoMapper;
 import com.cts.eventsphere.exception.contract.ContractNotFoundException;
 import com.cts.eventsphere.model.Contract;
-import com.cts.eventsphere.model.Delivery;
-import com.cts.eventsphere.model.Invoice;
-import com.cts.eventsphere.model.Payment;
-import com.cts.eventsphere.model.data.*;
+import com.cts.eventsphere.model.data.ContractStatus;
 import com.cts.eventsphere.repository.ContractRepository;
-import com.cts.eventsphere.repository.DeliveryRepository;
-import com.cts.eventsphere.repository.InvoiceRepository;
-import com.cts.eventsphere.repository.PaymentRepository;
 import com.cts.eventsphere.service.ContractService;
+import com.cts.eventsphere.service.DeliveryService;
+import com.cts.eventsphere.service.InvoiceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Implementation for Contract Service
+ * Service Implementation for Contract operations.
+ * Handles business logic for contract lifecycle management including creation,
+ * status transitions, and integration with delivery and billing services.
  *
  * @author 2480177
  * @version 1.0
  * @since 03-03-2026
  */
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ContractServiceImpl implements ContractService {
 
     private final ContractRepository contractRepository;
-    private final PaymentRepository paymentRepository;
-    private final InvoiceRepository invoiceRepository;
-    private final DeliveryRepository deliveryRepository;
     private final ContractRequestDtoMapper requestDtoMapper;
     private final ContractResponseDtoMapper responseDtoMapper;
 
+    private final DeliveryService deliveryService;
+    private final InvoiceService invoiceService;
+
     /**
-     * @param request
-     * @return
+     * Creates a new contract and persists it to the database.
+     * Uses mapper to convert incoming DTO to a persistence entity.
+     *
+     * @param request the contract details provided by the organizer
+     * @return the created contract details as a response DTO
      */
     @Override
-    public ContractResponseDto createContract(ContractRequestDto request){
-        log.info("Creating contract...");
-        Contract contract = requestDtoMapper.toEntity(request);
-        Contract saved = contractRepository.save(contract);
-        log.info("Contract created with ID={}", saved.getContractId());
+    @Transactional
+    public ContractResponseDto createContract(ContractRequestDto request) {
+        log.info("Attempting to create a new contract for vendor: {}", request.vendorId());
+        Contract saved = contractRepository.save(requestDtoMapper.toEntity(request));
+        log.info("Successfully created contract with ID: {}", saved.getContractId());
         return responseDtoMapper.toDto(saved);
     }
 
-     /**
-     * @param contractId
-     * @return
-     * @throws ContractNotFoundException
+    /**
+     * Adds a deliverable item to an existing contract.
+     * Validates contract existence before delegating to DeliveryService.
+     *
+     * @param contractId the unique identifier of the contract
+     * @param dto the delivery details to be recorded
+     * @throws ContractNotFoundException if the contract ID does not exist
      */
     @Override
-    public void processContractInvoice(String contractId) {
-        log.info("Starting invoice generation for contract: {}", contractId);
-
-        Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new ContractNotFoundException(contractId));
-
-        Invoice invoice = new Invoice();
-        invoice.setContractId(contract.getContractId());
-        invoice.setTotalAmount(contract.getValue());
-        invoice.setIssueDate(LocalDateTime.now());
-        invoice.setDueDate(LocalDateTime.now().plusDays(30));
-        invoice.setStatus(InvoiceStatus.issued);
-
-        Invoice savedInvoice = invoiceRepository.save(invoice);
-
-        Payment payment = new Payment();
-        payment.setInvoice(savedInvoice);
-        payment.setAmount(contract.getValue());
-        payment.setMethod(PaymentMethod.bank_transfer);
-        payment.setStatus(PaymentStatus.completed);
-        payment.setPaymentDate(LocalDateTime.now());
-
-        paymentRepository.save(payment);
-
-        savedInvoice.setStatus(InvoiceStatus.paid);
-        invoiceRepository.save(savedInvoice);
-
-        log.info("Successfully generated paid invoice {} for contract {}",
-                savedInvoice.getInvoiceId(), contractId);
+    @Transactional
+    public void addDeliverable(String contractId, DeliveryRequestDto dto) {
+        validateContract(contractId);
+        deliveryService.createDelivery(dto);
     }
 
     /**
-     * @param contractId
-     * @param item
-     * @param quantity
-     * @return
-     * @throws ContractNotFoundException
+     * Generates an invoice for an existing contract.
+     * Validates contract existence before delegating to InvoiceService.
+     *
+     * @param contractId the unique identifier of the contract
+     * @param dto the billing details for the invoice
+     * @return the generated invoice response DTO
+     * @throws ContractNotFoundException if the contract ID does not exist
      */
     @Override
-    public void addDeliverable(String contractId, String item, Integer quantity) {
-        log.info("Adding deliverable to Contract: {}", contractId);
-
-        Invoice invoice = invoiceRepository.findAll().stream()
-                .filter(i -> i.getContractId().equals(contractId))
-                .findFirst()
-                .orElseThrow(() -> new ContractNotFoundException(contractId));
-
-        Delivery delivery = new Delivery();
-        delivery.setInvoice(invoice);
-        delivery.setInvoiceId(invoice.getInvoiceId());
-        delivery.setItem(item);
-        delivery.setQuantity(quantity);
-        delivery.setStatus(DeliveryStatus.scheduled);
-
-        deliveryRepository.save(delivery);
+    @Transactional
+    public InvoiceResponseDto createInvoice(String contractId, InvoiceRequestDto dto) {
+        validateContract(contractId);
+        return invoiceService.generateInvoice(contractId, dto);
     }
 
     /**
-     * @param contractId
-     * @return
-     * @throws ContractNotFoundException
+     * Retrieves a specific contract by its unique identifier.
+     *
+     * @param contractId the ID of the contract to retrieve
+     * @return the contract details as a response DTO
+     * @throws ContractNotFoundException if the ID is not found in the database
      */
     @Override
-    public ContractResponseDto getContractById(String contractId){
-        log.info("Fetching contract with ID={}", contractId);
+    @Transactional(readOnly = true)
+    public ContractResponseDto getContractById(String contractId) {
+        log.info("Fetching contract details for ID={}", contractId);
 
-        Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new ContractNotFoundException(contractId));
-
-        return responseDtoMapper.toDto(contract);
+        return contractRepository.findById(contractId)
+                .map(responseDtoMapper::toDto)
+                .orElseThrow(() -> new ContractNotFoundException("Contract not found for ID: " + contractId));
     }
 
     /**
-     * @return
+     * Retrieves all contracts currently stored in the system.
+     *
+     * @return a list of all contract response DTOs
      */
     @Override
-    public List<ContractResponseDto> getAllContracts(){
-        log.info("Fetching all contracts");
-        return contractRepository.findAll()
-                .stream()
+    @Transactional(readOnly = true)
+    public List<ContractResponseDto> getAllContracts() {
+        log.info("Fetching all contracts from database");
+        return contractRepository.findAll().stream()
                 .map(responseDtoMapper::toDto)
                 .toList();
     }
 
     /**
-     * @param contractId
-     * @param status
-     * @return
-     * @throws ContractNotFoundException
+     * Updates the status of an existing contract record.
+     *
+     * @param contractId the unique identifier of the contract
+     * @param status the new status to be applied
+     * @return the updated contract details
+     * @throws ContractNotFoundException if the contract record does not exist
      */
     @Override
+    @Transactional
     public ContractResponseDto updateContractStatus(String contractId, ContractStatus status) {
-        log.info("Updating status for contract ID={} to {}", contractId, status);
+        log.info("Attempting to update status for contract ID: {} to {}", contractId, status);
 
         Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new ContractNotFoundException(contractId));
+                .orElseThrow(() -> new ContractNotFoundException("Contract not found for ID: " + contractId));
 
         contract.setStatus(status);
 
-        Contract updated = contractRepository.save(contract);
-        return responseDtoMapper.toDto(updated);
+        log.info("Successfully updated contract status for ID: {}", contractId);
+        return responseDtoMapper.toDto(contractRepository.save(contract));
     }
 
     /**
-     * @param contractId
-     * @param request
-     * @return
-     * @throws ContractNotFoundException
+     * Updates the comprehensive details of an existing contract record.
+     * Overwrites duration and value based on the provided request.
+     *
+     * @param contractId the unique identifier of the contract to update
+     * @param request the new contract details provided via DTO
+     * @return the updated contract details as a response DTO
+     * @throws ContractNotFoundException if the contract record does not exist in the database
      */
     @Override
-    public ContractResponseDto updateContract(String contractId, ContractRequestDto request){
-        log.info("Updating contract ID={}", contractId);
+    @Transactional
+    public ContractResponseDto updateContract(String contractId, ContractRequestDto request) {
+        log.info("Attempting to update details for contract ID: {}", contractId);
 
         Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new ContractNotFoundException(contractId));
+                .orElseThrow(() -> new ContractNotFoundException("Contract not found for ID: " + contractId));
 
-        contract.setVendorId(request.vendorId());
-        contract.setEventId(request.eventId());
         contract.setStartDate(request.startDate());
         contract.setEndDate(request.endDate());
         contract.setValue(request.value());
-        contract.setStatus(request.status());
 
-        Contract updated = contractRepository.save(contract);
-        return responseDtoMapper.toDto(updated);
+        log.info("Successfully updated contract details for ID: {}", contractId);
+        return responseDtoMapper.toDto(contractRepository.save(contract));
     }
 
     /**
-     * @param contractId
-     * @throws ContractNotFoundException
+     * Removes a contract record from the system based on the provided ID.
+     *
+     * @param contractId the unique identifier of the contract to delete
+     * @throws ContractNotFoundException if the contract is not found
      */
     @Override
-    public void deleteContract(String contractId){
-        log.warn("Deleting contract ID={}", contractId);
+    @Transactional
+    public void deleteContract(String contractId) {
+        log.info("Attempting to delete contract ID: {}", contractId);
 
-        if(!contractRepository.existsById(contractId)){
-            throw new ContractNotFoundException(contractId);
+        if (!contractRepository.existsById(contractId)) {
+            throw new ContractNotFoundException("Contract not found for ID :" + contractId);
         }
 
         contractRepository.deleteById(contractId);
+        log.info("Successfully deleted contract ID: {}", contractId);
+    }
+
+    /**
+     * Internal helper method to validate the existence of a contract.
+     *
+     * @param contractId the unique identifier to check
+     * @throws ContractNotFoundException if the contract does not exist
+     */
+    private void validateContract(String contractId) {
+        if (!contractRepository.existsById(contractId)) {
+            log.error("Validation failed: Contract {} not found", contractId);
+            throw new ContractNotFoundException("Contract not found with ID: " + contractId);
+        }
     }
 }

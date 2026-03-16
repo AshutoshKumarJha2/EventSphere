@@ -3,7 +3,7 @@ package com.cts.eventsphere.exception.invoice;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Exception raised when Invoice is not found.
+ * Exception raised when an Invoice cannot be located in the persistence layer.
  *
  * @author 2480177
  * @version 1.0
