@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * Response Dto for Invoice Dto
+ * Response DTO for returning comprehensive invoice details.
  *
  * @author 2480177
  * @version 1.0
@@ -20,6 +20,9 @@ public record InvoiceResponseDto(
 
         @NotBlank(message = "Response Error: Contract ID is missing")
         String contractId,
+
+        @NotNull(message = "Response Error: Issue date is missing")
+        LocalDateTime issueDate,
 
         @NotNull(message = "Response Error: Total amount is missing")
         @PositiveOrZero(message = "Response Error: Amount cannot be negative")

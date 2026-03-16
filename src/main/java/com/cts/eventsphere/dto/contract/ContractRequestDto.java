@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * Request Dto for Contract Dto
+ * Request DTO for capturing new contract details from the organizer.
  *
  * @author 2480177
  * @version 1.0

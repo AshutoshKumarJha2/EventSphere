@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents an invoice issued for contractual services.
+ * Entity representing a financial billing record.
+ * Tracks the amount due, status, and associated deliverables for a contract.
  *
  * @author 2480177
  * @version 1.0
@@ -32,17 +33,18 @@ public class Invoice {
     @OneToMany(mappedBy = "invoice" , cascade = CascadeType.ALL)
     private List<Payment> payments = new ArrayList<>();
 
-
-    @Column(name = "contractId", columnDefinition = "VARCHAR(50)",nullable = false)
+    @Column(name = "contractId", columnDefinition = "CHAR(36)",nullable = false)
     private String contractId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contractId", insertable = false, updatable = false)
     private Contract contract;
 
-    @Column
+    @CreationTimestamp
+    @Column(name = "issueDate", updatable = false)
     private LocalDateTime issueDate;
 
+    @Column(nullable = false)
     private LocalDateTime dueDate;
 
     @Column(nullable = false, precision = 10, scale = 2)
@@ -62,12 +64,22 @@ public class Invoice {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    /**
+     * Links a new delivery item to this invoice.
+     *
+     * @param delivery the delivery entity to be associated
+     */
     public void addDelivery(Delivery delivery) {
         deliveries.add(delivery);
         delivery.setInvoice(this);
         delivery.setInvoiceId(this.invoiceId);
     }
 
+    /**
+     * Records a new payment against this invoice.
+     *
+     * @param payment the payment details to be added
+     */
     public void addPayment(Payment payment) {
         payments.add(payment);
         payment.setInvoice(this);

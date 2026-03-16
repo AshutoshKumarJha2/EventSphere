@@ -6,7 +6,7 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 /**
- * Response Dto for Vendor Dto
+ * Response DTO for returning comprehensive vendor details.
  *
  * @author 2480177
  * @version 1.0
