@@ -1,6 +1,7 @@
 package com.cts.eventsphere.service.impl;
 
 import com.cts.eventsphere.model.Notification;
+import com.cts.eventsphere.model.data.NotificationStatus;
 import com.cts.eventsphere.repository.NotificationRepository;
 import com.cts.eventsphere.service.EmailService;
 import com.cts.eventsphere.service.NotificationService;
@@ -79,7 +80,7 @@ public class NotificationServiceImpl implements NotificationService {
         log.info("Attempting to mark notification {} as read", notificationId);
         notificationRepository.findById(notificationId).ifPresentOrElse(
                 n -> {
-                    n.setStatus("Read");
+                    n.setStatus(String.valueOf(NotificationStatus.READ));
                     log.info("Notification {} status updated to Read", notificationId);
                 },
                 () -> log.warn("Notification {} not found, unable to mark as read", notificationId)
