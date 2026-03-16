@@ -55,7 +55,6 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentResponseDto response = paymentResponseDtoMapper.toDTO(paymentRepository.save(payment));
         log.info("Payment successfully processed for expenseId: {}. Status: {}", expenseId, response.status());
         notificationService.sendNotification(
-                expense.getEvent().getEventId(),
                 expense.getEvent().getOrganizerId(),
                 "Payment Finalized: " + expense.getDescription() +
                         " | Amount: " + request.amount() +

@@ -56,14 +56,15 @@ public class EventServiceImpl implements EventService {
         Event savedEvent = eventRepository.save(event);
         log.info("Successfully saved event with ID: {}", savedEvent.getEventId());
 
+        var venueId = eventRequest.venueId() == null ? "null" : eventRequest.venueId();
+
         notificationService.sendNotification(
-                savedEvent.getEventId(),
                 eventRequest.organizerId(),
                 "New Event Created: " + eventRequest.name() +
-                        " at venue " + eventRequest.venueId() +
+                        " at venue " + venueId +
                         " from " + eventRequest.startDate() +
                         " to " + eventRequest.endDate(),
-                eventRequest.status().name()
+                "EVENT_CREATED"
         );
 
         return eventResponseDtoMapper.toDTO(savedEvent);
@@ -125,13 +126,12 @@ public class EventServiceImpl implements EventService {
         log.info("Successfully updated event ID: {}", eventId);
 
         notificationService.sendNotification(
-                eventId,
                 eventRequest.organizerId(),
                 "Event Updated: " + eventRequest.name() +
                         " at venue " + eventRequest.venueId() +
                         " from " + eventRequest.startDate() +
                         " to " + eventRequest.endDate(),
-                eventRequest.status().name()
+                "EVENT_UPDATED"
         );
 
         return true;
@@ -154,12 +154,12 @@ public class EventServiceImpl implements EventService {
         eventRepository.deleteById(eventId);
         log.info("Successfully deleted event ID: {}", eventId);
 
-        notificationService.sendNotification(
-                eventId,
-                "system@eventsphere.com",
-                "Event Deleted with ID: " + eventId,
-                "EVENT"
-        );
+//        notificationService.sendNotification(
+//                eventId,
+//                "system@eventsphere.com",
+//                "Event Deleted with ID: " + eventId,
+//                "EVENT"
+//        );
 
         return true;
     }
@@ -186,7 +186,6 @@ public class EventServiceImpl implements EventService {
         log.info("Successfully added activity ID: {} to event ID: {}", savedSchedule.getScheduleId(), eventId);
 
         notificationService.sendNotification(
-                eventId,
                 event.getOrganizerId(),
                 "New Activity Added to Event: " + event.getName() +
                         " | Activity ID: " + savedSchedule.getScheduleId(),

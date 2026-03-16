@@ -28,10 +28,8 @@ public record EventRequestDto(
         @Future(message = "End date must be in the future")
         LocalDateTime endDate,
 
-        @NotBlank(message = "Venue ID must not be blank")
         String venueId,
 
-        @NotNull(message = "Event status must not be null")
         EventStatus status
 ) {
 }

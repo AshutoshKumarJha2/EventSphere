@@ -12,6 +12,9 @@ public record RegistrationDTO(
         String eventId,
         String ticketId,
         String attendeeId,
+        String name,
+        String email,
+        String phone,
         String status
 ) {
 }

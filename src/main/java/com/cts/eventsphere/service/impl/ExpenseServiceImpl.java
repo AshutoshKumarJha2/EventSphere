@@ -58,7 +58,6 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setEvent(event);
         Expense savedExpense = expenseRepository.save(expense);
         notificationService.sendNotification(
-                eventId,
                 event.getOrganizerId(),
                 "New Expense Created: " + request.description() +
                         " | Amount: " + request.amount() +
@@ -120,12 +119,12 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
         expenseRepository.deleteById(expenseId);
         log.info("Successfully deleted expense with ID: {}", expenseId);
-        notificationService.sendNotification(
-                expenseId,
-                "finance-system@eventsphere.com",
-                "Expense Record Deleted with ID: " + expenseId,
-                "FINANCE_DELETED"
-        );
+//        notificationService.sendNotification(
+//                expenseId,
+//                "finance-system@eventsphere.com",
+//                "Expense Record Deleted with ID: " + expenseId,
+//                "FINANCE_DELETED"
+//        );
     }
 
     /**
@@ -146,7 +145,6 @@ public class ExpenseServiceImpl implements ExpenseService {
         ExpenseResponseDto response = expenseResponseDtoMapper.toDTO(updatedExpense);
         log.info("Successfully updated expenseId: {} to status: {}", expenseId, response.status());
         notificationService.sendNotification(
-                expense.getEvent().getEventId(),
                 expense.getEvent().getOrganizerId(),
                 "Expense Status Update: " + expense.getDescription() + " is now " + status,
                 "FINANCE_UPDATE"

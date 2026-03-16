@@ -3,15 +3,11 @@ package com.cts.eventsphere.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.*;
 import org.hibernate.annotations.*;
 
 import com.cts.eventsphere.model.data.RegistrationStatus;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,9 +35,6 @@ public class Registration {
     String eventId;
 
     @Column
-    String attendeeId;
-
-    @Column
     String ticketId;
 
     @Column
@@ -57,4 +50,8 @@ public class Registration {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "attendeeId", nullable = false)
+    private User attendee;
 }

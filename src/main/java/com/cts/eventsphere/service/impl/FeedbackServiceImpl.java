@@ -8,6 +8,7 @@ import com.cts.eventsphere.dto.registration.RegistrationDTO;
 import com.cts.eventsphere.exception.Feedback.FeedbackNotFoundException;
 import com.cts.eventsphere.model.FeedBack;
 import com.cts.eventsphere.repository.FeedbackRepository;
+import com.cts.eventsphere.repository.RegistrationRepository;
 import com.cts.eventsphere.service.FeedbackService;
 import com.cts.eventsphere.service.RegistrationService;
 import jakarta.persistence.EntityExistsException;
@@ -36,7 +37,7 @@ import java.util.Optional;
 public class FeedbackServiceImpl implements FeedbackService {
 
     private final FeedbackRepository feedbackRepository;
-    private final RegistrationService registrationService;
+    private final RegistrationRepository registrationRepository;
 
     @Override
     public FeedbackResponseDto create(FeedbackRequestDto request) {
@@ -108,19 +109,20 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     private void ensureEligibleToSubmit(String eventId, String attendeeId) {
-        RegistrationDTO dto = registrationService.getRegistrationByEventIdAndUserId(eventId, attendeeId);
+        var  registration = registrationRepository.findByAttendeeUserIdAndEventId(attendeeId, eventId);
 
-        if (dto == null || dto.status() == null) {
+        if (registration.isEmpty() || registration.get().getStatus() == null) {
             log.warn("No valid registration found for event={}, attendee={}", eventId, attendeeId);
             throw new IllegalStateException("Only Confirmed or Checked-In attendees can submit feedback.");
         }
 
-        boolean eligible = dto.status().equalsIgnoreCase("Confirmed")
-                || dto.status().equalsIgnoreCase("CheckedIn");
+        var status = registration.get().getStatus().name();
+        boolean eligible = status.equals("confirmed")
+                || status.equalsIgnoreCase("checked_in");
 
         if (!eligible) {
             log.warn("Attendee not eligible: event={}, attendee={}, status={}",
-                    eventId, attendeeId, dto.status());
+                    eventId, attendeeId, status);
             throw new IllegalStateException("Only Confirmed or Checked-In attendees can submit feedback.");
         }
     }

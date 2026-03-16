@@ -9,7 +9,10 @@ public class RegistrationDTOMapper {
                 registration.getRegistrationId(),
                 registration.getEventId(),
                 registration.getTicketId(),
-                registration.getAttendeeId(),
+                registration.getAttendee().getUserId(),
+                registration.getAttendee().getName(),
+                registration.getAttendee().getEmail(),
+                registration.getAttendee().getPhone(),
                 registration.getStatus().name()
         );
     }

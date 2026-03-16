@@ -69,7 +69,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         log.info("Successfully saved updated schedule ID: {}", updatedSchedule.getScheduleId());
 
         notificationService.sendNotification(
-                eventId,
                 event.getOrganizerId(),
                 "Schedule Updated for Event: " + event.getName() +
                         " | Date: " + scheduleRequest.date() +
@@ -100,12 +99,11 @@ public class ScheduleServiceImpl implements ScheduleService {
         scheduleRepository.deleteById(id);
         log.info("Successfully deleted schedule with ID: {}", id);
 
-        notificationService.sendNotification(
-                id,
-                "system@eventsphere.com",
-                "Schedule Deleted with ID: " + id,
-                "SCHEDULE"
-        );
+//        notificationService.sendNotification(
+//                id,
+//                "Schedule Deleted with ID: " + id,
+//                "SCHEDULE"
+//        );
 
         return true;
     }
