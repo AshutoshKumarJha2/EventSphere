@@ -1,8 +1,10 @@
 package com.cts.eventsphere.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -20,6 +22,8 @@ import java.time.LocalDateTime;
 @Table(name = "auditlog")
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AuditLog {
 
     @Id

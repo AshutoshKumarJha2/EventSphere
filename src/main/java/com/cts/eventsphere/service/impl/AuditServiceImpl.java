@@ -15,6 +15,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 /**
  * AuditServiceImpl provides the concrete implementation of the {@link AuditService}.
  * It handles the persistence of audit logs and facilitates paginated retrieval
@@ -55,10 +58,10 @@ public class AuditServiceImpl implements AuditService {
                 .resource(className)
                 .entityId(entityId)
                 .entityName(className)
+                .timeStamp(LocalDateTime.now())
                 .build();
 
         auditRepo.save(audit);
-
         log.info("Successfully saved audit log for EntityId: {}", entityId);
     }
 

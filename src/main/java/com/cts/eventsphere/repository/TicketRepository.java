@@ -18,4 +18,5 @@ import java.util.Optional;
 public interface TicketRepository extends JpaRepository<Ticket, String> {
     Page<Ticket> findByEventId(String eventId, Pageable pageable);
     Optional<Ticket> findByType(String type);
+    Optional<Ticket> findByEventIdAndType(String eventId, String type);
 }
