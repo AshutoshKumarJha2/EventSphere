@@ -11,8 +11,10 @@ import com.cts.eventsphere.dto.schedule.ScheduleResponseDto;
 import com.cts.eventsphere.exception.event.EventNotFoundException;
 import com.cts.eventsphere.model.Event;
 import com.cts.eventsphere.model.Schedule;
+import com.cts.eventsphere.model.data.AuditAction;
 import com.cts.eventsphere.repository.EventRepository;
 import com.cts.eventsphere.repository.ScheduleRepository;
+import com.cts.eventsphere.service.AuditService;
 import com.cts.eventsphere.service.EventService;
 import com.cts.eventsphere.service.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +44,7 @@ public class EventServiceImpl implements EventService {
     private final ScheduleResponseDtoMapper scheduleResponseDtoMapper;
     private final ScheduleRequestDtoMapper scheduleRequestDtoMapper;
     private final NotificationService notificationService;
+    private final AuditService auditService;
 
     /**
      * Creates a new event in the system and triggers a notification with event details.
@@ -50,11 +53,13 @@ public class EventServiceImpl implements EventService {
      * @return the response DTO representing the newly created event
      */
     @Override
-    public EventResponseDto create(EventRequestDto eventRequest) {
+    public EventResponseDto create(String userId,EventRequestDto eventRequest) {
         log.info("Creating a new event: {}", eventRequest.name());
         Event event = eventRequestDtoMapper.toEntity(eventRequest);
         Event savedEvent = eventRepository.save(event);
         log.info("Successfully saved event with ID: {}", savedEvent.getEventId());
+
+        auditService.logAudit(userId, AuditAction.CREATE, Event.class, savedEvent.getEventId());
 
         var venueId = eventRequest.venueId() == null ? "null" : eventRequest.venueId();
 
