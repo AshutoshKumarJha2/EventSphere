@@ -33,7 +33,6 @@ public class Venue {
     private List<Booking> bookings;
 
 
-
     @Column(nullable = false, columnDefinition = "VARCHAR(255)")
     private String location;
 

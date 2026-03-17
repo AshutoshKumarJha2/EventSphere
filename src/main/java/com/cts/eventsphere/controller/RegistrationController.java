@@ -120,6 +120,22 @@ public class RegistrationController {
     }
 
     /**
+     * Cancels an existing registration.
+     * This endpoint is intended for use by the Attendee.
+     *
+     * @param registrationId The unique identifier of the registration to cancel.
+     * @param userDetails    The authenticated user principal representing the actor.
+     * @return A {@link ResponseEntity} containing a {@link GenericResponse} confirming the cancellation.
+     */
+    @PatchMapping("/registrations/{registrationId}/check-in")
+    @PreAuthorize("hasRole('ATTENDEE')")
+    public ResponseEntity<GenericResponse> checkInRegistration(@PathVariable String registrationId, @AuthenticationPrincipal UserPrincipal userDetails) {
+        var actorId = userDetails.userId();
+        log.info("Checking in registration with registrationId: {} by actor: {}", registrationId, actorId);
+        return ResponseEntity.ok(registrationService.checkInRegistration(actorId, registrationId));
+    }
+
+    /**
      * Approves a pending event registration.
      * Accessible only by Organizers or Admins.
      *

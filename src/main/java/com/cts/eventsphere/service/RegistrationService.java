@@ -70,6 +70,15 @@ public interface RegistrationService {
     GenericResponse approveRegistration(String actorId, String registrationId);
 
     /**
+     * Check in a approved registration, typically initiated by an organizer or admin.
+     *
+     * @param actorId Unique identifier for the actor.
+     * @param registrationId The unique identifier of the registration to approve.
+     * @return A {@link GenericResponse} indicating successful approval.
+     */
+    GenericResponse checkInRegistration(String actorId, String registrationId);
+
+    /**
      * Rejects a pending registration.
      *
      * @param actorId Unique identifier for the actor.

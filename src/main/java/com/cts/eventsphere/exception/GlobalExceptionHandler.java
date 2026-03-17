@@ -9,6 +9,7 @@ import com.cts.eventsphere.exception.finance.ExpenseNotFoundException;
 import com.cts.eventsphere.exception.finance.PaymentNotFoundException;
 import com.cts.eventsphere.exception.invoice.InvoiceNotFoundException;
 import com.cts.eventsphere.exception.invoice.InvoicePdfGenerationException;
+import com.cts.eventsphere.exception.registration.InvalidRegistrationStatusException;
 import com.cts.eventsphere.exception.registration.RegistrationAlreadyExistsException;
 import com.cts.eventsphere.exception.registration.RegistrationNotFoundException;
 import com.cts.eventsphere.exception.resource.InsufficientResourceException;
@@ -28,6 +29,7 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -190,6 +192,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<GenericErrorResponse> httpMessageNotRedableException(HttpMessageNotReadableException e){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new GenericErrorResponse(e.getMessage()));
     }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<GenericErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException err){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new GenericErrorResponse(err.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidRegistrationStatusException.class)
+    public ResponseEntity<GenericErrorResponse> handelInvalidRegistrationStatus(InvalidRegistrationStatusException e){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new GenericErrorResponse(e.getMessage()));
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity< GenericErrorResponse> handleUnexpectedExceptions(Exception ex) {

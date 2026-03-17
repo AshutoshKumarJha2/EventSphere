@@ -5,6 +5,7 @@ import com.cts.eventsphere.dto.registration.RegistrationDTO;
 import com.cts.eventsphere.dto.registration.RegistrationListResponseDTO;
 import com.cts.eventsphere.dto.shared.GenericResponse;
 import com.cts.eventsphere.exception.event.EventNotFoundException;
+import com.cts.eventsphere.exception.registration.InvalidRegistrationStatusException;
 import com.cts.eventsphere.exception.registration.RegistrationAlreadyExistsException;
 import com.cts.eventsphere.exception.registration.RegistrationNotFoundException;
 import com.cts.eventsphere.exception.ticket.TicketNotFoundException;
@@ -142,6 +143,33 @@ public class RegistrationServiceImpl implements RegistrationService {
         try {
             auditService.logAudit(actorId, AuditAction.APPROVE, Registration.class, registrationId);
             notificationService.sendNotification(registration.getAttendee().getUserId(), String.format("Your registration for event %s has been approved", registration.getEvent().getName()), "REGISTRATION");
+        } catch (Exception e){
+            log.error(e.getMessage());
+        }
+        log.info("Registration with id {} approved by actor {}", registrationId, actorId);
+        return new GenericResponse("Registration approved successfully");
+    }
+
+    /**
+     * check in a approved registration, changing its status to confirmed.
+     *
+     * @param actorId        The unique identifier of the actor.
+     * @param registrationId The unique identifier of the registration.
+     * @return A {@link GenericResponse} indicating successful approval.
+     * @throws RegistrationNotFoundException if the registration ID does not exist.
+     */
+    @Override
+    public GenericResponse checkInRegistration(String actorId, String registrationId) {
+        var registration = registrationRepo.findById(registrationId)
+                .orElseThrow(() -> new RegistrationNotFoundException(String.format("Registration with id %s not found", registrationId)));
+        if (!registration.getStatus().equals(RegistrationStatus.confirmed)){
+            throw new InvalidRegistrationStatusException(String.format("User not confirmed for this event %s", registration.getEvent().getName()));
+        }
+        registration.setStatus(RegistrationStatus.checked_in);
+        registrationRepo.save(registration);
+        try {
+            auditService.logAudit(actorId, AuditAction.APPROVE, Registration.class, registrationId);
+            notificationService.sendNotification(registration.getAttendee().getUserId(), String.format("You have been checked into the event %s", registration.getEvent().getName()), "REGISTRATION");
         } catch (Exception e){
             log.error(e.getMessage());
         }
