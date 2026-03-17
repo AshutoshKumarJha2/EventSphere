@@ -1,9 +1,11 @@
 package com.cts.eventsphere.exception;
 
 import com.cts.eventsphere.dto.shared.GenericErrorResponse;
+import com.cts.eventsphere.exception.Feedback.FeedbackNotFoundException;
 import com.cts.eventsphere.exception.booking.BookingNotFoundException;
 import com.cts.eventsphere.exception.contract.ContractNotFoundException;
 import com.cts.eventsphere.exception.delivery.DeliveryNotFoundException;
+import com.cts.eventsphere.exception.engagement.EngagementNotFoundException;
 import com.cts.eventsphere.exception.finance.BudgetNotFoundException;
 import com.cts.eventsphere.exception.finance.ExpenseNotFoundException;
 import com.cts.eventsphere.exception.finance.PaymentNotFoundException;
@@ -200,5 +202,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(FeedbackNotFoundException.class)
+    public ResponseEntity<GenericErrorResponse> handleFeedbackNotFound(FeedbackNotFoundException e){
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(EngagementNotFoundException.class)
+    public ResponseEntity<GenericErrorResponse> handleEngagementNotFound(EngagementNotFoundException e){
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
+    }
 
 }

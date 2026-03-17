@@ -41,11 +41,11 @@ public class FeedbackController {
 
     @GetMapping("/{feedbackId}")
     @PreAuthorize("hasAnyRole('ATTENDEE','ORGANIZER','ADMIN')")
-    public ResponseEntity<FeedbackResponseDto> getById(@PathVariable String feedbackId) {
-        log.info("REST request to get Feedback by ID : {}", feedbackId);
-        FeedbackResponseDto response = feedbackService.getById(feedbackId);
+    public ResponseEntity<FeedbackResponseDto> getById(@PathVariable String id) {
+        log.info("REST request to get Feedback by ID : {}", id);
+        FeedbackResponseDto response = feedbackService.getById(id);
         if (response.feedbackId() == null) {
-            log.warn("Feedback with ID : {} not found", feedbackId);
+            log.warn("Feedback with ID : {} not found", id);
         }
         return  ResponseEntity.ok(response);
     }
