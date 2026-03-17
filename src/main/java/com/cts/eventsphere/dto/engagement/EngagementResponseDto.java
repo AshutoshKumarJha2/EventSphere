@@ -9,15 +9,15 @@ package com.cts.eventsphere.dto.engagement;
  */
 
 import com.cts.eventsphere.model.data.EngagementType;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 
+@Builder
 public record EngagementResponseDto(
         String engagementId,
         String eventId,
         String attendeeId,
         EngagementType activity,
-        LocalDateTime activityTimestamp,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime activityTimestamp
 ) {}

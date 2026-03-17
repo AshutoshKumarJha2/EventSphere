@@ -1,14 +1,13 @@
 package com.cts.eventsphere.controller;
-
 import com.cts.eventsphere.model.Engagement;
 import com.cts.eventsphere.model.data.EngagementType;
 import com.cts.eventsphere.service.EngagementService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,6 +27,15 @@ public class EngagementController {
 
     public EngagementController(EngagementService engagementService) {
         this.engagementService = engagementService;
+    }
+
+    @PostMapping("/log")
+    @PreAuthorize("hasRole('ATTENDEE')") // Usually attendees trigger these
+    public ResponseEntity<Engagement> logEngagement(@RequestBody Engagement engagement) {
+        log.info("API: Logging engagement for user={} at event={}",
+                engagement.getAttendeeId(), engagement.getEventId());
+        Engagement saved = engagementService.recordEngagement(engagement);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @GetMapping("/event/{eventId}/log")
