@@ -6,9 +6,12 @@ import com.cts.eventsphere.dto.mapper.feedback.FeedbackRequestDtoMapper;
 import com.cts.eventsphere.dto.mapper.feedback.FeedbackResponseDtoMapper;
 import com.cts.eventsphere.exception.Feedback.FeedbackNotFoundException;
 import com.cts.eventsphere.model.FeedBack;
+import com.cts.eventsphere.model.data.AuditAction;
 import com.cts.eventsphere.repository.FeedbackRepository;
 import com.cts.eventsphere.repository.RegistrationRepository;
+import com.cts.eventsphere.service.AuditService;
 import com.cts.eventsphere.service.FeedbackService;
+import com.cts.eventsphere.service.NotificationService;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,14 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 /**
- * Service implementation class for feedback entity
- *
- * @author 2480027
- * @version 1.0
- * @since 06-03-2026
+ * Service implementation for Feedback management.
+ * Integrates with AuditService for activity tracking and NotificationService for user alerts.
  */
 @Slf4j
 @Service
@@ -36,39 +35,46 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     private final FeedbackRepository feedbackRepository;
     private final RegistrationRepository registrationRepository;
+    private final NotificationService notificationService;
+    private final AuditService auditService;
 
     @Override
     public FeedbackResponseDto create(FeedbackRequestDto request) {
-        log.info("Creating feedback for event={}, attendee={}", request.eventId(), request.attendeeId());
+        log.info("Processing feedback creation for event: {}", request.eventId());
 
         validateRating(request.rating());
         ensureEligibleToSubmit(request.eventId(), request.attendeeId());
-        ensureNotDuplicate(request.eventId(), request.attendeeId(), null);
+        ensureNotDuplicate(request.eventId(), request.attendeeId());
 
         FeedBack entity = FeedbackRequestDtoMapper.toEntity(request);
         FeedBack saved = feedbackRepository.save(entity);
+        log.info("Feedback saved with ID: {}", saved.getFeedbackId());
 
-        log.info("Feedback created with id={}", saved.getFeedbackId());
+        // Standard Audit Call
+        auditService.logAudit(request.attendeeId(), AuditAction.CREATE, FeedBack.class, saved.getFeedbackId());
+
+        // Notification Call
+        notificationService.sendNotification(
+                request.attendeeId(),
+                "Thank you! Your feedback for event " + request.eventId() + " has been received.",
+                "FEEDBACK"
+        );
+
         return FeedbackResponseDtoMapper.toDTO(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public FeedbackResponseDto getById(String feedbackId) throws FeedbackNotFoundException {
-        log.info("Fetching feedback id={}", feedbackId);
-
+    public FeedbackResponseDto getById(String feedbackId) {
+        log.info("Fetching feedback: {}", feedbackId);
         return feedbackRepository.findById(feedbackId)
                 .map(FeedbackResponseDtoMapper::toDTO)
-                .orElseThrow(() -> {
-                    log.warn("Feedback not found id={}", feedbackId);
-                    return new FeedbackNotFoundException("Feedback does not exist");
-                });
+                .orElseThrow(() -> new FeedbackNotFoundException(feedbackId));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<FeedbackResponseDto> listByEvent(String eventId, Pageable pageable) {
-        log.info("Fetching feedback list for event={}", eventId);
         return feedbackRepository.findByEventId(eventId, pageable)
                 .map(FeedbackResponseDtoMapper::toDTO);
     }
@@ -77,74 +83,47 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Transactional(readOnly = true)
     public Page<FeedbackResponseDto> listByEventAndDateRange(
             String eventId, LocalDateTime start, LocalDateTime end, Pageable pageable) {
-
-        log.info("Fetching feedback for event={} within date range", eventId);
-
         return feedbackRepository.findByEventIdAndDateBetween(eventId, start, end, pageable)
                 .map(FeedbackResponseDtoMapper::toDTO);
     }
 
     @Override
-    public void delete(String feedbackId) throws FeedbackNotFoundException {
-        log.info("Deleting feedback id={}", feedbackId);
-
-        if (!feedbackRepository.existsById(feedbackId)) {
-            log.warn("Cannot delete — feedback not found id={}", feedbackId);
-            throw new FeedbackNotFoundException("Feedback Does not exist " + feedbackId);
-        }
+    public void delete(String feedbackId) {
+        log.info("Deleting feedback: {}", feedbackId);
+        FeedBack feedback = feedbackRepository.findById(feedbackId)
+                .orElseThrow(() -> new FeedbackNotFoundException(feedbackId));
 
         feedbackRepository.deleteById(feedbackId);
-        log.info("Feedback deleted id={}", feedbackId);
+
+        // Audit for deletion - using "SYSTEM" or a specific admin ID if available
+        auditService.logAudit(feedback.getAttendeeId(), AuditAction.DELETE, FeedBack.class, feedbackId);
     }
 
-    // ===================== GUARD METHODS =====================
+    // ===================== HELPER METHODS =====================
 
     private void validateRating(int rating) {
         if (rating < 1 || rating > 5) {
-            log.warn("Invalid rating {}", rating);
             throw new IllegalArgumentException("Rating must be between 1 and 5.");
         }
     }
 
     private void ensureEligibleToSubmit(String eventId, String attendeeId) {
-        var  registration = registrationRepository.findByAttendeeUserIdAndEventEventId(attendeeId, eventId);
+        var registration = registrationRepository.findByAttendeeUserIdAndEventEventId(attendeeId, eventId)
+                .orElseThrow(() -> new IllegalStateException("Attendee is not registered for this event."));
 
-        if (registration.isEmpty() || registration.get().getStatus() == null) {
-            log.warn("No valid registration found for event={}, attendee={}", eventId, attendeeId);
-            throw new IllegalStateException("Only Confirmed or Checked-In attendees can submit feedback.");
-        }
-
-        var status = registration.get().getStatus().name();
-        boolean eligible = status.equals("confirmed")
-                || status.equalsIgnoreCase("checked_in");
-
-        if (!eligible) {
-            log.warn("Attendee not eligible: event={}, attendee={}, status={}",
-                    eventId, attendeeId, status);
-            throw new IllegalStateException("Only Confirmed or Checked-In attendees can submit feedback.");
+        String status = registration.getStatus().name();
+        if (!(status.equalsIgnoreCase("confirmed") || status.equalsIgnoreCase("checked_in"))) {
+            throw new IllegalStateException("Only confirmed or checked-in attendees can provide feedback.");
         }
     }
 
-    private void ensureNotDuplicate(String eventId, String attendeeId, String ignoreFeedbackId) {
+    private void ensureNotDuplicate(String eventId, String attendeeId) {
         boolean exists = !feedbackRepository
                 .findByEventIdAndAttendeeId(eventId, attendeeId, PageRequest.of(0, 1))
                 .isEmpty();
 
-        if (exists && ignoreFeedbackId == null) {
-            log.warn("Duplicate feedback for event={}, attendee={}", eventId, attendeeId);
-            throw new EntityExistsException("Feedback already exists for this attendee in this event.");
-        }
-
-        if (exists && ignoreFeedbackId != null) {
-            Optional<FeedBack> existing = feedbackRepository.findById(ignoreFeedbackId);
-            boolean same = existing.isPresent()
-                    && eventId.equals(existing.get().getEventId())
-                    && attendeeId.equals(existing.get().getAttendeeId());
-
-            if (!same) {
-                log.warn("Another feedback exists for event={}, attendee={} (different ID)", eventId, attendeeId);
-                throw new EntityExistsException("Another feedback already exists for this attendee in this event.");
-            }
+        if (exists) {
+            throw new EntityExistsException("Feedback already submitted for this event.");
         }
     }
 }

@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class EngagementResponseDtoMapper {
+public  class EngagementResponseDtoMapper {
 
-    public EngagementResponseDto toDTO(Engagement entity) {
+    public static EngagementResponseDto toDTO(Engagement entity) {
         if (entity == null) {
             return null;
         }

@@ -12,9 +12,7 @@ import com.cts.eventsphere.dto.feedback.FeedbackRequestDto;
 import com.cts.eventsphere.dto.feedback.FeedbackResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 public interface FeedbackService {
 

@@ -1,6 +1,7 @@
 package com.cts.eventsphere.service;
 
-import com.cts.eventsphere.model.Engagement;
+import com.cts.eventsphere.dto.engagement.EngagementRequestDto;
+import com.cts.eventsphere.dto.engagement.EngagementResponseDto;
 import com.cts.eventsphere.model.data.EngagementType;
 
 import java.time.LocalDateTime;
@@ -14,11 +15,11 @@ import java.util.List;
  */
 public interface EngagementService {
 
-    Engagement recordEngagement(Engagement engagement);
+    EngagementResponseDto recordEngagement(EngagementRequestDto engagementRequestDto);
 
-    List<Engagement> getByEvent(String eventId);
+    List<EngagementResponseDto> getByEvent(String eventId);
 
-    List<Engagement> getByActivityType(EngagementType activity);
+    List<EngagementResponseDto> getByActivityType(EngagementType activity);
 
-    List<Engagement> getFilteredEngagements(String eventId, EngagementType activity, LocalDateTime start, LocalDateTime end);
+    List<EngagementResponseDto> getFilteredEngagements(String eventId, EngagementType activity, LocalDateTime start, LocalDateTime end);
 }
