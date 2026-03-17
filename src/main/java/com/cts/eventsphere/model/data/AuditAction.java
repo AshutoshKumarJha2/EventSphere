@@ -31,6 +31,10 @@ public enum AuditAction {
     RESTORE,
 
     // --- Security & Access Control ---
+    /** Action recorded when a new user successfully registers. */
+    REGISTRATION_SUCCESS,
+    /** Action recorded when a user registration attempt fails (e.g., due to validation errors). */
+    REGISTRATON_FAILURE,
     /** Action recorded upon a successful user authentication. */
     LOGIN_SUCCESS,
     /** Action recorded upon a failed authentication attempt. */
