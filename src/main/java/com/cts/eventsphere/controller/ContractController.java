@@ -59,6 +59,7 @@ public class ContractController {
      * @return the generated invoice details [cite: 55]
      */
     @PostMapping("/{contractId}/invoice")
+    @PreAuthorize("hasAnyRole('FINANCE_OFFICER','VENDOR')")
     public ResponseEntity<InvoiceResponseDto> createInvoice(@PathVariable String contractId, @Valid @RequestBody InvoiceRequestDto dto) {
         return new ResponseEntity<>(contractService.createInvoice(contractId, dto), HttpStatus.CREATED);
     }
@@ -71,6 +72,7 @@ public class ContractController {
      * @return a success message confirming the delivery addition [cite: 55]
      */
     @PostMapping("/{contractId}/deliveries")
+    @PreAuthorize("hasRole('VENDOR')")
     public ResponseEntity<String> addDelivery(@PathVariable String contractId, @Valid @RequestBody DeliveryRequestDto dto) {
         contractService.addDeliverable(contractId, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Delivery Added");
