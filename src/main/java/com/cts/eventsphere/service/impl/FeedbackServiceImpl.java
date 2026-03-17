@@ -4,13 +4,11 @@ import com.cts.eventsphere.dto.feedback.FeedbackRequestDto;
 import com.cts.eventsphere.dto.feedback.FeedbackResponseDto;
 import com.cts.eventsphere.dto.mapper.feedback.FeedbackRequestDtoMapper;
 import com.cts.eventsphere.dto.mapper.feedback.FeedbackResponseDtoMapper;
-import com.cts.eventsphere.dto.registration.RegistrationDTO;
 import com.cts.eventsphere.exception.Feedback.FeedbackNotFoundException;
 import com.cts.eventsphere.model.FeedBack;
 import com.cts.eventsphere.repository.FeedbackRepository;
 import com.cts.eventsphere.repository.RegistrationRepository;
 import com.cts.eventsphere.service.FeedbackService;
-import com.cts.eventsphere.service.RegistrationService;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -109,7 +107,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     private void ensureEligibleToSubmit(String eventId, String attendeeId) {
-        var  registration = registrationRepository.findByAttendeeUserIdAndEventId(attendeeId, eventId);
+        var  registration = registrationRepository.findByAttendeeUserIdAndEventEventId(attendeeId, eventId);
 
         if (registration.isEmpty() || registration.get().getStatus() == null) {
             log.warn("No valid registration found for event={}, attendee={}", eventId, attendeeId);

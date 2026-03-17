@@ -1,7 +1,6 @@
 package com.cts.eventsphere.dto.mapper.user;
 
 import com.cts.eventsphere.dto.user.UserResponseDto;
-
 import com.cts.eventsphere.model.User;
 import org.springframework.stereotype.Component;
 

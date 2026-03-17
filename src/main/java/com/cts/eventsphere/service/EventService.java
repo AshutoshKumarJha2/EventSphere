@@ -5,7 +5,6 @@ import com.cts.eventsphere.dto.event.EventResponseDto;
 import com.cts.eventsphere.dto.schedule.ScheduleRequestDto;
 import com.cts.eventsphere.dto.schedule.ScheduleResponseDto;
 import com.cts.eventsphere.exception.event.EventNotFoundException;
-import com.cts.eventsphere.model.Schedule;
 
 import java.util.List;
 

@@ -1,14 +1,13 @@
 package com.cts.eventsphere.model;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 import com.cts.eventsphere.model.data.BookingStatus;
 import jakarta.persistence.*;
-
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 /**

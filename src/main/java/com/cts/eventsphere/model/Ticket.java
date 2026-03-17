@@ -1,21 +1,18 @@
 package com.cts.eventsphere.model;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.*;
-
 import com.cts.eventsphere.model.data.TicketStatus;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * Entity for ticket data

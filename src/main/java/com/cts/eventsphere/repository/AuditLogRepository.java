@@ -1,7 +1,6 @@
 package com.cts.eventsphere.repository;
 
 import com.cts.eventsphere.model.AuditLog;
-import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

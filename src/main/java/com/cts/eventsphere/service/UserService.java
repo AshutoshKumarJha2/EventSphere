@@ -2,8 +2,6 @@ package com.cts.eventsphere.service;
 
 import com.cts.eventsphere.dto.user.UserRequestDto;
 import com.cts.eventsphere.dto.user.UserResponseDto;
-import com.cts.eventsphere.repository.UserRepository;
-import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 

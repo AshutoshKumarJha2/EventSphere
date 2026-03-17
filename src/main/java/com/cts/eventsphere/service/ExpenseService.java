@@ -5,8 +5,6 @@ import com.cts.eventsphere.dto.expense.ExpenseResponseDto;
 import com.cts.eventsphere.exception.event.EventNotFoundException;
 import com.cts.eventsphere.exception.finance.ExpenseNotFoundException;
 import com.cts.eventsphere.model.data.ExpenseStatus;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 

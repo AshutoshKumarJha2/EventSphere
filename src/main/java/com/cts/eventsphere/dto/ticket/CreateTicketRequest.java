@@ -1,7 +1,6 @@
 package com.cts.eventsphere.dto.ticket;
 
 import com.cts.eventsphere.model.data.TicketStatus;
-
 import jakarta.validation.constraints.NotNull;
 
 /**

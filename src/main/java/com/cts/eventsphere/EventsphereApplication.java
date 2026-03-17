@@ -13,5 +13,4 @@ public class EventsphereApplication {
         log.info("EventSphere backend started");
 		SpringApplication.run(EventsphereApplication.class, args);
 	}
-
 }

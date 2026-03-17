@@ -8,5 +8,5 @@ package com.cts.eventsphere.model.data;
  * @since 10-03-2026
  */
 public enum NotificationCategory {
-    EVENT, VENUE, TICKET, VENDOR, FINANCE
+    EVENT, VENUE, TICKET, VENDOR, FINANCE, INFO
 }

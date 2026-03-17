@@ -1,13 +1,9 @@
 package com.cts.eventsphere.repository;
 
 import com.cts.eventsphere.model.Booking;
-import com.cts.eventsphere.model.data.BookingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**

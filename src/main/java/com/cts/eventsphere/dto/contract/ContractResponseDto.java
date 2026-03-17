@@ -1,7 +1,10 @@
 package com.cts.eventsphere.dto.contract;
 
 import com.cts.eventsphere.model.data.ContractStatus;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 

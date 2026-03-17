@@ -7,8 +7,8 @@ public class RegistrationDTOMapper {
     public static RegistrationDTO toDTO(Registration registration) {
         return new RegistrationDTO(
                 registration.getRegistrationId(),
-                registration.getEventId(),
-                registration.getTicketId(),
+                registration.getEvent().getEventId(),
+                registration.getTicket().getTicketId(),
                 registration.getAttendee().getUserId(),
                 registration.getAttendee().getName(),
                 registration.getAttendee().getEmail(),

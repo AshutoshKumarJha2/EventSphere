@@ -1,17 +1,18 @@
 package com.cts.eventsphere.model;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import jakarta.persistence.*;
-import org.hibernate.annotations.*;
-
 import com.cts.eventsphere.model.data.RegistrationStatus;
-
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Entity class for Registration table
@@ -29,16 +30,18 @@ import lombok.NoArgsConstructor;
 public class Registration {
     @Id
     @UuidGenerator
-    String registrationId;
+    private String registrationId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "eventId")
+    private Event event;
+
+    @ManyToOne
+    @JoinColumn(name = "ticketId")
+    Ticket ticket;
 
     @Column
-    String eventId;
-
-    @Column
-    String ticketId;
-
-    @Column
-    LocalDate date;
+    private  LocalDate date;
 
     @Column(columnDefinition = "ENUM('pending', 'confirmed', 'cancelled', 'checked_in')")
     @Enumerated(EnumType.STRING)
