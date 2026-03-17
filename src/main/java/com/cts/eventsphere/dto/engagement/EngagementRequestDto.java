@@ -1,6 +1,6 @@
 package com.cts.eventsphere.dto.engagement;
 
-import com.cts.eventsphere.model.data.EngagementType;
+import com.cts.eventsphere.model.data.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;

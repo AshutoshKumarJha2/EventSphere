@@ -1,9 +1,11 @@
 package com.cts.eventsphere.exception;
 
 import com.cts.eventsphere.dto.shared.GenericErrorResponse;
+import com.cts.eventsphere.exception.Feedback.FeedbackNotFoundException;
 import com.cts.eventsphere.exception.booking.BookingNotFoundException;
 import com.cts.eventsphere.exception.contract.ContractNotFoundException;
 import com.cts.eventsphere.exception.delivery.DeliveryNotFoundException;
+import com.cts.eventsphere.exception.engagement.EngagementNotFoundException;
 import com.cts.eventsphere.exception.finance.BudgetNotFoundException;
 import com.cts.eventsphere.exception.finance.ExpenseNotFoundException;
 import com.cts.eventsphere.exception.finance.PaymentNotFoundException;
@@ -88,7 +90,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InsufficientResourceException.class)
     public ResponseEntity<String> handleInsufficientResource(InsufficientResourceException e) {
-               return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ResourceAlreadyExistsException.class)
@@ -213,5 +215,7 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
+
+
 
 }

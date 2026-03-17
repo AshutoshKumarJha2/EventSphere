@@ -11,21 +11,21 @@ import org.springframework.stereotype.Component;
  * @version 1.0
  * @since 02-03-2026
  */
+
 @Component
 public class EngagementResponseDtoMapper {
 
-    public static EngagementResponseDto toDTO(Engagement entity) {
+    public EngagementResponseDto toDTO(Engagement entity) {
         if (entity == null) {
             return null;
         }
-        return new EngagementResponseDto(
-                entity.getEngagementId(),
-                entity.getEventId(),
-                entity.getAttendeeId(),
-                entity.getActivity(),
-                entity.getTimestamp(),
-                entity.getCreatedAt(),
-                entity.getUpdatedAt()
-        );
+
+        return EngagementResponseDto.builder()
+                .engagementId(entity.getEngagementId())
+                .eventId(entity.getEventId())
+                .attendeeId(entity.getAttendeeId())
+                .activity(entity.getActivity())
+                .activityTimestamp(entity.getTimestamp())
+                .build();
     }
 }

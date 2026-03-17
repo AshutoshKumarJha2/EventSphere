@@ -26,8 +26,6 @@ public class FeedbackResponseDtoMapper {
                 .rating(entity.getRating())
                 .comments(entity.getComments())
                 .date(entity.getDate())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 }
