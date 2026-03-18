@@ -15,41 +15,13 @@ import java.util.List;
  * @since 04-03-2026
  */
 public interface BookingService {
+    // State-changing operations
+    BookingResponseDto createBooking(String actorId, BookingRequestDto bookingRequestDto);
+    BookingResponseDto updateBookingStatus(String actorId, String bookingId, BookingStatus status);
+    void deleteBooking(String actorId, String bookingId);
 
-    /**
-     * Creates a new booking with an initial status (typically 'pending')
-     * * @param bookingRequestDto the booking details from the organizer
-     * @return the created booking response
-     */
-    BookingResponseDto createBooking(BookingRequestDto bookingRequestDto);
-
-
-
-    List<BookingResponseVenueManagerDto> getBookingsByVenue(String venueId);
-
-
-    /**
-     * Retrieves all bookings in the system
-     * * @return list of booking responses
-     */
-    List<BookingResponseDto> getAllBookingsServ();
-
-
-
-    List<BookingResponseDto> getBookingsByEvent(String eventId);
-
-    /**
-     * Updates the status of an existing booking (e.g., from pending to confirmed)
-     * * @param bookingId the ID of the booking to update
-     * @return the updated booking response
-     */
-
-
-    BookingResponseDto updateBookingStatus(String bookingId, BookingStatus status);
-
-    /**
-     * Cancels/Deletes a booking record
-     * * @param bookingId the ID of the booking to remove
-     */
-    void deleteBooking(String bookingId);
+    // Read operations
+    List<BookingResponseDto> getAllBookingsServ(String actorId);
+    List<BookingResponseVenueManagerDto> getBookingsByVenue(String actorId, String venueId);
+    List<BookingResponseDto> getBookingsByEvent(String actorId, String eventId);
 }

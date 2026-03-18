@@ -1,30 +1,61 @@
 package com.cts.eventsphere.service;
 
-
 import com.cts.eventsphere.dto.venue.VenueRequestDto;
 import com.cts.eventsphere.dto.venue.VenueResponseDto;
 import com.cts.eventsphere.model.data.AvailabilityStatus;
 
 import java.util.List;
 
+/**
+ * Service interface for managing venue-related operations.
+ * Integrated with actorId for consistent audit logging across the EventSphere system.
+ */
 public interface VenueService {
 
-  public  VenueResponseDto create(VenueRequestDto dto);
+    /**
+     * Creates a new venue.
+     * @param actorId The unique identifier of the user performing the creation.
+     */
+    VenueResponseDto create(String actorId, VenueRequestDto dto);
 
-  public List<VenueResponseDto> findAll();
+    /**
+     * Retrieves all venues.
+     * @param actorId The unique identifier of the user requesting the data.
+     */
+    List<VenueResponseDto> findAll(String actorId);
 
-  public List<VenueResponseDto> findByLocation(String location);
+    /**
+     * Finds venues by location.
+     */
+    List<VenueResponseDto> findByLocation(String actorId, String location);
 
-    public VenueResponseDto updateVenue(String venueId, VenueRequestDto dto);
+    /**
+     * Updates an existing venue's core details.
+     */
+    VenueResponseDto updateVenue(String actorId, String venueId, VenueRequestDto dto);
 
-    public VenueResponseDto updateVenueStatus(String venueId, AvailabilityStatus status);
+    /**
+     * Specifically updates the availability status of a venue.
+     */
+    VenueResponseDto updateVenueStatus(String actorId, String venueId, AvailabilityStatus status);
 
-    public void deleteVenue(String venueId);
+    /**
+     * Removes a venue from the system.
+     */
+    void deleteVenue(String actorId, String venueId);
 
-  public List<VenueResponseDto> findByDate(String date);
+    /**
+     * Finds venues available on a specific date.
+     */
+    List<VenueResponseDto> findByDate(String actorId, String date);
 
-  public List<VenueResponseDto> findByCapacity(int capacity);
+    /**
+     * Finds venues that meet a minimum capacity requirement.
+     */
+    List<VenueResponseDto> findByCapacity(String actorId, int capacity);
 
-  public List<VenueResponseDto> findByAvailablityStatus(AvailabilityStatus status);
-
+    /**
+     * Finds venues filtered by their current availability status.
+     */
+    List<VenueResponseDto> findByAvailabilityStatus(String actorId, AvailabilityStatus status);
 }

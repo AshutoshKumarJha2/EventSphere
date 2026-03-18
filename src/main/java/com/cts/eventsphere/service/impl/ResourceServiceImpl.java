@@ -10,14 +10,18 @@ import com.cts.eventsphere.exception.resource.InsufficientResourceException;
 import com.cts.eventsphere.exception.resource.ResourceAlreadyExistsException;
 import com.cts.eventsphere.exception.resource.ResourceDuplicateAllocationException;
 import com.cts.eventsphere.exception.resource.ResourceNotFoundException;
+import com.cts.eventsphere.exception.venue.VenueNotFoundException;
 import com.cts.eventsphere.model.Event;
 import com.cts.eventsphere.model.Resource;
 import com.cts.eventsphere.model.ResourceAllocation;
 import com.cts.eventsphere.model.Venue;
+import com.cts.eventsphere.model.data.AuditAction;
 import com.cts.eventsphere.repository.EventRepository;
 import com.cts.eventsphere.repository.ResourceAllocationRepository;
 import com.cts.eventsphere.repository.ResourceRepository;
 import com.cts.eventsphere.repository.VenueRepository;
+import com.cts.eventsphere.service.AuditService;
+import com.cts.eventsphere.service.NotificationService;
 import com.cts.eventsphere.service.ResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +33,10 @@ import java.util.stream.Collectors;
 
 /**
  * Service implementation for managing inventory resources and their allocations.
- * * @author 2479476
- * @version 1.0
+ * Integrated with AuditService for tracking all management actions and NotificationService for alerts.
+ *
+ * @author 2479476
+ * @version 1.1
  * @since 05-03-2026
  */
 @Slf4j
@@ -42,18 +48,37 @@ public class ResourceServiceImpl implements ResourceService {
     private final EventRepository eventRepository;
     private final VenueRepository venueRepository;
     private final ResourceAllocationRepository resourceAllocationRepository;
+    private final AuditService auditService;
+    private final NotificationService notificationService;
+
+    /**
+     * Helper method to send notifications safely without breaking the main transaction.
+     *
+     * @param userId  The unique identifier of the user to receive the notification.
+     * @param message The content of the notification.
+     * @param type    The category/type of notification.
+     */
+    private void sendSafeNotification(String userId, String message, String type) {
+        try {
+            notificationService.sendNotification(userId, message, type);
+        } catch (Exception e) {
+            log.error("Failed to send notification to user {}: {}", userId, e.getMessage());
+        }
+    }
 
     /**
      * Creates a new resource associated with a specific venue.
-     * * @param venueId the unique identifier of the venue
+     *
+     * @param actorId the unique identifier of the user performing the creation
+     * @param venueId the unique identifier of the venue
      * @param resourceRequestDto the data transfer object for resource creation
      * @return the created resource response DTO
      * @throws ResourceAlreadyExistsException if a resource with the same name exists
      */
     @Override
     @Transactional
-    public ResourceResponseDto createResource(String venueId, ResourceRequestDto resourceRequestDto) {
-        log.info("Initiating resource creation: {}", resourceRequestDto.name());
+    public ResourceResponseDto createResource(String actorId, String venueId, ResourceRequestDto resourceRequestDto) {
+        log.info("Actor {} initiating resource creation: {}", actorId, resourceRequestDto.name());
 
         if (resourceRepository.existsByName(resourceRequestDto.name())) {
             log.warn("Resource creation failed: Name '{}' already exists", resourceRequestDto.name());
@@ -61,45 +86,54 @@ public class ResourceServiceImpl implements ResourceService {
         }
 
         Venue venue = venueRepository.findById(venueId)
-                .orElseThrow(() -> {
-                    log.error("Venue ID {} not found during resource creation", venueId);
-                    return new RuntimeException("Venue not found with id: " + venueId);
-                });
+                .orElseThrow(() -> new VenueNotFoundException("Venue not found with id: " + venueId));
 
         Resource resource = ResourceRequestDtoMapper.toEntity(resourceRequestDto);
-
         resource.setVenue(venue);
         Resource savedResource = resourceRepository.save(resource);
 
-        log.info("Resource successfully created with ID: {}", savedResource.getResourceId());
+        auditService.logAudit(actorId, AuditAction.CREATE, Resource.class, savedResource.getResourceId());
+
+        sendSafeNotification(actorId,
+                String.format("Resource '%s' successfully created for venue '%s'.", savedResource.getName(), venue.getName()),
+                "RESOURCE_CREATE");
+
+        log.info("Resource successfully created with ID: {} by actor: {}", savedResource.getResourceId(), actorId);
+
         return ResourceResponseDtoMapper.mapToResponseDto(savedResource);
     }
 
     /**
      * Retrieves all resources available across the system.
-     * * @return a list of all resource response DTOs
+     *
+     * @param actorId the unique identifier of the user requesting the data
+     * @return a list of all resource response DTOs
      */
     @Override
-    public List<ResourceResponseDto> getAllResources() {
-        log.info("Fetching all available resources");
-        return resourceRepository.findAll().stream()
+    public List<ResourceResponseDto> getAllResources(String actorId) {
+        log.info("Actor {} fetching all available resources", actorId);
+        List<Resource> resources = resourceRepository.findAll();
+
+        return resources.stream()
+                .peek(r -> auditService.logAudit(actorId, AuditAction.READ, Resource.class, r.getResourceId()))
                 .map(ResourceResponseDtoMapper::mapToResponseDto)
                 .collect(Collectors.toList());
     }
 
     /**
      * Approves an allocation and deducts units from the resource inventory.
-     * * @param allocationId the unique identifier of the allocation request
+     *
+     * @param actorId the unique identifier of the user performing the approval
+     * @param allocationId the unique identifier of the allocation request
      * @throws InsufficientResourceException if requested units exceed available units
      */
     @Override
     @Transactional
-    public void approveAllocation(String allocationId) {
-        log.info("Venue Manager approving allocation ID: {}", allocationId);
+    public void approveAllocation(String actorId, String allocationId) {
+        log.info("Actor {} (Venue Manager) approving allocation ID: {}", actorId, allocationId);
 
         ResourceAllocation allocation = resourceAllocationRepository.findById(allocationId)
-                .orElseThrow(() -> new RuntimeException("Allocation request not found"));
-
+                .orElseThrow(() -> new ResourceNotFoundException("Allocation request not found"));
 
         Resource resource = allocation.getResource();
 
@@ -108,46 +142,49 @@ public class ResourceServiceImpl implements ResourceService {
         }
 
         resource.setUnit(resource.getUnit() - allocation.getQuantity());
-
         resourceRepository.save(resource);
-        resourceAllocationRepository.save(allocation);
 
-        log.info("Allocation approved and inventory updated for: {}", resource.getName());
+        auditService.logAudit(actorId, AuditAction.UPDATE, Resource.class, resource.getResourceId());
+
+        sendSafeNotification(actorId,
+                String.format("Allocation for resource '%s' (Qty: %d) has been approved.", resource.getName(), allocation.getQuantity()),
+                "ALLOCATION_APPROVE");
+
+        log.info("Allocation approved by {}. Inventory updated for: {}", actorId, resource.getName());
     }
 
     /**
      * Retrieves resource details by its unique identifier.
-     * * @param resourceId the ID of the resource to fetch
+     *
+     * @param actorId the unique identifier of the user requesting the data
+     * @param resourceId the ID of the resource to fetch
      * @return the resource details as a response DTO
      */
     @Override
-    public ResourceResponseDto getResourceById(String resourceId) {
-        log.info("Fetching resource details for ID: {}", resourceId);
+    public ResourceResponseDto getResourceById(String actorId, String resourceId) {
+        log.info("Actor {} fetching resource details for ID: {}", actorId, resourceId);
         Resource resource = resourceRepository.findById(resourceId)
-                .orElseThrow(() -> {
-                    log.error("Resource fetch failed: ID {} does not exist", resourceId);
-                    return new RuntimeException("Resource not found with id: " + resourceId);
-                });
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + resourceId));
+
+        auditService.logAudit(actorId, AuditAction.READ, Resource.class, resourceId);
         return ResourceResponseDtoMapper.mapToResponseDto(resource);
     }
 
     /**
      * Updates an existing resource's core details.
-     * * @param resourceId the unique identifier of the resource
+     *
+     * @param actorId the unique identifier of the user performing the update
+     * @param resourceId the unique identifier of the resource
      * @param dto the updated resource information
      * @return the updated resource response DTO
      */
     @Override
     @Transactional
-    public ResourceResponseDto updateResource(String resourceId, ResourceRequestDto dto) {
-        log.info("Updating resource ID: {}", resourceId);
+    public ResourceResponseDto updateResource(String actorId, String resourceId, ResourceRequestDto dto) {
+        log.info("Actor {} updating resource ID: {}", actorId, resourceId);
 
         Resource existingResource = resourceRepository.findById(resourceId)
-                .orElseThrow(() -> {
-                    log.error("Update failed: Resource ID {} not found", resourceId);
-                    return new RuntimeException("Resource not found with id: " + resourceId);
-                });
-
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + resourceId));
 
         existingResource.setName(dto.name());
         existingResource.setType(dto.type());
@@ -155,44 +192,58 @@ public class ResourceServiceImpl implements ResourceService {
         existingResource.setUnit(dto.unit());
 
         Resource updatedResource = resourceRepository.save(existingResource);
-        log.info("Resource ID: {} updated successfully", resourceId);
+
+        auditService.logAudit(actorId, AuditAction.UPDATE, Resource.class, resourceId);
+
+        sendSafeNotification(actorId,
+                String.format("Resource '%s' has been successfully updated.", updatedResource.getName()),
+                "RESOURCE_UPDATE");
+
+        log.info("Resource ID: {} updated successfully by actor: {}", resourceId, actorId);
 
         return ResourceResponseDtoMapper.mapToResponseDto(updatedResource);
     }
 
     /**
      * Deletes a resource from the inventory by its ID.
-     * * @param resourceId the unique identifier of the resource to delete
+     *
+     * @param actorId the unique identifier of the user performing the deletion
+     * @param resourceId the unique identifier of the resource to delete
      * @throws ResourceNotFoundException if the resource ID does not exist
      */
     @Override
     @Transactional
-    public void deleteResource(String resourceId) {
-        log.info("Attempting to delete resource ID: {}", resourceId);
+    public void deleteResource(String actorId, String resourceId) {
+        log.info("Actor {} attempting to delete resource ID: {}", actorId, resourceId);
 
-        if (!resourceRepository.existsById(resourceId)) {
-            log.warn("Delete aborted: Resource ID {} not found", resourceId);
-            throw new ResourceNotFoundException("Resource not found with id: " + resourceId);
-        }
+        Resource resource = resourceRepository.findById(resourceId)
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + resourceId));
 
+        String resourceName = resource.getName();
         resourceRepository.deleteById(resourceId);
-        log.info("Resource ID: {} deleted", resourceId);
+
+        auditService.logAudit(actorId, AuditAction.DELETE, Resource.class, resourceId);
+
+        sendSafeNotification(actorId,
+                String.format("Resource '%s' has been removed from the inventory.", resourceName),
+                "RESOURCE_DELETE");
+
+        log.info("Resource ID: {} deleted by actor: {}", resourceId, actorId);
     }
 
     /**
      * Requests allocation of multiple resources for a specific event booking.
-     * * @param bookingId the unique identifier of the booking
+     *
+     * @param actorId the unique identifier of the user requesting the allocation
+     * @param bookingId the unique identifier of the booking
      * @param eventId the unique identifier of the event
      * @param venueId the unique identifier of the venue
      * @param resources the list of resources and their quantities to allocate
-     * @throws EventNotFoundException if the event does not exist
-     * @throws ResourceDuplicateAllocationException if a resource is already allocated to the venue
-     * @throws InsufficientResourceException if inventory units are insufficient
      */
     @Override
     @Transactional
-    public void requestAllocation(String bookingId, String eventId, String venueId, List<ResourceListElementDto> resources) {
-        log.info("Processing resource allocation for Event: {} at Venue: {}", eventId, venueId);
+    public void requestAllocation(String actorId, String bookingId, String eventId, String venueId, List<ResourceListElementDto> resources) {
+        log.info("Actor {} processing allocation for Event: {} at Venue: {}", actorId, eventId, venueId);
 
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("Event not found: " + eventId));
@@ -203,11 +254,9 @@ public class ResourceServiceImpl implements ResourceService {
             Resource resource = resourceRepository.findById(resourceReq.resourceId())
                     .orElseThrow(() -> new ResourceNotFoundException("Resource not found: " + resourceReq.resourceId()));
 
-            if (resourceAllocationRepository.existsByResourceNameAndVenueVenueId(resource.getName(), venueId)) {
-                log.warn("Allocation failed: Resource '{}' is already allocated to Venue '{}'", resource.getName(), venueId);
-                throw new ResourceDuplicateAllocationException("Resource '" + resource.getName() + "' is already allocated to this venue.");
+            if (resourceAllocationRepository.existsByResourceNameAndEventEventId(resource.getName(), eventId)) {
+                throw new ResourceDuplicateAllocationException("Resource '" + resource.getName() + "' is already allocated to this event.");
             }
-
 
             ResourceAllocation resourceAllocation = ResourceAllocation.builder()
                     .resource(resource)
@@ -218,18 +267,31 @@ public class ResourceServiceImpl implements ResourceService {
 
             resourceAllocationRepository.save(resourceAllocation);
         }
-        log.info("Resource allocation completed for Event: {}", eventId);
+
+        auditService.logAudit(actorId, AuditAction.UPDATE, Event.class, eventId);
+
+        sendSafeNotification(actorId,
+                String.format("Resource allocation requested for event '%s'.", event.getName()),
+                "ALLOCATION_REQUEST");
+
+        log.info("Resource allocation request completed for Event: {} by actor: {}", eventId, actorId);
     }
 
     /**
      * Retrieves all resources belonging to a specific venue.
-     * * @param venueId the unique identifier of the venue
+     *
+     * @param actorId the unique identifier of the user requesting the data
+     * @param venueId the unique identifier of the venue
      * @return a list of resource response DTOs for the venue
      */
     @Override
-    public List<ResourceResponseDto> getResourcesByVenue(String venueId) {
-        log.info("Fetching resources for Venue ID: {}", venueId);
-        List<Resource> venueResources  =  resourceRepository.findByVenue_VenueId(venueId);
-        return venueResources.stream().map( ResourceResponseDtoMapper::mapToResponseDto).collect(Collectors.toList());
+    public List<ResourceResponseDto> getResourcesByVenue(String actorId, String venueId) {
+        log.info("Actor {} fetching resources for Venue ID: {}", actorId, venueId);
+        List<Resource> venueResources = resourceRepository.findByVenue_VenueId(venueId);
+
+        return venueResources.stream()
+                .peek(r -> auditService.logAudit(actorId, AuditAction.READ, Resource.class, r.getResourceId()))
+                .map(ResourceResponseDtoMapper::mapToResponseDto)
+                .collect(Collectors.toList());
     }
 }
