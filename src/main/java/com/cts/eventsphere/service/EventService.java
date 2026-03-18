@@ -23,7 +23,7 @@ public interface EventService {
      * @param event the request DTO containing event details
      * @return the response DTO representing the created event
      */
-    EventResponseDto create(EventRequestDto event);
+    EventResponseDto create(String userId, EventRequestDto event);
 
     /**
      * Retrieves all events available in the system.

@@ -6,8 +6,10 @@ import com.cts.eventsphere.dto.auth.RegisterResponseDto;
 import com.cts.eventsphere.dto.user.UserRequestDto;
 import com.cts.eventsphere.exception.user.*;
 import com.cts.eventsphere.model.User;
+import com.cts.eventsphere.model.data.AuditAction;
 import com.cts.eventsphere.model.data.UserStatus;
 import com.cts.eventsphere.repository.UserRepository;
+import com.cts.eventsphere.service.AuditService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +30,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final AuditService auditService;
 
     /**
     * Handles user registration. It checks if a user with the provided email already exists, and if not, it creates a new user with the provided details, hashes the password, and saves the user to the database. If the registration is successful, it returns a RegisterResponseDto containing the registered user's information.
@@ -41,6 +44,7 @@ public class AuthService {
         var existingUser = userRepository.findByEmail(dto.email());
 
         if (existingUser.isPresent()) {
+//            auditService.logAudit(existingUser.getUserId(), AuditAction.REGISTRATION_FAILURE, User.class, user.getUserId());
             throw new UserAlreadyExistsException(dto.email());
         }
 
@@ -51,6 +55,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(dto.password())); // Hashing
         userRepository.save(user);
         log.info("User {} registered with id {}", user.getName(),user.getUserId());
+        auditService.logAudit(user.getUserId(), AuditAction.REGISTRATION_SUCCESS, User.class, user.getUserId());
         String successRegistration = "User registered successfully with email: " + user.getEmail();
         return new RegisterResponseDto(user.getUserId(), user.getName(), user.getEmail(), user.getRole().name(), user.getPhone(), user.getStatus().name(), successRegistration);
     }
@@ -80,6 +85,7 @@ public class AuthService {
         String accessToken = jwtUtil.generateAccessToken(user.getUserId(),user.getEmail(), roleName);
         String refreshToken = jwtUtil.generateRefreshToken(user.getUserId(),user.getEmail(), roleName);
 
+        auditService.logAudit(user.getUserId(), AuditAction.LOGIN_SUCCESS, User.class, user.getUserId());
         return new LoginResponseDto(accessToken, refreshToken, "Bearer");
     }
 

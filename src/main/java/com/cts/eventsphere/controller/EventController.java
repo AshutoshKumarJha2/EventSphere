@@ -4,6 +4,7 @@ import com.cts.eventsphere.dto.event.EventRequestDto;
 import com.cts.eventsphere.dto.event.EventResponseDto;
 import com.cts.eventsphere.dto.schedule.ScheduleRequestDto;
 import com.cts.eventsphere.dto.schedule.ScheduleResponseDto;
+import com.cts.eventsphere.security.UserPrincipal;
 import com.cts.eventsphere.service.EventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,9 +41,10 @@ public class EventController {
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER', 'VENUE_MANAGER')")
-    public ResponseEntity<EventResponseDto> create(@Valid @RequestBody EventRequestDto event) {
+    public ResponseEntity<EventResponseDto> create(@Valid @RequestBody EventRequestDto event, @AuthenticationPrincipal UserPrincipal userDetails) {
+        var userId = userDetails.userId();
         log.info("Received request to create a new event: {}", event.name());
-        EventResponseDto createdEvent = eventService.create(event);
+        EventResponseDto createdEvent = eventService.create(userId,event);
         log.info("Successfully created event with ID: {}", createdEvent.id());
         return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
     }
