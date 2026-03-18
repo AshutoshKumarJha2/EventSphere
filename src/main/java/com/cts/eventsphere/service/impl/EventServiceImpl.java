@@ -81,9 +81,10 @@ public class EventServiceImpl implements EventService {
      * @return a list of response DTOs representing all events
      */
     @Override
-    public List<EventResponseDto> findAllEvents() {
+    public List<EventResponseDto> findAllEvents(String userId) {
         log.info("Fetching all events from repository");
         List<EventResponseDto> events = eventRepository.findAll().stream()
+                .peek(e -> auditService.logAudit(userId, AuditAction.READ, Event.class, e.getEventId()))
                 .map(eventResponseDtoMapper::toDTO)
                 .toList();
         log.debug("Found {} events in total", events.size());
@@ -98,13 +99,14 @@ public class EventServiceImpl implements EventService {
      * @throws EventNotFoundException if no event exists with the given ID
      */
     @Override
-    public EventResponseDto findById(String eventId) throws EventNotFoundException {
+    public EventResponseDto findById(String eventId, String userId) throws EventNotFoundException {
         log.info("Searching for event with ID: {}", eventId);
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> {
                     log.error("Event lookup failed: ID {} not found", eventId);
                     return new EventNotFoundException(eventId);
                 });
+        auditService.logAudit(userId, AuditAction.READ, Event.class, event.getEventId());
 
         return eventResponseDtoMapper.toDTO(event);
     }
@@ -118,7 +120,7 @@ public class EventServiceImpl implements EventService {
      * @throws EventNotFoundException if no event exists with the given ID
      */
     @Override
-    public boolean updateById(String eventId, EventRequestDto eventRequest) throws EventNotFoundException {
+    public boolean updateById(String eventId, EventRequestDto eventRequest, String userId) throws EventNotFoundException {
         log.info("Updating event with ID: {}", eventId);
         if(!eventRepository.existsById(eventId)) {
             log.error("Update failed: Event ID {} does not exist", eventId);
@@ -129,6 +131,7 @@ public class EventServiceImpl implements EventService {
         event.setEventId(eventId);
         eventRepository.save(event);
         log.info("Successfully updated event ID: {}", eventId);
+        auditService.logAudit(userId, AuditAction.UPDATE, Event.class, event.getEventId());
 
         notificationService.sendNotification(
                 eventRequest.organizerId(),
@@ -150,13 +153,14 @@ public class EventServiceImpl implements EventService {
      * @throws EventNotFoundException if no event exists with the given ID
      */
     @Override
-    public boolean deleteById(String eventId) throws EventNotFoundException {
+    public boolean deleteById(String eventId, String userId) throws EventNotFoundException {
         log.info("Request to delete event with ID: {}", eventId);
         if(!eventRepository.existsById(eventId)) {
             log.warn("Delete aborted: Event ID {} not found", eventId);
             throw new EventNotFoundException(eventId);
         }
         eventRepository.deleteById(eventId);
+        auditService.logAudit(userId, AuditAction.DELETE, Event.class, eventId);
         log.info("Successfully deleted event ID: {}", eventId);
 
         return true;
@@ -171,7 +175,7 @@ public class EventServiceImpl implements EventService {
      * @throws EventNotFoundException if the parent event does not exist
      */
     @Override
-    public ScheduleResponseDto addActivity(String eventId, ScheduleRequestDto scheduleRequest) {
+    public ScheduleResponseDto addActivity(String eventId, ScheduleRequestDto scheduleRequest, String userId) {
         log.info("Adding new activity to event ID: {}", eventId);
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> {
@@ -183,6 +187,7 @@ public class EventServiceImpl implements EventService {
         Schedule savedSchedule = scheduleRepository.save(schedule);
         log.info("Successfully added activity ID: {} to event ID: {}", savedSchedule.getScheduleId(), eventId);
 
+        auditService.logAudit(userId, AuditAction.CREATE, Schedule.class, savedSchedule.getScheduleId());
         notificationService.sendNotification(
                 event.getOrganizerId(),
                 "New Activity Added to Event: " + event.getName() +
@@ -200,10 +205,11 @@ public class EventServiceImpl implements EventService {
      * @return a list of response DTOs representing all schedules for the event
      */
     @Override
-    public List<ScheduleResponseDto> findAllSchedules(String eventId) {
+    public List<ScheduleResponseDto> findAllSchedules(String eventId, String userId) {
         log.info("Fetching all activities for event ID: {}", eventId);
         List<ScheduleResponseDto> schedules = scheduleRepository.findAll().stream()
                 .filter(s -> s.getEvent().getEventId().equals(eventId))
+                .peek(s -> auditService.logAudit(userId, AuditAction.READ, Schedule.class, s.getScheduleId()))
                 .map(scheduleResponseDtoMapper::toDTO)
                 .toList();
         log.debug("Found {} activities matching event ID: {}", schedules.size(), eventId);
