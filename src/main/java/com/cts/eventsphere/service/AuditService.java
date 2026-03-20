@@ -21,6 +21,7 @@ public interface AuditService {
      * @param entityClass The class type of the entity being acted upon.
      * @param entityId    The unique identifier of the specific entity instance.
      */
+
     public void logAudit(
             String userId,
             AuditAction action,

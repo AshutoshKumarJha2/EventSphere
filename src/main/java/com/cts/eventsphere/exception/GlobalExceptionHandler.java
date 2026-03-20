@@ -6,6 +6,7 @@ import com.cts.eventsphere.exception.booking.BookingNotFoundException;
 import com.cts.eventsphere.exception.contract.ContractNotFoundException;
 import com.cts.eventsphere.exception.delivery.DeliveryNotFoundException;
 import com.cts.eventsphere.exception.engagement.EngagementNotFoundException;
+import com.cts.eventsphere.exception.engagement.InvalidEngagementException;
 import com.cts.eventsphere.exception.finance.BudgetNotFoundException;
 import com.cts.eventsphere.exception.finance.ExpenseNotFoundException;
 import com.cts.eventsphere.exception.finance.PaymentNotFoundException;
@@ -201,6 +202,23 @@ public class GlobalExceptionHandler {
                 "An unexpected error occurred. Please contact support with traceId: " + traceId
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
+    @ExceptionHandler(FeedbackNotFoundException.class)
+    public ResponseEntity<GenericErrorResponse> handleFeedbackNotFound(FeedbackNotFoundException e) {
+        log.error("Feedback error: {}", e.getMessage());
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(EngagementNotFoundException.class)
+    public ResponseEntity<GenericErrorResponse> handleEngagementNotFound(EngagementNotFoundException e) {
+        log.error("Engagement error: {}", e.getMessage());
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidEngagementException.class)
+    public ResponseEntity<GenericErrorResponse> handleInvalidEngagement(InvalidEngagementException e) {
+        log.error("Invalid Engagement: {}", e.getMessage());
+        return new ResponseEntity<>(new GenericErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
 
