@@ -10,6 +10,7 @@ public record ResourceResponseDto(String resourceId,
                                   ResourceType type,
                                   String name,
                                   Availability availability,
+                                  Integer unit,
                                   BigDecimal costRate
                                   ) {
 }

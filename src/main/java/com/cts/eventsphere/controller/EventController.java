@@ -51,7 +51,6 @@ public class EventController {
 
     /**
      * Retrieves all events.
-     *
      * @return ResponseEntity containing a list of event DTOs and HTTP status 200 (OK)
      */
     @GetMapping

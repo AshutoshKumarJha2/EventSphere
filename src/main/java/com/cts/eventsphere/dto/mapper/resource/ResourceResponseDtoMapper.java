@@ -29,6 +29,7 @@ public class ResourceResponseDtoMapper {
                 resource.getType(),
                 resource.getName(),
                 resource.getAvailability(),
+                resource.getUnit(),
                 resource.getCostRate()
         );
     }
