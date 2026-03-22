@@ -61,7 +61,6 @@ public class NotificationServiceTest {
     @Test
     void testSendNotification() {
         String userId = faker.idNumber().valid();
-        String email = faker.internet().emailAddress();
         String message = faker.lorem().sentence();
         String category = "INFO";
 
@@ -69,7 +68,7 @@ public class NotificationServiceTest {
         saved.setNotificationId(faker.idNumber().valid());
         when(notificationRepository.save(any(Notification.class))).thenReturn(saved);
 
-        notificationService.sendNotification(userId, email, message, category);
+        notificationService.sendNotification(userId, message, category);
 
         ArgumentCaptor<Notification> captor = ArgumentCaptor.forClass(Notification.class);
         verify(notificationRepository).save(captor.capture());
@@ -79,8 +78,6 @@ public class NotificationServiceTest {
         assertThat(captured.getMessage()).isEqualTo(message);
         assertThat(captured.getCategory()).isEqualTo(category);
         assertThat(captured.getStatus()).isEqualTo("Unread");
-
-        verify(emailService).sendNotificationEmail(eq(email), contains(category), eq(message));
     }
 
     @Test
@@ -94,7 +91,7 @@ public class NotificationServiceTest {
 
         notificationService.markAsRead(notificationId);
 
-        assertThat(notification.getStatus()).isEqualTo("Read");
+        assertThat(notification.getStatus()).isEqualTo("READ");
         verify(notificationRepository).findById(notificationId);
     }
 

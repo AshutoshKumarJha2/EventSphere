@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -90,7 +91,7 @@ class TicketControllerTest {
         CreateTicketRequest request = new CreateTicketRequest("VIP", 150.0, TicketStatus.active);
         GenericResponse expectedResponse = new GenericResponse("Ticket created successfully");
 
-        when(ticketService.createTicket(anyString(), anyString(), anyDouble(), any(TicketStatus.class)))
+        when(ticketService.createTicket(anyString(), anyString(), anyString(), anyDouble(), any(TicketStatus.class)))
                 .thenReturn(expectedResponse);
 
         mockMvc.perform(post("/api/v1/events/{eventId}/tickets", eventId)
@@ -105,7 +106,7 @@ class TicketControllerTest {
         TicketResponseDTO ticketDto = new TicketResponseDTO(ticketId, eventId, "VIP", 150.0, TicketStatus.active);
         TicketListResponseDTO expectedResponse = new TicketListResponseDTO(List.of(ticketDto), 0, 10, 1, 1);
 
-        when(ticketService.getTicketsByEventId(anyString(), anyInt(), anyInt())).thenReturn(expectedResponse);
+        when(ticketService.getTicketsByEventId(anyString(), anyString(), anyInt(), anyInt())).thenReturn(expectedResponse);
 
         mockMvc.perform(get("/api/v1/events/{eventId}/tickets", eventId)
                         .param("page", "0")
@@ -119,7 +120,7 @@ class TicketControllerTest {
     void updateTicket_ReturnsOk() throws Exception {
         CreateTicketRequest request = new CreateTicketRequest("General", 50.0, TicketStatus.inactive);
 
-        when(ticketService.updateTicket(anyString(), anyString(), anyDouble(), any(TicketStatus.class)))
+        when(ticketService.updateTicket(anyString(), anyString(), anyString(), anyDouble(), any(TicketStatus.class)))
                 .thenReturn(new GenericResponse("Ticket updated successfully"));
 
         mockMvc.perform(put("/api/v1/tickets/{ticketId}", ticketId)
@@ -131,7 +132,7 @@ class TicketControllerTest {
 
     @Test
     void deleteTicket_ReturnsOk() throws Exception {
-        when(ticketService.deleteTicket(ticketId))
+        when(ticketService.deleteTicket(anyString(), eq(ticketId)))
                 .thenReturn(new GenericResponse("Ticket deleted successfully"));
 
         mockMvc.perform(delete("/api/v1/tickets/{ticketId}", ticketId))
@@ -152,7 +153,7 @@ class TicketControllerTest {
     @Test
     void createTicket_ThrowsTicketAlreadyExistsException() throws Exception {
         CreateTicketRequest request = new CreateTicketRequest("VIP", 150.0, TicketStatus.active);
-        when(ticketService.createTicket(anyString(), anyString(), anyDouble(), any(TicketStatus.class)))
+        when(ticketService.createTicket(anyString(), anyString(), anyString(), anyDouble(), any(TicketStatus.class)))
                 .thenThrow(new TicketAlreadyExistsException("Ticket type already exists for this event"));
 
         mockMvc.perform(post("/api/v1/events/{eventId}/tickets", eventId)
@@ -165,7 +166,7 @@ class TicketControllerTest {
     @Test
     void updateTicket_ThrowsTicketNotFoundException() throws Exception {
         CreateTicketRequest request = new CreateTicketRequest("General", 50.0, TicketStatus.inactive);
-        when(ticketService.updateTicket(anyString(), anyString(), anyDouble(), any(TicketStatus.class)))
+        when(ticketService.updateTicket(anyString(), anyString(), anyString(), anyDouble(), any(TicketStatus.class)))
                 .thenThrow(new TicketNotFoundException("Ticket not found"));
 
         mockMvc.perform(put("/api/v1/tickets/{ticketId}", ticketId)
@@ -177,7 +178,7 @@ class TicketControllerTest {
 
     @Test
     void deleteTicket_ThrowsTicketNotFoundException() throws Exception {
-        when(ticketService.deleteTicket(ticketId))
+        when(ticketService.deleteTicket(anyString(), eq(ticketId)))
                 .thenThrow(new TicketNotFoundException("Ticket not found"));
 
         mockMvc.perform(delete("/api/v1/tickets/{ticketId}", ticketId))

@@ -92,7 +92,7 @@ public class NotificationControllerTest {
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED))
                 .andExpect(status().isCreated());
 
-        Mockito.verify(notificationService).sendNotification(eq(userId), eq(email), eq(message), eq(category));
+        Mockito.verify(notificationService).sendNotification(eq(userId), eq(message), eq(category));
     }
 
     @Test

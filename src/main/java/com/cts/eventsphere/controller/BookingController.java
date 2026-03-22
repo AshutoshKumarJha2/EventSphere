@@ -32,7 +32,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated // Required for validating method parameters like @PathVariable or @RequestParam
 public class BookingController {
-
+    
     private final BookingService bookingService;
 
     /**

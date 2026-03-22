@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import com.cts.eventsphere.service.AuditService;
 import com.cts.eventsphere.service.impl.TicketServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,17 +31,22 @@ class TicketServiceTest {
     @Mock
     private TicketRepository ticketRepository;
 
+    @Mock
+    private AuditService auditService;
+
     @InjectMocks
     private TicketServiceImpl ticketService;
 
     private Faker faker;
     private Ticket mockTicket;
+    private String actorId;
     private String eventId;
     private String ticketId;
 
     @BeforeEach
     void setUp() {
         faker = new Faker();
+        actorId = faker.internet().uuid();
         eventId = faker.internet().uuid();
         ticketId = faker.internet().uuid();
 
@@ -55,10 +61,10 @@ class TicketServiceTest {
 
     @Test
     void createTicket_Success() {
-        when(ticketRepository.findByType("vip")).thenReturn(Optional.empty());
+        when(ticketRepository.findByEventIdAndType(eventId, "vip")).thenReturn(Optional.empty());
         when(ticketRepository.save(any(Ticket.class))).thenReturn(mockTicket);
 
-        GenericResponse response = ticketService.createTicket(eventId, "VIP", 150.0, TicketStatus.active);
+        GenericResponse response = ticketService.createTicket(actorId, eventId, "VIP", 150.0, TicketStatus.active);
 
         assertEquals("Ticket created successfully", response.message());
         verify(ticketRepository, times(1)).save(any(Ticket.class));
@@ -66,11 +72,11 @@ class TicketServiceTest {
 
     @Test
     void createTicket_ThrowsAlreadyExistsException() {
-        when(ticketRepository.findByType("vip")).thenReturn(Optional.of(mockTicket));
+        when(ticketRepository.findByEventIdAndType(eventId, "vip")).thenReturn(Optional.of(mockTicket));
 
         assertThrows(
                 TicketAlreadyExistsException.class,
-                () -> ticketService.createTicket(eventId, "VIP", 150.0, TicketStatus.active)
+                () -> ticketService.createTicket(actorId, eventId, "VIP", 150.0, TicketStatus.active)
         );
         verify(ticketRepository, never()).save(any(Ticket.class));
     }
@@ -80,7 +86,7 @@ class TicketServiceTest {
         when(ticketRepository.findById(ticketId)).thenReturn(Optional.of(mockTicket));
         when(ticketRepository.save(any(Ticket.class))).thenReturn(mockTicket);
 
-        GenericResponse response = ticketService.updateTicket(ticketId, "early_bird", 99.99, TicketStatus.inactive);
+        GenericResponse response = ticketService.updateTicket(actorId, ticketId, "early_bird", 99.99, TicketStatus.inactive);
 
         assertEquals("Ticket updated successfully", response.message());
         assertEquals("early_bird", mockTicket.getType());
@@ -93,7 +99,7 @@ class TicketServiceTest {
     void deleteTicket_Success() {
         when(ticketRepository.existsById(ticketId)).thenReturn(true);
 
-        GenericResponse response = ticketService.deleteTicket(ticketId);
+        GenericResponse response = ticketService.deleteTicket(actorId, ticketId);
 
         assertEquals("Ticket deleted successfully", response.message());
         verify(ticketRepository, times(1)).deleteById(ticketId);
@@ -105,7 +111,7 @@ class TicketServiceTest {
 
         assertThrows(
                 TicketNotFoundException.class,
-                () -> ticketService.deleteTicket(ticketId)
+                () -> ticketService.deleteTicket(actorId, ticketId)
         );
         verify(ticketRepository, never()).deleteById(anyString());
     }

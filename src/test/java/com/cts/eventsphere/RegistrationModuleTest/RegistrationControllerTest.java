@@ -3,6 +3,8 @@ package com.cts.eventsphere.RegistrationModuleTest;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -105,7 +107,7 @@ class RegistrationControllerTest {
         RegistrationDTO regDto = new RegistrationDTO(registrationId, eventId, ticketId, userId, "pending");
         RegistrationListResponseDTO expectedResponse = new RegistrationListResponseDTO(List.of(regDto), 0, 10, 1, 1);
 
-        when(registrationService.getRegistrationsByEventId(anyString(), anyInt(), anyInt())).thenReturn(expectedResponse);
+        when(registrationService.getRegistrationsByEventIdStatus(anyString(), anyString(), any(), anyInt(), anyInt())).thenReturn(expectedResponse);
 
         mockMvc.perform(get("/api/v1/events/{eventId}/registrations", eventId)
                         .param("page", "0")
@@ -117,7 +119,7 @@ class RegistrationControllerTest {
 
     @Test
     void approveRegistration_ReturnsOk() throws Exception {
-        when(registrationService.approveRegistration(registrationId))
+        when(registrationService.approveRegistration(anyString(), eq(registrationId)))
                 .thenReturn(new GenericResponse("Registration approved successfully"));
 
         mockMvc.perform(patch("/api/v1/registrations/{registrationId}/approve", registrationId))
@@ -127,7 +129,7 @@ class RegistrationControllerTest {
 
     @Test
     void cancelRegistration_ReturnsOk() throws Exception {
-       lenient().when(registrationService.cancelRegistration(registrationId))
+        when(registrationService.cancelRegistration(anyString(), eq(registrationId)))
                 .thenReturn(new GenericResponse("Registration cancelled successfully"));
 
         mockMvc.perform(patch("/api/v1/registrations/{registrationId}/cancel", registrationId))
@@ -160,8 +162,8 @@ class RegistrationControllerTest {
 
     @Test
     void approveRegistration_ThrowsRegistrationNotFoundException() throws Exception {
-        lenient().when(registrationService.approveRegistration(registrationId))
-                .thenThrow(new RegistrationNotFoundException(registrationId));
+        when(registrationService.approveRegistration(anyString(), eq(registrationId)))
+                .thenThrow(new RegistrationNotFoundException("Registration not found"));
 
         mockMvc.perform(patch("/api/v1/registrations/{registrationId}/approve", registrationId))
                 .andExpect(result -> assertInstanceOf(RegistrationNotFoundException.class, result.getResolvedException()))

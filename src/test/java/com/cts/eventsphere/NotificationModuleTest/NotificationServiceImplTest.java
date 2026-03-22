@@ -2,7 +2,6 @@ package com.cts.eventsphere.NotificationModuleTest;
 
 import com.cts.eventsphere.model.Notification;
 import com.cts.eventsphere.repository.NotificationRepository;
-import com.cts.eventsphere.service.EmailService;
 import com.cts.eventsphere.service.impl.NotificationServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,9 +29,6 @@ public class NotificationServiceImplTest {
     @Mock
     private NotificationRepository notificationRepository;
 
-    @Mock
-    private EmailService emailService;
-
     @InjectMocks
     private NotificationServiceImpl notificationService;
 
@@ -44,7 +40,6 @@ public class NotificationServiceImplTest {
     @Test
     void testSendNotification_savesNotificationAndSendsEmail() {
         String userId = "user-123";
-        String email = "user@example.com";
         String message = "Test message";
         String category = "INFO";
 
@@ -52,7 +47,7 @@ public class NotificationServiceImplTest {
         savedNotification.setNotificationId("notif-1");
         when(notificationRepository.save(any(Notification.class))).thenReturn(savedNotification);
 
-        notificationService.sendNotification(userId, email, message, category);
+        notificationService.sendNotification(userId, message, category);
 
         ArgumentCaptor<Notification> captor = ArgumentCaptor.forClass(Notification.class);
         verify(notificationRepository).save(captor.capture());
@@ -61,8 +56,6 @@ public class NotificationServiceImplTest {
         assertEquals(message, captured.getMessage());
         assertEquals(category, captured.getCategory());
         assertEquals("Unread", captured.getStatus());
-
-        verify(emailService).sendNotificationEmail(eq(email), contains(category), eq(message));
     }
 
     @Test
@@ -93,7 +86,7 @@ public class NotificationServiceImplTest {
 
         notificationService.markAsRead(notificationId);
 
-        assertEquals("Read", n.getStatus());
+        assertEquals("READ", n.getStatus());
     }
 
     @Test
