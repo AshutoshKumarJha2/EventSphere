@@ -1,7 +1,7 @@
 package com.cts.eventsphere.EngagementModuleTest;
 
 import com.cts.eventsphere.controller.EngagementController;
-import com.cts.eventsphere.model.Engagement;
+import com.cts.eventsphere.dto.engagement.EngagementResponseDto;
 import com.cts.eventsphere.model.data.EngagementType;
 import com.cts.eventsphere.service.EngagementService;
 import com.github.javafaker.Faker;
@@ -19,15 +19,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-/**
- * @author 2480027
- * @version 1.0
- * @since 07-03-2026
- */
-
-/**
- * Unit tests for Engagement Controller
- */
 
 @ExtendWith(MockitoExtension.class)
 class EngagementControllerFakerTest {
@@ -50,14 +41,17 @@ class EngagementControllerFakerTest {
         String eventId = faker.internet().uuid();
         int size = faker.number().numberBetween(1, 5);
 
-        List<Engagement> engagements = new ArrayList<>();
+        List<EngagementResponseDto> engagements = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            engagements.add(mock(Engagement.class));
+            engagements.add(EngagementResponseDto.builder()
+                    .engagementId(faker.internet().uuid())
+                    .eventId(eventId)
+                    .build());
         }
 
         when(engagementService.getByEvent(eventId)).thenReturn(engagements);
 
-        ResponseEntity<List<Engagement>> response = engagementController.getByEvent(eventId);
+        ResponseEntity<List<EngagementResponseDto>> response = engagementController.getByEvent(eventId);
 
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
@@ -72,14 +66,17 @@ class EngagementControllerFakerTest {
         EngagementType activity = faker.options().option(EngagementType.values());
         int size = faker.number().numberBetween(1, 5);
 
-        List<Engagement> engagements = new ArrayList<>();
+        List<EngagementResponseDto> engagements = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            engagements.add(mock(Engagement.class));
+            engagements.add(EngagementResponseDto.builder()
+                    .engagementId(faker.internet().uuid())
+                    .activity(activity)
+                    .build());
         }
 
         when(engagementService.getByActivityType(activity)).thenReturn(engagements);
 
-        ResponseEntity<List<Engagement>> response = engagementController.getByActivity(activity);
+        ResponseEntity<List<EngagementResponseDto>> response = engagementController.getByActivity(activity);
 
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
@@ -100,14 +97,18 @@ class EngagementControllerFakerTest {
         LocalDateTime end = LocalDateTime.now().minusDays(endMinusDays);
 
         int size = faker.number().numberBetween(1, 5);
-        List<Engagement> engagements = new ArrayList<>();
+        List<EngagementResponseDto> engagements = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            engagements.add(mock(Engagement.class));
+            engagements.add(EngagementResponseDto.builder()
+                    .engagementId(faker.internet().uuid())
+                    .eventId(eventId)
+                    .activity(activity)
+                    .build());
         }
 
         when(engagementService.getFilteredEngagements(eventId, activity, start, end)).thenReturn(engagements);
 
-        ResponseEntity<List<Engagement>> response =
+        ResponseEntity<List<EngagementResponseDto>> response =
                 engagementController.getDetailedFilter(eventId, activity, start, end);
 
         assertEquals(200, response.getStatusCode().value());

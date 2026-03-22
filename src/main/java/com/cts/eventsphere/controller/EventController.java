@@ -4,6 +4,7 @@ import com.cts.eventsphere.dto.event.EventRequestDto;
 import com.cts.eventsphere.dto.event.EventResponseDto;
 import com.cts.eventsphere.dto.schedule.ScheduleRequestDto;
 import com.cts.eventsphere.dto.schedule.ScheduleResponseDto;
+import com.cts.eventsphere.security.UserPrincipal;
 import com.cts.eventsphere.service.EventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,22 +41,23 @@ public class EventController {
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER', 'VENUE_MANAGER')")
-    public ResponseEntity<EventResponseDto> create(@Valid @RequestBody EventRequestDto event) {
+    public ResponseEntity<EventResponseDto> create(@Valid @RequestBody EventRequestDto event, @AuthenticationPrincipal UserPrincipal userDetails) {
+        var userId = userDetails.userId();
         log.info("Received request to create a new event: {}", event.name());
-        EventResponseDto createdEvent = eventService.create(event);
+        EventResponseDto createdEvent = eventService.create(userId,event);
         log.info("Successfully created event with ID: {}", createdEvent.id());
         return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
     }
 
     /**
      * Retrieves all events.
-     *
      * @return ResponseEntity containing a list of event DTOs and HTTP status 200 (OK)
      */
     @GetMapping
-    public ResponseEntity<List<EventResponseDto>> readAll() {
+    public ResponseEntity<List<EventResponseDto>> readAll(@AuthenticationPrincipal UserPrincipal userDetails) {
+        var userId = userDetails.userId();
         log.info("Received request to fetch all events");
-        List<EventResponseDto> events = eventService.findAllEvents();
+        List<EventResponseDto> events = eventService.findAllEvents(userId);
         log.info("Successfully retrieved {} events", events.size());
         return ResponseEntity.ok(events);
     }
@@ -68,18 +71,20 @@ public class EventController {
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
-    public ResponseEntity<Void> update(@PathVariable String id, @Valid @RequestBody EventRequestDto eventRequest) {
+    public ResponseEntity<Void> update(@PathVariable String id, @Valid @RequestBody EventRequestDto eventRequest, @AuthenticationPrincipal UserPrincipal userDetails) {
+        var userId = userDetails.userId();
         log.info("Received request to update event with ID: {}", id);
-        eventService.updateById(id, eventRequest);
+        eventService.updateById(id, eventRequest, userId);
         log.info("Successfully updated event with ID: {}", id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<EventResponseDto> getById(@PathVariable String id) {
+    public ResponseEntity<EventResponseDto> getById(@PathVariable String id, @AuthenticationPrincipal UserPrincipal userDetails) {
+        var userId = userDetails.userId();
         log.info("Received request to get event with ID: {}", id);
-        return ResponseEntity.ok(eventService.findById(id));
+        return ResponseEntity.ok(eventService.findById(id,userId));
 
     }
 
@@ -90,9 +95,10 @@ public class EventController {
      * @return ResponseEntity with HTTP status 204 (NO_CONTENT) if deletion is successful
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
+    public ResponseEntity<Void> delete(@PathVariable String id, @AuthenticationPrincipal UserPrincipal userDetails) {
+        var userId = userDetails.userId();
         log.info("Received request to delete event with ID: {}", id);
-        eventService.deleteById(id);
+        eventService.deleteById(id, userId);
         log.info("Successfully deleted event with ID: {}", id);
         return ResponseEntity.noContent().build();
     }
@@ -106,9 +112,10 @@ public class EventController {
      */
     @PostMapping("/{id}/schedules")
     @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER', 'VENUE_MANAGER')")
-    public ResponseEntity<ScheduleResponseDto> createActivity(@PathVariable String id, @Valid @RequestBody ScheduleRequestDto scheduleRequest) {
+    public ResponseEntity<ScheduleResponseDto> createActivity(@PathVariable String id, @Valid @RequestBody ScheduleRequestDto scheduleRequest , @AuthenticationPrincipal UserPrincipal userDetails) {
+        var userId = userDetails.userId();
         log.info("Received request to add activity to event ID: {}", id);
-        ScheduleResponseDto response = eventService.addActivity(id, scheduleRequest);
+        ScheduleResponseDto response = eventService.addActivity(id, scheduleRequest, userId);
         log.info("Successfully added activity with ID: {} to event ID: {}", response.eventId(), id);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -120,9 +127,10 @@ public class EventController {
      * @return ResponseEntity containing a list of schedule DTOs and HTTP status 200 (OK)
      */
     @GetMapping("/{id}/schedules")
-    public ResponseEntity<List<ScheduleResponseDto>> getAllActivity(@PathVariable String id) {
+    public ResponseEntity<List<ScheduleResponseDto>> getAllActivity(@PathVariable String id, @AuthenticationPrincipal UserPrincipal userDetails) {
+        var userId = userDetails.userId();
         log.info("Received request to fetch all activities for event ID: {}", id);
-        List<ScheduleResponseDto> schedules = eventService.findAllSchedules(id);
+        List<ScheduleResponseDto> schedules = eventService.findAllSchedules(id, userId);
         log.info("Successfully retrieved {} activities for event ID: {}", schedules.size(), id);
         return ResponseEntity.ok(schedules);
     }

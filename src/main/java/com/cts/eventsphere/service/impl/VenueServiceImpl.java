@@ -6,152 +6,213 @@ import com.cts.eventsphere.dto.venue.VenueRequestDto;
 import com.cts.eventsphere.dto.venue.VenueResponseDto;
 import com.cts.eventsphere.exception.venue.VenueNotFoundException;
 import com.cts.eventsphere.model.Venue;
+import com.cts.eventsphere.model.data.AuditAction;
 import com.cts.eventsphere.model.data.AvailabilityStatus;
 import com.cts.eventsphere.repository.VenueRepository;
+import com.cts.eventsphere.service.AuditService;
+import com.cts.eventsphere.service.NotificationService;
 import com.cts.eventsphere.service.VenueService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Service implementation for Venue related operations.
- * Handles business logic for venue registration, updates, and filtering.
+ * Service implementation for Venue related operations with integrated Auditing and Notifications.
+ * Handles business logic for venue registration, updates, and filtering while maintaining
+ * an audit trail and notifying relevant actors.
  *
  * @author 2479476
  * @since 05-03-2026
+ * @version 1.1
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class VenueServiceImpl implements VenueService {
 
     private final VenueRepository venueRepository;
+    private final AuditService auditService;
+    private final NotificationService notificationService;
     private final VenueRequestDtoMapper venueRequestDtoMapper;
     private final VenueResponseDtoMapper venueResponseDtoMapper;
 
     /**
-     * Converts a list of Venue entities into a list of VenueResponseDto objects.
+     * Helper method to send notifications safely without breaking the main transaction.
      *
-     * @param venueList the list of venue entities to convert
-     * @return a list of mapped venue response DTOs
+     * @param userId  The unique identifier of the user to receive the notification.
+     * @param message The content of the notification.
+     * @param type    The category/type of notification.
      */
-    public List<VenueResponseDto> convertHelper(List<Venue> venueList){
-        List<VenueResponseDto> convertedList = new ArrayList<>();
-        for(Venue v : venueList){
-            convertedList.add(venueResponseDtoMapper.toDto(v));
+    private void sendSafeNotification(String userId, String message, String type) {
+        try {
+            notificationService.sendNotification(userId, message, type);
+        } catch (Exception e) {
+            log.error("Failed to send notification to user {}: {}", userId, e.getMessage());
         }
-        return convertedList;
     }
 
     /**
-     * Saves a new venue to the repository.
+     * Converts entities to DTOs and logs a READ audit for each.
      *
-     * @param dto the venue request data transfer object
-     * @return the saved venue as a response DTO
+     * @param actorId   The unique identifier of the user performing the read operation.
+     * @param venueList The list of venue entities to convert and audit.
+     * @return A list of mapped venue response DTOs.
+     */
+    private List<VenueResponseDto> convertAndAudit(String actorId, List<Venue> venueList) {
+        return venueList.stream()
+                .peek(v -> auditService.logAudit(actorId, AuditAction.READ, Venue.class, v.getVenueId()))
+                .map(venueResponseDtoMapper::toDto)
+                .toList();
+    }
+
+    /**
+     * Registers a new venue in the system.
+     *
+     * @param actorId The unique identifier of the user performing the creation.
+     * @param dto     The venue request data transfer object.
+     * @return The saved venue as a response DTO.
      */
     @Override
-    public VenueResponseDto create(VenueRequestDto dto) {
+    @Transactional
+    public VenueResponseDto create(String actorId, VenueRequestDto dto) {
         Venue venue = venueRequestDtoMapper.toEntity(dto);
+
         Venue savedVenue = venueRepository.save(venue);
+
+        log.info("Venue created with id: {} by actor: {}", savedVenue.getVenueId(), actorId);
+        auditService.logAudit(actorId, AuditAction.CREATE, Venue.class, savedVenue.getVenueId());
+
+        sendSafeNotification(actorId, String.format("Venue '%s' has been successfully registered.", savedVenue.getName()), "VENUE");
+
         return venueResponseDtoMapper.toDto(savedVenue);
     }
 
     /**
      * Retrieves all venues available in the system.
      *
-     * @return a list of all venue response DTOs
+     * @param actorId The unique identifier of the user requesting the data.
+     * @return A list of all venue response DTOs.
      */
     @Override
-    public List<VenueResponseDto> findAll() {
+    public List<VenueResponseDto> findAll(String actorId) {
+        log.info("Fetching all venues by actor: {}", actorId);
         List<Venue> venues = venueRepository.findAll();
-        return convertHelper(venues);
+        return convertAndAudit(actorId, venues);
     }
 
     /**
      * Retrieves venues filtered by a specific geographic location.
      *
-     * @param location the location string to search for
-     * @return a list of venues matching the location
+     * @param actorId  The unique identifier of the user requesting the data.
+     * @param location The location string to search for.
+     * @return A list of venues matching the location.
      */
     @Override
-    public List<VenueResponseDto> findByLocation(String location) {
-        List<Venue> locationList = venueRepository.findByLocation(location);
-        return convertHelper(locationList);
+    public List<VenueResponseDto> findByLocation(String actorId, String location) {
+        log.info("Fetching venues at location: {} by actor: {}", location, actorId);
+        List<Venue> venues = venueRepository.findByLocation(location);
+        return convertAndAudit(actorId, venues);
     }
 
     /**
      * Updates an existing venue's information.
      *
-     * @param venueId the ID of the venue to update
-     * @param dto the new venue details
-     * @return the updated venue response DTO
-     * @throws VenueNotFoundException if no venue exists with the given ID
+     * @param actorId The unique identifier of the user performing the update.
+     * @param venueId The ID of the venue to update.
+     * @param dto     The new venue details.
+     * @return The updated venue response DTO.
+     * @throws VenueNotFoundException if no venue exists with the given ID.
      */
     @Override
-    public VenueResponseDto updateVenue(String venueId, VenueRequestDto dto) {
+    @Transactional
+    public VenueResponseDto updateVenue(String actorId, String venueId, VenueRequestDto dto) {
         Venue existingVenue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new VenueNotFoundException("Venue not found with id: " + venueId));
 
         Venue updatedVenue = venueRequestDtoMapper.toEntity(dto);
         updatedVenue.setVenueId(existingVenue.getVenueId());
+        Venue saved = venueRepository.save(updatedVenue);
 
-        return venueResponseDtoMapper.toDto(venueRepository.save(updatedVenue));
+        log.info("Venue updated with id: {} by actor: {}", venueId, actorId);
+        auditService.logAudit(actorId, AuditAction.UPDATE, Venue.class, venueId);
+
+        sendSafeNotification(actorId, String.format("Details for venue '%s' have been updated.", saved.getName()), "VENUE");
+
+        return venueResponseDtoMapper.toDto(saved);
     }
 
     /**
      * Updates only the availability status of a specific venue.
      *
-     * @param venueId the ID of the venue
-     * @param status the new availability status (e.g., available, maintenance)
-     * @return the updated venue response DTO
-     * @throws VenueNotFoundException if no venue exists with the given ID
+     * @param actorId The unique identifier of the user performing the update.
+     * @param venueId The ID of the venue.
+     * @param status  The new availability status.
+     * @return The updated venue response DTO.
+     * @throws VenueNotFoundException if no venue exists with the given ID.
      */
     @Override
-    public VenueResponseDto updateVenueStatus(String venueId, AvailabilityStatus status) {
+    @Transactional
+    public VenueResponseDto updateVenueStatus(String actorId, String venueId, AvailabilityStatus status) {
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new VenueNotFoundException("Venue not found with id: " + venueId));
 
         venue.setAvailabilityStatus(status);
-        return venueResponseDtoMapper.toDto(venueRepository.save(venue));
+        venueRepository.save(venue);
+
+        log.info("Venue status updated for id: {} to {} by actor: {}", venueId, status, actorId);
+        auditService.logAudit(actorId, AuditAction.UPDATE, Venue.class, venueId);
+
+        sendSafeNotification(actorId, String.format("Venue '%s' status changed to %s.", venue.getName(), status), "VENUE_STATUS");
+
+        return venueResponseDtoMapper.toDto(venue);
     }
 
     /**
      * Deletes a venue from the system by its ID.
      *
-     * @param venueId the ID of the venue to be removed
-     * @throws VenueNotFoundException if no venue exists with the given ID
+     * @param actorId The unique identifier of the user performing the deletion.
+     * @param venueId The ID of the venue to be removed.
+     * @throws VenueNotFoundException if no venue exists with the given ID.
      */
     @Override
-    public void deleteVenue(String venueId) {
-        if (!venueRepository.existsById(venueId)) {
-            throw new VenueNotFoundException("Venue not found with id: " + venueId);
-        }
+    @Transactional
+    public void deleteVenue(String actorId, String venueId) {
+        Venue venue = venueRepository.findById(venueId)
+                .orElseThrow(() -> new VenueNotFoundException("Venue not found with id: " + venueId));
+
+        String venueName = venue.getName();
         venueRepository.deleteById(venueId);
+
+        log.info("Venue deleted with id: {} by actor: {}", venueId, actorId);
+        auditService.logAudit(actorId, AuditAction.DELETE, Venue.class, venueId);
+
+        sendSafeNotification(actorId, String.format("Venue '%s' has been removed from the system.", venueName), "VENUE_DELETE");
     }
 
     /**
      * Finds venues that are free on a specific date.
      *
-     * @param date the date string in yyyy-MM-dd format
-     * @return a list of available venues for that date
-     * @throws IllegalArgumentException if the date format is invalid
+     * @param actorId The unique identifier of the user requesting the data.
+     * @param date    The date string in yyyy-MM-dd format.
+     * @return A list of available venues for that date.
+     * @throws IllegalArgumentException if the date format is invalid.
      */
     @Override
-    public List<VenueResponseDto> findByDate(String date) {
+    public List<VenueResponseDto> findByDate(String actorId, String date) {
         try {
+            log.info("Fetching venues for date: {} by actor: {}", date, actorId);
             LocalDate localDate = LocalDate.parse(date);
-
             List<Venue> freeVenues = venueRepository.findAvailableVenues(
                     localDate,
                     AvailabilityStatus.available,
                     null
             );
-
-            return convertHelper(freeVenues);
-
+            return convertAndAudit(actorId, freeVenues);
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Invalid date format. Please use yyyy-MM-dd", e);
         }
@@ -160,24 +221,28 @@ public class VenueServiceImpl implements VenueService {
     /**
      * Retrieves venues that have a capacity equal to or greater than the specified amount.
      *
-     * @param capacity the minimum capacity required
-     * @return a list of venues meeting the capacity criteria
+     * @param actorId  The unique identifier of the user requesting the data.
+     * @param capacity The minimum capacity required.
+     * @return A list of venues meeting the capacity criteria.
      */
     @Override
-    public List<VenueResponseDto> findByCapacity(int capacity) {
-        List<Venue> byCapacityList = venueRepository.findByCapacityGreaterThanEqual(capacity);
-        return convertHelper(byCapacityList);
+    public List<VenueResponseDto> findByCapacity(String actorId, int capacity) {
+        log.info("Fetching venues with capacity >= {} by actor: {}", capacity, actorId);
+        List<Venue> venues = venueRepository.findByCapacityGreaterThanEqual(capacity);
+        return convertAndAudit(actorId, venues);
     }
 
     /**
      * Filters venues based on their current availability status.
      *
-     * @param status the status to filter by
-     * @return a list of venues matching the status
+     * @param actorId The unique identifier of the user requesting the data.
+     * @param status  The status to filter by.
+     * @return A list of venues matching the status.
      */
     @Override
-    public List<VenueResponseDto> findByAvailablityStatus(AvailabilityStatus status) {
-        List<Venue> byStatus = venueRepository.findByAvailabilityStatus(status);
-        return convertHelper(byStatus);
+    public List<VenueResponseDto> findByAvailabilityStatus(String actorId, AvailabilityStatus status) {
+        log.info("Fetching venues with status: {} by actor: {}", status, actorId);
+        List<Venue> venues = venueRepository.findByAvailabilityStatus(status);
+        return convertAndAudit(actorId, venues);
     }
 }

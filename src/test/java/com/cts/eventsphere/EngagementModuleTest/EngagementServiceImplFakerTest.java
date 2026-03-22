@@ -1,10 +1,14 @@
 package com.cts.eventsphere.EngagementModuleTest;
 
+import com.cts.eventsphere.dto.engagement.EngagementRequestDto;
+import com.cts.eventsphere.dto.engagement.EngagementResponseDto;
 import com.cts.eventsphere.exception.engagement.InvalidEngagementException;
 import com.cts.eventsphere.model.Engagement;
+import com.cts.eventsphere.model.data.AuditAction;
 import com.cts.eventsphere.model.data.EngagementType;
 import com.cts.eventsphere.repository.EngagementRepository;
-import com.cts.eventsphere.service.EngagementService;
+import com.cts.eventsphere.service.AuditService;
+import com.cts.eventsphere.service.NotificationService;
 import com.cts.eventsphere.service.impl.EngagementServiceImpl;
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,109 +22,121 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-/**
- * @author 2480027
- * @version 1.0
- * @since 07-03-2026
- */
 
 /**
- * Unit tests for EngagementServiceImpl
+ * Unit tests for EngagementServiceImpl including Audit and Notification verification.
  */
 @ExtendWith(MockitoExtension.class)
 class EngagementServiceImplFakerTest {
 
     private EngagementRepository engagementRepository;
-    private EngagementService service;
-
+    private AuditService auditService;
+    private NotificationService notificationService;
+    private EngagementServiceImpl service;
     private Faker faker;
 
     @BeforeEach
     void setup() {
         engagementRepository = mock(EngagementRepository.class);
-        service = new EngagementServiceImpl(engagementRepository);
+        auditService = mock(AuditService.class);
+        notificationService = mock(NotificationService.class);
+
+        // Pass the new dependencies to the constructor
+        service = new EngagementServiceImpl(engagementRepository, auditService, notificationService);
         faker = new Faker();
     }
 
     @Test
-    void recordEngagement_withNullActivity_throwsInvalidEngagementException() {
-        Engagement engagement = mock(Engagement.class);
-        when(engagement.getActivity()).thenReturn(null);
-        when(engagement.getAttendeeId()).thenReturn(faker.internet().uuid());
-        when(engagement.getEventId()).thenReturn(faker.internet().uuid());
+    void recordEngagement_withValidActivity_savesLogsAndNotifies() {
+        // Arrange
+        String attendeeId = faker.internet().uuid();
+        EngagementType activity = faker.options().option(EngagementType.class);
 
-        assertThrows(InvalidEngagementException.class, () -> service.recordEngagement(engagement));
-        verifyNoInteractions(engagementRepository);
-    }
+        EngagementRequestDto requestDto = EngagementRequestDto.builder()
+                .eventId(faker.internet().uuid())
+                .attendeeId(attendeeId)
+                .activity(activity)
+                .activityTimestamp(LocalDateTime.now())
+                .build();
 
-    @Test
-    void recordEngagement_withValidActivity_savesAndReturns() {
-        Engagement engagement = mock(Engagement.class);
-        EngagementType activity = faker.options().option(EngagementType.values());
+        Engagement savedEntity = new Engagement();
+        savedEntity.setEngagementId(faker.internet().uuid());
 
-        when(engagement.getActivity()).thenReturn(activity);
-        when(engagement.getAttendeeId()).thenReturn(faker.internet().uuid());
-        when(engagement.getEventId()).thenReturn(faker.internet().uuid());
+        when(engagementRepository.save(any(Engagement.class))).thenReturn(savedEntity);
 
-        Engagement saved = mock(Engagement.class);
-        when(saved.getEngagementId()).thenReturn(faker.internet().uuid());
-        when(engagementRepository.save(engagement)).thenReturn(saved);
+        // Act
+        EngagementResponseDto result = service.recordEngagement(requestDto);
 
-        Engagement result = service.recordEngagement(engagement);
-
+        // Assert
         assertNotNull(result);
-        assertSame(saved, result);
-        verify(engagementRepository, times(1)).save(same(engagement));
-        verifyNoMoreInteractions(engagementRepository);
+        assertEquals(savedEntity.getEngagementId(), result.engagementId());
+
+        // Verify Repository interaction
+        verify(engagementRepository, times(1)).save(any(Engagement.class));
+
+        // Verify Audit interaction (Crucial for the new changes)
+        verify(auditService, times(1)).logAudit(
+                eq(attendeeId),
+                eq(AuditAction.CREATE),
+                eq(Engagement.class),
+                eq(savedEntity.getEngagementId())
+        );
+
+        // Verify Notification interaction
+        verify(notificationService, times(1)).sendNotification(
+                eq(attendeeId),
+                anyString(),
+                eq("ENGAGEMENT_RECORDED")
+        );
     }
 
     @Test
-    void getByEvent_returnsListFromRepository() {
+    void recordEngagement_futureTimestamp_throwsExceptionAndNoSideEffects() {
+        EngagementRequestDto requestDto = EngagementRequestDto.builder()
+                .eventId(faker.internet().uuid())
+                .attendeeId(faker.internet().uuid())
+                .activity(EngagementType.SESSION_JOIN)
+                .activityTimestamp(LocalDateTime.now().plusDays(1)) // Future date
+                .build();
+
+        assertThrows(InvalidEngagementException.class, () -> service.recordEngagement(requestDto));
+
+        // Ensure no data was saved or audited if validation fails
+        verifyNoInteractions(engagementRepository, auditService, notificationService);
+    }
+
+    @Test
+    void getByEvent_returnsDtoListFromRepository() {
         String eventId = faker.internet().uuid();
-        List<Engagement> repoResult = List.of(mock(Engagement.class), mock(Engagement.class));
-        when(engagementRepository.findByEventId(eventId)).thenReturn(repoResult);
+        Engagement e1 = new Engagement();
+        e1.setEngagementId(faker.internet().uuid());
 
-        List<Engagement> result = service.getByEvent(eventId);
+        when(engagementRepository.findByEventId(eventId)).thenReturn(List.of(e1));
 
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        verify(engagementRepository, times(1)).findByEventId(eventId);
-        verifyNoMoreInteractions(engagementRepository);
-    }
+        List<EngagementResponseDto> result = service.getByEvent(eventId);
 
-    @Test
-    void getByActivityType_returnsListFromRepository() {
-        EngagementType activity = faker.options().option(EngagementType.values());
-        List<Engagement> repoResult = List.of(mock(Engagement.class));
-        when(engagementRepository.findByActivity(activity)).thenReturn(repoResult);
-
-        List<Engagement> result = service.getByActivityType(activity);
-
-        assertNotNull(result);
         assertEquals(1, result.size());
-        verify(engagementRepository, times(1)).findByActivity(activity);
-        verifyNoMoreInteractions(engagementRepository);
+        verify(engagementRepository).findByEventId(eventId);
+        // Read operations should not trigger audits in this implementation
+        verifyNoInteractions(auditService);
     }
 
     @Test
-    void getFilteredEngagements_returnsListFromRepository() {
-
+    void getFilteredEngagements_withValidFilters_returnsList() {
         String eventId = faker.internet().uuid();
-        EngagementType activity = faker.options().option(EngagementType.values());
+        EngagementType activity = EngagementType.CHECK_IN;
+        LocalDateTime start = LocalDateTime.now().minusDays(1);
+        LocalDateTime end = LocalDateTime.now();
 
-        LocalDateTime start = LocalDateTime.now().minusDays(faker.number().numberBetween(5, 10));
-        LocalDateTime end = LocalDateTime.now().minusDays(faker.number().numberBetween(0, 4));
+        Engagement e = new Engagement();
+        e.setEngagementId(faker.internet().uuid());
 
-        List<Engagement> repoResult = List.of(mock(Engagement.class), mock(Engagement.class), mock(Engagement.class));
-        when(engagementRepository.findByEventIdAndActivityAndTimestampBetween(eventId, activity, start, end))
-                .thenReturn(repoResult);
+        when(engagementRepository.findByEventIdAndActivityAndTimestampBetween(eq(eventId), eq(activity), eq(start), eq(end)))
+                .thenReturn(List.of(e));
 
-        List<Engagement> result = service.getFilteredEngagements(eventId, activity, start, end);
+        List<EngagementResponseDto> result = service.getFilteredEngagements(eventId, activity, start, end);
 
-        assertNotNull(result);
-        assertEquals(3, result.size());
-        verify(engagementRepository, times(1))
-                .findByEventIdAndActivityAndTimestampBetween(eq(eventId), eq(activity), eq(start), eq(end));
-        verifyNoMoreInteractions(engagementRepository);
+        assertFalse(result.isEmpty());
+        verify(engagementRepository).findByEventIdAndActivityAndTimestampBetween(eventId, activity, start, end);
     }
 }

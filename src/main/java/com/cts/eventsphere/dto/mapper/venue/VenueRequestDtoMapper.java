@@ -2,29 +2,42 @@ package com.cts.eventsphere.dto.mapper.venue;
 
 import com.cts.eventsphere.dto.venue.VenueRequestDto;
 import com.cts.eventsphere.model.Venue;
+import com.cts.eventsphere.model.data.AvailabilityStatus;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
 /**
- *  DtoMapper from dta to Venue
+ * DtoMapper from DTO to Venue Entity.
  *
  * @author 2479476
- * @version 1.0
+ * @version 1.1
  * @since 2-03-2026
  */
-
 @Component
 public class VenueRequestDtoMapper {
+
+    /**
+     * Maps a VenueRequestDto to a Venue Entity.
+     * Note: CreatedAt/UpdatedAt should be handled by JPA auditing annotations in the Entity.
+     * * @param dto the source request DTO
+     * @return a mapped Venue entity
+     */
     public Venue toEntity(VenueRequestDto dto){
+        if (dto == null) {
+            return null;
+        }
+
         Venue venue = new Venue();
 
         venue.setName(dto.name());
         venue.setLocation(dto.location());
         venue.setCapacity(dto.capacity());
-        venue.setAvailabilityStatus(dto.availabilityStatus());
-        venue.setCreatedAt(LocalDateTime.now());
 
-        return  venue;
+        if (dto.availabilityStatus() != null) {
+            venue.setAvailabilityStatus(dto.availabilityStatus());
+        } else {
+            venue.setAvailabilityStatus(AvailabilityStatus.available);
+        }
+
+        return venue;
     }
 }

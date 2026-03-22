@@ -39,7 +39,7 @@ public class FeedbackController {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{feedbackId}")
+    @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ATTENDEE','ORGANIZER','ADMIN')")
     public ResponseEntity<FeedbackResponseDto> getById(@PathVariable String id) {
         log.info("REST request to get Feedback by ID : {}", id);

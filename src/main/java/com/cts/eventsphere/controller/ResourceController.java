@@ -3,12 +3,17 @@ package com.cts.eventsphere.controller;
 import com.cts.eventsphere.dto.resource.ResourceAllocationRequestDto;
 import com.cts.eventsphere.dto.resource.ResourceRequestDto;
 import com.cts.eventsphere.dto.resource.ResourceResponseDto;
+import com.cts.eventsphere.security.UserPrincipal;
 import com.cts.eventsphere.service.ResourceService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +28,7 @@ import java.util.List;
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Slf4j
+@Validated // Required to enable validation for method parameters like @PathVariable
 public class ResourceController {
 
     private final ResourceService resourceService;
@@ -33,39 +39,50 @@ public class ResourceController {
      *
      * @param venueId the unique identifier of the venue
      * @param requestDto the data transfer object containing resource details
+     * @param userPrincipal the authenticated user performing the action
      * @return the created resource details wrapped in a ResponseEntity
      */
     @PostMapping("/venues/{venueId}/resources")
     @PreAuthorize("hasRole('VENUE_MANAGER')")
     public ResponseEntity<ResourceResponseDto> createResource(
-            @PathVariable String venueId,
-            @RequestBody ResourceRequestDto requestDto) {
-        log.info("REST request to create resource for venue {}: {}", venueId, requestDto);
-        ResourceResponseDto response = resourceService.createResource(venueId, requestDto);
+            @PathVariable @NotBlank(message = "Venue ID is required") String venueId,
+            @RequestBody @Valid ResourceRequestDto requestDto,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String actorId = userPrincipal.userId();
+        log.info("REST request to create resource for venue {} by actor {}: {}", venueId, actorId, requestDto);
+        ResourceResponseDto response = resourceService.createResource(actorId, venueId, requestDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     /**
      * Retrieve all resources in the system.
      *
+     * @param userPrincipal the authenticated user performing the action
      * @return a list of all resource response DTOs
      */
     @GetMapping("/resources")
-    public ResponseEntity<List<ResourceResponseDto>> getAllResources() {
-        log.info("REST request to get all resources");
-        return ResponseEntity.ok(resourceService.getAllResources());
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<ResourceResponseDto>> getAllResources(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String actorId = userPrincipal.userId();
+        log.info("REST request to get all resources by actor: {}", actorId);
+        return ResponseEntity.ok(resourceService.getAllResources(actorId));
     }
 
     /**
      * Get a specific resource by its unique ID.
      *
      * @param resourceId the unique identifier of the resource
+     * @param userPrincipal the authenticated user performing the action
      * @return the resource details wrapped in a ResponseEntity
      */
     @GetMapping("/resources/{resourceId}")
-    public ResponseEntity<ResourceResponseDto> getResourceById(@PathVariable String resourceId) {
-        log.info("REST request to get resource by ID: {}", resourceId);
-        return ResponseEntity.ok(resourceService.getResourceById(resourceId));
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ResourceResponseDto> getResourceById(
+            @PathVariable @NotBlank(message = "Resource ID is required") String resourceId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String actorId = userPrincipal.userId();
+        log.info("REST request to get resource by ID: {} by actor: {}", resourceId, actorId);
+        return ResponseEntity.ok(resourceService.getResourceById(actorId, resourceId));
     }
 
     /**
@@ -73,13 +90,17 @@ public class ResourceController {
      * Accessible by Venue Managers, Organizers, or Admins.
      *
      * @param venueId the unique identifier of the venue
+     * @param userPrincipal the authenticated user performing the action
      * @return a list of resources associated with the specified venue
      */
     @GetMapping("/venues/{venueId}/resources")
-    @PreAuthorize("hasRole('VENUE_MANAGER') or hasRole('ORGANIZER') or hasRole('ADMIN')")
-    public ResponseEntity<List<ResourceResponseDto>> getResourcesByVenue(@PathVariable String venueId) {
-        log.info("REST request to get resources for venue ID: {}", venueId);
-        return ResponseEntity.ok(resourceService.getResourcesByVenue(venueId));
+    @PreAuthorize("hasAnyRole('VENUE_MANAGER', 'ORGANIZER', 'ADMIN')")
+    public ResponseEntity<List<ResourceResponseDto>> getResourcesByVenue(
+            @PathVariable @NotBlank(message = "Venue ID is required") String venueId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String actorId = userPrincipal.userId();
+        log.info("REST request to get resources for venue ID: {} by actor: {}", venueId, actorId);
+        return ResponseEntity.ok(resourceService.getResourcesByVenue(actorId, venueId));
     }
 
     /**
@@ -87,13 +108,18 @@ public class ResourceController {
      * Restricted to Organizers.
      *
      * @param requestDto the allocation request details
+     * @param userPrincipal the authenticated user performing the action
      * @return a success message string wrapped in a ResponseEntity
      */
     @PostMapping("/resources/allocation")
     @PreAuthorize("hasRole('ORGANIZER')")
-    public ResponseEntity<String> requestAllocation(@RequestBody ResourceAllocationRequestDto requestDto) {
-        log.info("REST request to allocate resources: {}", requestDto);
+    public ResponseEntity<String> requestAllocation(
+            @RequestBody @Valid ResourceAllocationRequestDto requestDto,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String actorId = userPrincipal.userId();
+        log.info("REST request to allocate resources by actor {}: {}", actorId, requestDto);
         resourceService.requestAllocation(
+                actorId,
                 requestDto.bookingId(),
                 requestDto.eventId(),
                 requestDto.venueId(),
@@ -107,13 +133,17 @@ public class ResourceController {
      * Restricted to Venue Managers.
      *
      * @param allocationId the unique identifier of the allocation request
+     * @param userPrincipal the authenticated user performing the action
      * @return a confirmation message string wrapped in a ResponseEntity
      */
     @PatchMapping("/resources/allocation/{allocationId}/approve")
     @PreAuthorize("hasRole('VENUE_MANAGER')")
-    public ResponseEntity<String> approveAllocation(@PathVariable String allocationId) {
-        log.info("REST request to approve allocation: {}", allocationId);
-        resourceService.approveAllocation(allocationId);
+    public ResponseEntity<String> approveAllocation(
+            @PathVariable @NotBlank(message = "Allocation ID is required") String allocationId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String actorId = userPrincipal.userId();
+        log.info("REST request to approve allocation: {} by actor: {}", allocationId, actorId);
+        resourceService.approveAllocation(actorId, allocationId);
         return ResponseEntity.ok("Resource allocation approved and inventory updated.");
     }
 
@@ -123,15 +153,18 @@ public class ResourceController {
      *
      * @param resourceId the unique identifier of the resource to update
      * @param requestDto the updated resource details
+     * @param userPrincipal the authenticated user performing the action
      * @return the updated resource response DTO
      */
     @PutMapping("/resources/{resourceId}")
     @PreAuthorize("hasRole('VENUE_MANAGER')")
     public ResponseEntity<ResourceResponseDto> updateResource(
-            @PathVariable String resourceId,
-            @RequestBody ResourceRequestDto requestDto) {
-        log.info("REST request to update resource ID: {}", resourceId);
-        return ResponseEntity.ok(resourceService.updateResource(resourceId, requestDto));
+            @PathVariable @NotBlank(message = "Resource ID is required") String resourceId,
+            @RequestBody @Valid ResourceRequestDto requestDto,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String actorId = userPrincipal.userId();
+        log.info("REST request to update resource ID: {} by actor: {}", resourceId, actorId);
+        return ResponseEntity.ok(resourceService.updateResource(actorId, resourceId, requestDto));
     }
 
     /**
@@ -139,13 +172,17 @@ public class ResourceController {
      * Restricted to Venue Managers or Admins.
      *
      * @param resourceId the unique identifier of the resource to delete
+     * @param userPrincipal the authenticated user performing the action
      * @return an empty ResponseEntity with No Content status
      */
     @DeleteMapping("/resources/{resourceId}")
-    @PreAuthorize("hasRole('VENUE_MANAGER') or hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteResource(@PathVariable String resourceId) {
-        log.warn("REST request to delete resource ID: {}", resourceId);
-        resourceService.deleteResource(resourceId);
+    @PreAuthorize("hasAnyRole('VENUE_MANAGER', 'ADMIN')")
+    public ResponseEntity<Void> deleteResource(
+            @PathVariable @NotBlank(message = "Resource ID is required") String resourceId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String actorId = userPrincipal.userId();
+        log.warn("REST request to delete resource ID: {} by actor: {}", resourceId, actorId);
+        resourceService.deleteResource(actorId, resourceId);
         return ResponseEntity.noContent().build();
     }
 }
