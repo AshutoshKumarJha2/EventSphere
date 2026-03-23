@@ -6,9 +6,12 @@ import com.cts.eventsphere.dto.mapper.delivery.DeliveryRequestDtoMapper;
 import com.cts.eventsphere.dto.mapper.delivery.DeliveryResponseDtoMapper;
 import com.cts.eventsphere.exception.delivery.DeliveryNotFoundException;
 import com.cts.eventsphere.model.Delivery;
+import com.cts.eventsphere.model.data.AuditAction;
 import com.cts.eventsphere.model.data.DeliveryStatus;
 import com.cts.eventsphere.repository.DeliveryRepository;
+import com.cts.eventsphere.service.AuditService;
 import com.cts.eventsphere.service.DeliveryService;
+import com.cts.eventsphere.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,6 +36,8 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final DeliveryRepository deliveryRepository;
     private final DeliveryRequestDtoMapper requestDtoMapper;
     private final DeliveryResponseDtoMapper responseDtoMapper;
+    private final AuditService auditService;
+    private final NotificationService notificationService;
 
     /**
      * Creates a new delivery record and persists it to the database.
@@ -42,11 +47,24 @@ public class DeliveryServiceImpl implements DeliveryService {
      */
     @Override
     @Transactional
-    public DeliveryResponseDto createDelivery(DeliveryRequestDto request){
-        log.info("Attempting to create a new delivery for invoice ID: {}", request.invoiceId());
+    public DeliveryResponseDto createDelivery(String actorId, DeliveryRequestDto request){
+        log.info("Attempting to create a new delivery for invoice ID: {} by actorId={}", request.invoiceId(), actorId);
         Delivery delivery = requestDtoMapper.toEntity(request);
         Delivery saved = deliveryRepository.save(delivery);
-        log.info("Successfully created delivery with ID: {}", saved.getDeliveryId());
+        log.info("Successfully created delivery with ID: {} by actorId={}", saved.getDeliveryId(),actorId);
+        auditService.logAudit(
+                actorId,
+                AuditAction.CREATE,
+                Delivery.class,
+                saved.getDeliveryId()
+        );
+
+        notificationService.sendNotification(
+                actorId,
+                "Delivery created for Invoice ID: " + request.invoiceId(),
+                "DELIVERY_CREATED"
+        );
+
         return responseDtoMapper.toDto(saved);
     }
 
@@ -58,11 +76,18 @@ public class DeliveryServiceImpl implements DeliveryService {
      * @throws DeliveryNotFoundException if the delivery ID is not found in the database
      */
     @Override
-    public DeliveryResponseDto getDeliveryById(String deliveryId){
-        log.info("Fetching delivery details for ID: {}", deliveryId);
-        return deliveryRepository.findById(deliveryId)
-                .map(responseDtoMapper::toDto)
+    public DeliveryResponseDto getDeliveryById(String actorId, String deliveryId){
+        log.info("Fetching delivery details for ID: {} by actorId={}", deliveryId, actorId);
+
+        Delivery delivery = deliveryRepository.findById(deliveryId)
                 .orElseThrow(() -> new DeliveryNotFoundException(deliveryId));
+        auditService.logAudit(
+                actorId,
+                AuditAction.READ,
+                Delivery.class,
+                deliveryId
+        );
+        return responseDtoMapper.toDto(delivery);
     }
 
     /**
@@ -71,10 +96,18 @@ public class DeliveryServiceImpl implements DeliveryService {
      * @return list of all delivery response DTOs
      */
     @Override
-    public List<DeliveryResponseDto> getAllDeliveries(){
-        log.info("Fetching all deliveries from database");
+    public List<DeliveryResponseDto> getAllDeliveries(String actorId){
+        log.info("Fetching all deliveries from database by actorId={}",actorId);
         return deliveryRepository.findAll()
                 .stream()
+                .peek(d ->
+                        auditService.logAudit(
+                                actorId,
+                                AuditAction.READ,
+                                Delivery.class,
+                                d.getDeliveryId()
+                        )
+                )
                 .map(responseDtoMapper::toDto)
                 .toList();
     }
@@ -90,15 +123,28 @@ public class DeliveryServiceImpl implements DeliveryService {
      */
     @Override
     @Transactional
-    public DeliveryResponseDto updateDeliveryStatus(String deliveryId, DeliveryStatus status) {
-        log.info("Attempting to update status for delivery ID: {} to {}", deliveryId, status);
+    public DeliveryResponseDto updateDeliveryStatus(String actorId, String deliveryId, DeliveryStatus status) {
+        log.info("Attempting to update status for delivery ID: {} to {} by actorId={}", deliveryId, status, actorId);
         Delivery delivery = deliveryRepository.findById(deliveryId)
                 .orElseThrow(() -> new DeliveryNotFoundException(deliveryId));
 
         delivery.setStatus(status);
         Delivery updated = deliveryRepository.save(delivery);
+        log.info("Successfully updated status for delivery ID: {} by actorId={}", deliveryId, actorId);
+        auditService.logAudit(
+                actorId,
+                AuditAction.UPDATE,
+                Delivery.class,
+                deliveryId
+        );
 
-        log.info("Successfully updated status for delivery ID: {}", deliveryId);
+        notificationService.sendNotification(
+                actorId,
+                "Delivery status updated to " + status +
+                        ". Delivery ID: " + deliveryId,
+                "DELIVERY_STATUS_UPDATED"
+        );
+
         return responseDtoMapper.toDto(updated);
     }
 
@@ -112,8 +158,8 @@ public class DeliveryServiceImpl implements DeliveryService {
      */
     @Override
     @Transactional
-    public DeliveryResponseDto updateDelivery(String deliveryId, DeliveryRequestDto request){
-        log.info("Attempting to update details for delivery ID: {}", deliveryId);
+    public DeliveryResponseDto updateDelivery(String actorId, String deliveryId, DeliveryRequestDto request){
+        log.info("Attempting to update details for delivery ID: {} by actorId={}", deliveryId, actorId);
 
         Delivery delivery = deliveryRepository.findById(deliveryId)
                 .orElseThrow(() -> new DeliveryNotFoundException(deliveryId));
@@ -126,7 +172,20 @@ public class DeliveryServiceImpl implements DeliveryService {
         delivery.setTrackingNumber(request.trackingNumber());
 
         Delivery updated = deliveryRepository.save(delivery);
-        log.info("Successfully updated details for delivery ID: {}", deliveryId);
+        log.info("Successfully updated details for delivery ID: {} by actorId={}", deliveryId, actorId);
+        auditService.logAudit(
+                actorId,
+                AuditAction.UPDATE,
+                Delivery.class,
+                deliveryId
+        );
+
+        notificationService.sendNotification(
+                actorId,
+                "Delivery details updated. Delivery ID: " + deliveryId,
+                "DELIVERY_UPDATED"
+        );
+
         return responseDtoMapper.toDto(updated);
     }
 
@@ -138,14 +197,26 @@ public class DeliveryServiceImpl implements DeliveryService {
      */
     @Override
     @Transactional
-    public void deleteDelivery(String deliveryId){
-        log.info("Attempting to delete delivery ID: {}", deliveryId);
+    public void deleteDelivery(String actorId, String deliveryId){
+        log.info("Attempting to delete delivery ID: {} by actorId={}", deliveryId, actorId);
 
         if(!deliveryRepository.existsById(deliveryId)){
             throw new DeliveryNotFoundException(deliveryId);
         }
 
         deliveryRepository.deleteById(deliveryId);
-        log.info("Successfully deleted delivery ID: {}", deliveryId);
+        log.info("Successfully deleted delivery ID: {} by actorId={}", deliveryId, actorId);
+        auditService.logAudit(
+                actorId,
+                AuditAction.DELETE,
+                Delivery.class,
+                deliveryId
+        );
+
+        notificationService.sendNotification(
+                actorId,
+                "Delivery deleted. Delivery ID: " + deliveryId,
+                "DELIVERY_DELETED"
+        );
     }
 }

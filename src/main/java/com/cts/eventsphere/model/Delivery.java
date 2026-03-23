@@ -2,7 +2,10 @@ package com.cts.eventsphere.model;
 
 import com.cts.eventsphere.model.data.DeliveryStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -20,6 +23,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "delivery")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Delivery {
 
     @Id

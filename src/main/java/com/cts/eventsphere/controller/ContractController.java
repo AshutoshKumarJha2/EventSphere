@@ -7,6 +7,7 @@ import com.cts.eventsphere.dto.invoice.InvoiceRequestDto;
 import com.cts.eventsphere.dto.invoice.InvoiceResponseDto;
 import com.cts.eventsphere.exception.contract.ContractNotFoundException;
 import com.cts.eventsphere.model.data.ContractStatus;
+import com.cts.eventsphere.security.UserPrincipal;
 import com.cts.eventsphere.service.ContractService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,69 +43,82 @@ public class ContractController {
      * Initiates a new contract record in the system. [cite: 51]
      * Restricted to users with the 'ORGANIZER' role.
      *
+     * @param user The currently authenticated user's details representing the actor.
      * @param request the contract details to be created, validated by @Valid [cite: 54]
      * @return the created contract response DTO wrapped in a ResponseEntity [cite: 55]
      */
     @PostMapping
     @PreAuthorize("hasRole('ORGANIZER')")
-    public ResponseEntity<ContractResponseDto> create(@Valid @RequestBody ContractRequestDto request) {
-        log.info("REST request to create contract for vendor: {}",request.vendorId());
-        return new ResponseEntity<>(contractService.createContract(request), HttpStatus.CREATED);
+    public ResponseEntity<ContractResponseDto> create(@AuthenticationPrincipal UserPrincipal user, @Valid @RequestBody ContractRequestDto request) {
+        var actorId = user.userId();
+        log.info("REST request to create contract for vendor: {} by actorId={}",request.vendorId(), actorId);
+        return new ResponseEntity<>(contractService.createContract(user.userId(),request), HttpStatus.CREATED);
     }
 
     /**
      * Creates a new invoice associated with a specific contract. [cite: 51]
      *
+     * @param user The currently authenticated user's details representing the actor.
      * @param contractId unique identifier of the contract [cite: 54]
      * @param dto the invoice details to be processed [cite: 54]
      * @return the generated invoice details [cite: 55]
      */
     @PostMapping("/{contractId}/invoice")
     @PreAuthorize("hasAnyRole('FINANCE_OFFICER','VENDOR')")
-    public ResponseEntity<InvoiceResponseDto> createInvoice(@PathVariable String contractId, @Valid @RequestBody InvoiceRequestDto dto) {
-        return new ResponseEntity<>(contractService.createInvoice(contractId, dto), HttpStatus.CREATED);
+    public ResponseEntity<InvoiceResponseDto> createInvoice(@AuthenticationPrincipal UserPrincipal user,@PathVariable String contractId, @Valid @RequestBody InvoiceRequestDto dto) {
+        var actorId = user.userId();
+        log.info("REST request to create invoice for contract with ID: {} by actorId={}",contractId,actorId);
+        return new ResponseEntity<>(contractService.createInvoice(user.userId(),contractId, dto), HttpStatus.CREATED);
     }
 
     /**
      * Adds a new deliverable item to an existing contract. [cite: 51]
      *
+     * @param user The currently authenticated user's details representing the actor.
      * @param contractId unique identifier of the contract [cite: 54]
      * @param dto the delivery details to be added [cite: 54]
      * @return a success message confirming the delivery addition [cite: 55]
      */
     @PostMapping("/{contractId}/deliveries")
     @PreAuthorize("hasRole('VENDOR')")
-    public ResponseEntity<String> addDelivery(@PathVariable String contractId, @Valid @RequestBody DeliveryRequestDto dto) {
-        contractService.addDeliverable(contractId, dto);
+    public ResponseEntity<String> addDelivery(@AuthenticationPrincipal UserPrincipal user,@PathVariable String contractId, @Valid @RequestBody DeliveryRequestDto dto) {
+        var actorId = user.userId();
+        log.info("REST request to add delivery for contract with ID: {} by actorId={}",contractId, actorId);
+        contractService.addDeliverable(user.userId(),contractId, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Delivery Added");
     }
 
     /**
      * Retrieves a single contract by its unique ID. [cite: 51]
      *
+     * @param user The currently authenticated user's details representing the actor.
      * @param id the unique identifier of the contract [cite: 54]
      * @return the contract details wrapped in a ResponseEntity [cite: 55]
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ContractResponseDto> getById(@PathVariable String id) {
-        log.info("REST request to fetch contract with ID={}", id);
-        return ResponseEntity.ok(contractService.getContractById(id));
+    public ResponseEntity<ContractResponseDto> getById(@AuthenticationPrincipal UserPrincipal user,@PathVariable String id) {
+        var actorId = user.userId();
+        log.info("REST request to fetch contract with ID={} by actorId={}", id, actorId);
+        return ResponseEntity.ok(contractService.getContractById(user.userId(),id));
     }
 
     /**
      * Fetches a list of all contracts available in the system. [cite: 51]
      *
+     * @param user The currently authenticated user's details representing the actor.
      * @return a list of all contract response DTOs [cite: 55]
      */
     @GetMapping
-    public ResponseEntity<List<ContractResponseDto>> getAll() {
-        log.info("REST request to fetch all contracts");
-        return ResponseEntity.ok(contractService.getAllContracts());
+    public ResponseEntity<List<ContractResponseDto>> getAll(@AuthenticationPrincipal UserPrincipal user) {
+        var actorId = user.userId();
+        log.info("REST request to fetch all contracts by actorId={}", actorId);
+        return ResponseEntity.ok(contractService.getAllContracts(user.userId()));
     }
 
     /**
      * Updates only the status of an existing contract. [cite: 51]
      *
+     * @param user The currently authenticated user's details representing the actor.
      * @param id the unique identifier of the contract [cite: 54]
      * @param status the new status to apply [cite: 54]
      * @return the updated contract details [cite: 55]
@@ -111,17 +126,20 @@ public class ContractController {
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasAnyRole('ORGANIZER', 'VENDOR')")
     public ResponseEntity<ContractResponseDto> updateStatus(
+            @AuthenticationPrincipal UserPrincipal user,
             @PathVariable String id,
             @RequestParam ContractStatus status) {
 
-        log.info("REST request to update status for contract ID={} to {}", id, status);
-        return ResponseEntity.ok(contractService.updateContractStatus(id, status));
+        var actorId = user.userId();
+        log.info("REST request to update status for contract ID={} to {} by actorId={}", id, status, actorId);
+        return ResponseEntity.ok(contractService.updateContractStatus(user.userId(),id, status));
     }
 
     /**
      * Performs a full update of an existing contract's information. [cite: 51]
      * Overwrites vendor, event, duration, and financial details. [cite: 52]
      *
+     * @param user The currently authenticated user's details representing the actor.
      * @param id the unique identifier of the contract to update [cite: 54]
      * @param request the updated contract details wrapped in a DTO [cite: 54]
      * @return the updated contract response DTO wrapped in a ResponseEntity [cite: 55]
@@ -130,25 +148,29 @@ public class ContractController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ORGANIZER')")
     public ResponseEntity<ContractResponseDto> update(
+            @AuthenticationPrincipal UserPrincipal user,
             @PathVariable String id,
             @Valid @RequestBody ContractRequestDto request){
 
-        log.info("REST request to update contract with ID={}", id);
-        return ResponseEntity.ok(contractService.updateContract(id, request));
+        var actorId = user.userId();
+        log.info("REST request to update contract with ID={} by actorId={}", id, actorId);
+        return ResponseEntity.ok(contractService.updateContract(user.userId(),id, request));
     }
 
     /**
      * Deletes a contract record from the system permanently. [cite: 51]
      * Restricted to Admins.
      *
+     * @param user The currently authenticated user's details representing the actor.
      * @param id the unique identifier of the contract to remove [cite: 54]
      * @return ResponseEntity with No Content status [cite: 55]
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        log.info("REST request to delete contract with ID={}", id);
-        contractService.deleteContract(id);
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal UserPrincipal user,@PathVariable String id) {
+        var actorId = user.userId();
+        log.info("REST request to delete contract with ID={} by actorId={}", id, actorId);
+        contractService.deleteContract(user.userId(),id);
         return ResponseEntity.noContent().build();
     }
 }
