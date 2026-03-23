@@ -9,11 +9,10 @@ import com.cts.eventsphere.dto.mapper.contract.ContractRequestDtoMapper;
 import com.cts.eventsphere.dto.mapper.contract.ContractResponseDtoMapper;
 import com.cts.eventsphere.exception.contract.ContractNotFoundException;
 import com.cts.eventsphere.model.Contract;
+import com.cts.eventsphere.model.data.AuditAction;
 import com.cts.eventsphere.model.data.ContractStatus;
 import com.cts.eventsphere.repository.ContractRepository;
-import com.cts.eventsphere.service.ContractService;
-import com.cts.eventsphere.service.DeliveryService;
-import com.cts.eventsphere.service.InvoiceService;
+import com.cts.eventsphere.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,6 +40,8 @@ public class ContractServiceImpl implements ContractService {
 
     private final DeliveryService deliveryService;
     private final InvoiceService invoiceService;
+    private final AuditService auditService;
+    private final NotificationService notificationService;
 
     /**
      * Creates a new contract and persists it to the database.
@@ -51,10 +52,23 @@ public class ContractServiceImpl implements ContractService {
      */
     @Override
     @Transactional
-    public ContractResponseDto createContract(ContractRequestDto request) {
-        log.info("Attempting to create a new contract for vendor: {}", request.vendorId());
+    public ContractResponseDto createContract(String actorId, ContractRequestDto request) {
+        log.info("Attempting to create a new contract for vendor: {} by actorId={}", request.vendorId(), actorId);
         Contract saved = contractRepository.save(requestDtoMapper.toEntity(request));
-        log.info("Successfully created contract with ID: {}", saved.getContractId());
+        auditService.logAudit(
+                actorId,
+                AuditAction.CREATE,
+                Contract.class,
+                saved.getContractId()
+        );
+        log.info("Successfully created contract with ID: {} by actorId={}", saved.getContractId(), actorId);
+
+        notificationService.sendNotification(
+                actorId,
+                "New contract created. Contract ID: " + saved.getContractId(),
+                "CONTRACT_CREATED"
+        );
+
         return responseDtoMapper.toDto(saved);
     }
 
@@ -68,9 +82,23 @@ public class ContractServiceImpl implements ContractService {
      */
     @Override
     @Transactional
-    public void addDeliverable(String contractId, DeliveryRequestDto dto) {
+    public void addDeliverable(String actorId, String contractId, DeliveryRequestDto dto) {
+        log.info("Attempting to add a new deliverable for contract with ID: {} by actorId={}", contractId, actorId);
         validateContract(contractId);
-        deliveryService.createDelivery(dto);
+        deliveryService.createDelivery(actorId,dto);
+        log.info("Successfully added a deliverable for contract with ID: {} by actorId={}", contractId, actorId);
+        auditService.logAudit(
+                actorId,
+                AuditAction.CREATE,
+                Contract.class,
+                contractId
+        );
+
+        notificationService.sendNotification(
+                actorId,
+                "Delivery added for Contract ID: " + contractId,
+                "DELIVERY_ADDED"
+        );
     }
 
     /**
@@ -84,9 +112,10 @@ public class ContractServiceImpl implements ContractService {
      */
     @Override
     @Transactional
-    public InvoiceResponseDto createInvoice(String contractId, InvoiceRequestDto dto) {
+    public InvoiceResponseDto createInvoice(String actorId, String contractId, InvoiceRequestDto dto) {
+        log.info("Attempting to create an invoice for contract with ID: {} by actorId={}", contractId, actorId);
         validateContract(contractId);
-        return invoiceService.generateInvoice(contractId, dto);
+        return invoiceService.generateInvoice(actorId,contractId, dto);
     }
 
     /**
@@ -98,12 +127,18 @@ public class ContractServiceImpl implements ContractService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ContractResponseDto getContractById(String contractId) {
-        log.info("Fetching contract details for ID={}", contractId);
+    public ContractResponseDto getContractById(String actorId, String contractId) {
+        log.info("Fetching contract details for ID={} by actorId={}", contractId, actorId);
 
-        return contractRepository.findById(contractId)
-                .map(responseDtoMapper::toDto)
+        Contract contract = contractRepository.findById(contractId)
                 .orElseThrow(() -> new ContractNotFoundException("Contract not found for ID: " + contractId));
+        auditService.logAudit(
+                actorId,
+                AuditAction.READ,
+                Contract.class,
+                contractId
+        );
+        return responseDtoMapper.toDto(contract);
     }
 
     /**
@@ -113,9 +148,17 @@ public class ContractServiceImpl implements ContractService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<ContractResponseDto> getAllContracts() {
-        log.info("Fetching all contracts from database");
+    public List<ContractResponseDto> getAllContracts(String actorId) {
+        log.info("Fetching all contracts from database by actorId={}", actorId);
         return contractRepository.findAll().stream()
+                .peek(c ->
+                        auditService.logAudit(
+                                actorId,
+                                AuditAction.READ,
+                                Contract.class,
+                                c.getContractId()
+                        )
+                )
                 .map(responseDtoMapper::toDto)
                 .toList();
     }
@@ -130,15 +173,29 @@ public class ContractServiceImpl implements ContractService {
      */
     @Override
     @Transactional
-    public ContractResponseDto updateContractStatus(String contractId, ContractStatus status) {
-        log.info("Attempting to update status for contract ID: {} to {}", contractId, status);
+    public ContractResponseDto updateContractStatus(String actorId, String contractId, ContractStatus status) {
+        log.info("Attempting to update status for contract ID: {} to {} by actorId={}", contractId, status, actorId);
 
         Contract contract = contractRepository.findById(contractId)
                 .orElseThrow(() -> new ContractNotFoundException("Contract not found for ID: " + contractId));
 
         contract.setStatus(status);
 
-        log.info("Successfully updated contract status for ID: {}", contractId);
+        log.info("Successfully updated contract status for ID: {} by actorId={}", contractId, actorId);
+        auditService.logAudit(
+                actorId,
+                AuditAction.UPDATE,
+                Contract.class,
+                contractId
+        );
+
+        notificationService.sendNotification(
+                actorId,
+                "Contract status updated to " + status +
+                        ". Contract ID: " + contractId,
+                "CONTRACT_STATUS_UPDATED"
+        );
+
         return responseDtoMapper.toDto(contractRepository.save(contract));
     }
 
@@ -153,8 +210,8 @@ public class ContractServiceImpl implements ContractService {
      */
     @Override
     @Transactional
-    public ContractResponseDto updateContract(String contractId, ContractRequestDto request) {
-        log.info("Attempting to update details for contract ID: {}", contractId);
+    public ContractResponseDto updateContract(String actorId, String contractId, ContractRequestDto request) {
+        log.info("Attempting to update details for contract ID: {} by actorId={}", contractId, actorId);
 
         Contract contract = contractRepository.findById(contractId)
                 .orElseThrow(() -> new ContractNotFoundException("Contract not found for ID: " + contractId));
@@ -163,7 +220,20 @@ public class ContractServiceImpl implements ContractService {
         contract.setEndDate(request.endDate());
         contract.setValue(request.value());
 
-        log.info("Successfully updated contract details for ID: {}", contractId);
+        log.info("Successfully updated contract details for ID: {} by actorId={}", contractId, actorId);
+        auditService.logAudit(
+                actorId,
+                AuditAction.UPDATE,
+                Contract.class,
+                contractId
+        );
+
+        notificationService.sendNotification(
+                actorId,
+                "Contract details updated. Contract ID: " + contractId,
+                "CONTRACT_UPDATED"
+        );
+
         return responseDtoMapper.toDto(contractRepository.save(contract));
     }
 
@@ -175,15 +245,27 @@ public class ContractServiceImpl implements ContractService {
      */
     @Override
     @Transactional
-    public void deleteContract(String contractId) {
-        log.info("Attempting to delete contract ID: {}", contractId);
+    public void deleteContract(String actorId, String contractId) {
+        log.info("Attempting to delete contract ID: {} by actorId={}", contractId, actorId);
 
         if (!contractRepository.existsById(contractId)) {
             throw new ContractNotFoundException("Contract not found for ID :" + contractId);
         }
 
         contractRepository.deleteById(contractId);
-        log.info("Successfully deleted contract ID: {}", contractId);
+        log.info("Successfully deleted contract ID: {} by actorId={}", contractId, actorId);
+        auditService.logAudit(
+                actorId,
+                AuditAction.DELETE,
+                Contract.class,
+                contractId
+        );
+
+        notificationService.sendNotification(
+                actorId,
+                "Contract deleted. Contract ID: " + contractId,
+                "CONTRACT_DELETED"
+        );
     }
 
     /**

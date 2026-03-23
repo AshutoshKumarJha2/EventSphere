@@ -6,7 +6,10 @@ import com.cts.eventsphere.dto.vendor.VendorRequestDto;
 import com.cts.eventsphere.dto.vendor.VendorResponseDto;
 import com.cts.eventsphere.exception.vendor.VendorNotFoundException;
 import com.cts.eventsphere.model.Vendor;
+import com.cts.eventsphere.model.data.AuditAction;
 import com.cts.eventsphere.repository.VendorRepository;
+import com.cts.eventsphere.service.AuditService;
+import com.cts.eventsphere.service.NotificationService;
 import com.cts.eventsphere.service.VendorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +35,8 @@ public class VendorServiceImpl implements VendorService {
     private final VendorRepository vendorRepository;
     private final VendorRequestDtoMapper requestDtoMapper;
     private final VendorResponseDtoMapper responseDtoMapper;
+    private final AuditService auditService;
+    private final NotificationService notificationService;
 
     /**
      * Registers a new vendor in the system.
@@ -41,11 +46,18 @@ public class VendorServiceImpl implements VendorService {
      */
     @Override
     @Transactional
-    public VendorResponseDto createVendor(VendorRequestDto request){
-        log.info("Attempting to create a new vendor: {}",request.name());
+    public VendorResponseDto createVendor(String actorId, VendorRequestDto request){
+        log.info("Creating vendor by actorId={}", actorId);
         Vendor vendor = requestDtoMapper.toEntity(request);
         Vendor saved = vendorRepository.save(vendor);
-        log.info("Vendor created with ID={}", saved.getVendorId());
+
+        log.info("Vendor created with ID={}, by actorId={}", saved.getVendorId(),actorId);
+        auditService.logAudit(actorId, AuditAction.CREATE, Vendor.class, saved.getVendorId());
+        notificationService.sendNotification(
+                actorId,
+                "Welcome! Vendor registered successfully.",
+                "VENDOR_REGISTERED"
+        );
         return responseDtoMapper.toDto(saved);
     }
 
@@ -58,12 +70,14 @@ public class VendorServiceImpl implements VendorService {
      */
     @Override
     @Transactional(readOnly = true)
-    public VendorResponseDto getVendorById(String vendorId){
-        log.info("Fetching vendor details for ID={}", vendorId);
+    public VendorResponseDto getVendorById(String actorId, String vendorId){
+        log.info("Fetching vendor details for Id={}, by actorId={}", vendorId,actorId);
 
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new VendorNotFoundException("Vendor not found with ID: " +vendorId));
 
+        auditService.logAudit(actorId, AuditAction.READ, Vendor.class, vendorId);
+        log.info("Fetched vendor details for Id: {} by actorId= {}", vendorId, actorId);
         return responseDtoMapper.toDto(vendor);
     }
 
@@ -74,10 +88,18 @@ public class VendorServiceImpl implements VendorService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<VendorResponseDto> getAllVendors(){
-        log.info("Fetching all vendor details from database");
+    public List<VendorResponseDto> getAllVendors(String actorId){
+        log.info("Fetching all vendor details from database by actorId={}",actorId);
         return vendorRepository.findAll()
                 .stream()
+                .peek(v ->
+                        auditService.logAudit(
+                                actorId,
+                                AuditAction.READ,
+                                Vendor.class,
+                                v.getVendorId()
+                        )
+                )
                 .map(responseDtoMapper::toDto)
                 .toList();
     }
@@ -92,8 +114,8 @@ public class VendorServiceImpl implements VendorService {
      */
     @Override
     @Transactional
-    public VendorResponseDto updateVendor(String vendorId, VendorRequestDto request){
-        log.info("Updating vendor details for ID={}", vendorId);
+    public VendorResponseDto updateVendor(String actorId, String vendorId, VendorRequestDto request){
+        log.info("Updating vendor details for ID={} by actorId={}", vendorId, actorId);
 
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new VendorNotFoundException("Cannot update. Vendor not found with ID: "+vendorId));
@@ -103,7 +125,14 @@ public class VendorServiceImpl implements VendorService {
         vendor.setStatus(request.status());
 
         Vendor updated = vendorRepository.save(vendor);
-        log.info("Vendor ID={} updated successfully", vendorId);
+        log.info("Vendor ID={} updated successfully by actorId={}", vendorId, actorId);
+        auditService.logAudit(actorId, AuditAction.UPDATE, Vendor.class, vendorId);
+
+        notificationService.sendNotification(
+                actorId,
+                "Vendor profile updated successfully.",
+                "VENDOR_UPDATED"
+        );
         return responseDtoMapper.toDto(updated);
     }
 
@@ -115,14 +144,21 @@ public class VendorServiceImpl implements VendorService {
      */
     @Override
     @Transactional
-    public void deleteVendor(String vendorId){
-        log.info("Attempting to Delete vendor with ID={}", vendorId);
+    public void deleteVendor(String actorId, String vendorId){
+        log.info("Attempting to Delete vendor with ID={} by actorId={}", vendorId, actorId);
 
         if(!vendorRepository.existsById(vendorId)){
             throw new VendorNotFoundException("Vendor not found with ID: "+vendorId);
         }
 
         vendorRepository.deleteById(vendorId);
-        log.info("Vendor ID={} deleted successfully", vendorId);
+        log.info("Vendor ID={} deleted successfully by actorId={}", vendorId, actorId);
+        auditService.logAudit(actorId, AuditAction.DELETE, Vendor.class, vendorId);
+
+        notificationService.sendNotification(
+                actorId,
+                "Vendor account removed.",
+                "VENDOR_DELETED"
+        );
     }
 }

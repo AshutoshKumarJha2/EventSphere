@@ -21,20 +21,20 @@ public interface InvoiceService {
      * @param request the invoice details to be persisted
      * @return the created invoice response DTO
      */
-    InvoiceResponseDto createInvoice(InvoiceRequestDto request);
+    InvoiceResponseDto createInvoice(String actorId, InvoiceRequestDto request);
 
     /**
      * Retrieves an invoice by its unique identifier.
      * @param invoiceId the unique ID of the invoice
      * @return the invoice details response DTO
      */
-    InvoiceResponseDto getInvoiceById(String invoiceId);
+    InvoiceResponseDto getInvoiceById(String actorId, String invoiceId);
 
     /**
      * Retrieves all invoices currently stored in the system.
      * @return list of all invoice response DTOs
      */
-    List<InvoiceResponseDto> getAllInvoices();
+    List<InvoiceResponseDto> getAllInvoices(String actorId);
 
     /**
      * Updates an existing invoice's details.
@@ -42,13 +42,13 @@ public interface InvoiceService {
      * @param request the new billing details
      * @return the updated invoice response DTO
      */
-    InvoiceResponseDto updateInvoice(String invoiceId, InvoiceRequestDto request);
+    InvoiceResponseDto updateInvoice(String actorId, String invoiceId, InvoiceRequestDto request);
 
     /**
      * Removes an invoice from the system.
      * @param invoiceId the unique ID to delete
      */
-    void deleteInvoice(String invoiceId);
+    void deleteInvoice(String actorId, String invoiceId);
 
     /**
      * Business logic for generating an invoice specifically linked to a contract.
@@ -56,12 +56,12 @@ public interface InvoiceService {
      * @param dto the invoice data
      * @return the generated invoice response DTO
      */
-    InvoiceResponseDto generateInvoice(String contractId, InvoiceRequestDto dto);
+    InvoiceResponseDto generateInvoice(String actorId, String contractId, InvoiceRequestDto dto);
 
     /**
      * Generates a PDF document for a specific invoice.
      * * @param invoiceId the unique identifier of the invoice
      * @return a byte array containing the PDF document data
      */
-    byte[] generateInvoicePdf(String invoiceId);
+    byte[] generateInvoicePdf(String actorId, String invoiceId);
 }

@@ -23,7 +23,7 @@ public interface VendorService {
      * @param request the vendor details to be saved
      * @return the saved vendor as a response DTO
      */
-    VendorResponseDto createVendor(VendorRequestDto request);
+    VendorResponseDto createVendor(String actorId, VendorRequestDto request);
 
     /**
      * Retrieves vendor details based on the provided ID.
@@ -31,14 +31,14 @@ public interface VendorService {
      * @param vendorId the unique identifier of the vendor
      * @return the vendor details response DTO
      */
-    VendorResponseDto getVendorById(String vendorId);
+    VendorResponseDto getVendorById(String actorId, String vendorId);
 
     /**
      * Fetches all registered vendors from the database.
      *
      * @return a list of all vendor response DTOs
      */
-    List<VendorResponseDto> getAllVendors();
+    List<VendorResponseDto> getAllVendors(String actorId);
 
     /**
      * Updates an existing vendor's profile information.
@@ -47,12 +47,12 @@ public interface VendorService {
      * @param request the new details to apply
      * @return the updated vendor response DTO
      */
-    VendorResponseDto updateVendor(String vendorId, VendorRequestDto request);
+    VendorResponseDto updateVendor(String actorId, String vendorId, VendorRequestDto request);
 
     /**
      * Removes a vendor record from the system.
      *
      * @param vendorId the ID of the vendor to delete
      */
-    void deleteVendor(String vendorId);
+    void deleteVendor(String actorId, String vendorId);
 }

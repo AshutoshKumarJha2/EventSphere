@@ -7,8 +7,11 @@ import com.cts.eventsphere.dto.mapper.invoice.InvoiceResponseDtoMapper;
 import com.cts.eventsphere.exception.invoice.InvoiceNotFoundException;
 import com.cts.eventsphere.exception.invoice.InvoicePdfGenerationException;
 import com.cts.eventsphere.model.Invoice;
+import com.cts.eventsphere.model.data.AuditAction;
 import com.cts.eventsphere.repository.InvoiceRepository;
+import com.cts.eventsphere.service.AuditService;
 import com.cts.eventsphere.service.InvoiceService;
+import com.cts.eventsphere.service.NotificationService;
 import com.lowagie.text.Document;
 import com.lowagie.text.FontFactory;
 import com.lowagie.text.PageSize;
@@ -40,6 +43,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final InvoiceRequestDtoMapper requestDtoMapper;
     private final InvoiceResponseDtoMapper responseDtoMapper;
+    private final AuditService auditService;
+    private final NotificationService notificationService;
 
     /**
      * Creates a new invoice and persists it to the database.
@@ -49,10 +54,17 @@ public class InvoiceServiceImpl implements InvoiceService {
      */
     @Override
     @Transactional
-    public InvoiceResponseDto createInvoice(InvoiceRequestDto request){
-        log.info("Attempting to create invoice for contract ID: {}", request.contractId());
+    public InvoiceResponseDto createInvoice(String actorId, InvoiceRequestDto request){
+        log.info("Attempting to create invoice for contract ID: {} by actorId={}", request.contractId(), actorId);
         Invoice saved = invoiceRepository.save(requestDtoMapper.toEntity(request));
-        log.info("Successfully created invoice with ID: {}", saved.getInvoiceId());
+
+        log.info("Successfully created invoice with ID: {} by actorId={}", saved.getInvoiceId(), actorId);
+        auditService.logAudit(actorId, AuditAction.CREATE, Invoice.class, saved.getInvoiceId());
+        notificationService.sendNotification(
+                actorId,
+                "Invoice created. Amount: " + saved.getTotalAmount(),
+                "INVOICE_CREATED"
+        );
         return responseDtoMapper.toDto(saved);
     }
 
@@ -65,11 +77,14 @@ public class InvoiceServiceImpl implements InvoiceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public InvoiceResponseDto getInvoiceById(String invoiceId){
-        log.info("Fetching invoice details for ID: {}", invoiceId);
-        return invoiceRepository.findById(invoiceId)
-                .map(responseDtoMapper::toDto)
+    public InvoiceResponseDto getInvoiceById(String actorId, String invoiceId){
+        log.info("Fetching invoice details for ID: {} by actorId={}", invoiceId, actorId);
+
+        Invoice invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new InvoiceNotFoundException(invoiceId));
+
+        auditService.logAudit(actorId, AuditAction.READ, Invoice.class, invoiceId);
+        return responseDtoMapper.toDto(invoice);
     }
 
     /**
@@ -79,9 +94,17 @@ public class InvoiceServiceImpl implements InvoiceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<InvoiceResponseDto> getAllInvoices(){
-        log.info("Fetching all invoices from database");
+    public List<InvoiceResponseDto> getAllInvoices(String actorId){
+        log.info("Fetching all invoices from database by actorId={}", actorId);
         return invoiceRepository.findAll().stream()
+                .peek(i ->
+                        auditService.logAudit(
+                                actorId,
+                                AuditAction.READ,
+                                Invoice.class,
+                                i.getInvoiceId()
+                        )
+                )
                 .map(responseDtoMapper::toDto)
                 .toList();
     }
@@ -95,10 +118,18 @@ public class InvoiceServiceImpl implements InvoiceService {
      */
     @Override
     @Transactional
-    public InvoiceResponseDto generateInvoice(String contractId, InvoiceRequestDto dto) {
+    public InvoiceResponseDto generateInvoice(String actorId, String contractId, InvoiceRequestDto dto) {
+        log.info("Generating invoice for contractId={} by actorId={}", contractId, actorId);
         Invoice invoice = requestDtoMapper.toEntity(dto);
-        invoice.setContractId(contractId); // Linking the contract
-        return responseDtoMapper.toDto(invoiceRepository.save(invoice));
+        invoice.setContractId(contractId);
+        Invoice saved = invoiceRepository.save(invoice);
+        auditService.logAudit(actorId, AuditAction.CREATE, Invoice.class, saved.getInvoiceId());
+        notificationService.sendNotification(
+                actorId,
+                "Invoice generated. Invoice ID: " + saved.getInvoiceId(),
+                "INVOICE_GENERATED"
+        );
+        return responseDtoMapper.toDto(saved);
     }
 
     /**
@@ -111,9 +142,18 @@ public class InvoiceServiceImpl implements InvoiceService {
      */
     @Override
     @Transactional(readOnly = true)
-    public byte[] generateInvoicePdf(String invoiceId) {
+    public byte[] generateInvoicePdf(String actorId, String invoiceId) {
+        log.info("Generating invoice PDF for invoiceId={} by actorId={}", invoiceId, actorId);
         Invoice invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new InvoiceNotFoundException(invoiceId));
+
+        auditService.logAudit(actorId, AuditAction.READ, Invoice.class, invoiceId);
+
+        notificationService.sendNotification(
+                actorId,
+                "Invoice PDF downloaded. Invoice ID: " + invoiceId,
+                "INVOICE_PDF_DOWNLOADED"
+        );
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Document document = new Document(PageSize.A4);
@@ -142,8 +182,8 @@ public class InvoiceServiceImpl implements InvoiceService {
      */
     @Override
     @Transactional
-    public InvoiceResponseDto updateInvoice(String invoiceId, InvoiceRequestDto request){
-        log.info("Attempting to update invoice ID: {}", invoiceId);
+    public InvoiceResponseDto updateInvoice(String actorId, String invoiceId, InvoiceRequestDto request){
+        log.info("Attempting to update invoice ID: {} by actorId={}", invoiceId, actorId);
 
         Invoice invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new InvoiceNotFoundException(invoiceId));
@@ -152,7 +192,13 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setDueDate(request.dueDate());
         invoice.setStatus(request.status());
 
-        log.info("Successfully updated invoice details for ID: {}", invoiceId);
+        log.info("Successfully updated invoice details for ID: {} by actorId={}", invoiceId, actorId);
+        auditService.logAudit(actorId, AuditAction.UPDATE, Invoice.class, invoiceId);
+        notificationService.sendNotification(
+                actorId,
+                "Invoice updated. Invoice ID: " + invoiceId,
+                "INVOICE_UPDATED"
+        );
         return responseDtoMapper.toDto(invoiceRepository.save(invoice));
     }
 
@@ -164,14 +210,20 @@ public class InvoiceServiceImpl implements InvoiceService {
      */
     @Override
     @Transactional
-    public void deleteInvoice(String invoiceId){
-        log.info("Attempting to delete invoice ID: {}", invoiceId);
+    public void deleteInvoice(String actorId, String invoiceId){
+        log.info("Attempting to delete invoice ID: {} by actorId={}", invoiceId, actorId);
 
         if(!invoiceRepository.existsById(invoiceId)){
             throw new InvoiceNotFoundException(invoiceId);
         }
 
         invoiceRepository.deleteById(invoiceId);
-        log.info("Successfully deleted invoice ID: {}", invoiceId);
+        log.info("Successfully deleted invoice ID: {} by actorId={}", invoiceId, actorId);
+        auditService.logAudit(actorId, AuditAction.DELETE, Invoice.class, invoiceId);
+        notificationService.sendNotification(
+                actorId,
+                "Invoice deleted. Invoice ID: " + invoiceId,
+                "INVOICE_DELETED"
+        );
     }
 }
